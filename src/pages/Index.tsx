@@ -11,12 +11,14 @@ import CollectionGrid from '@/components/CollectionGrid';
 import LoadingOverlay from '@/components/LoadingOverlay';
 import { watchCollection, WatchProduct } from '@/data/watchData';
 import { formatBengaliPrice } from '@/lib/bengali';
+import { useSettings } from '@/hooks/useSupabaseData';
 import { motion } from 'framer-motion';
 
 const Index = () => {
   const [orderOpen, setOrderOpen] = useState(false);
   const [currentWatch, setCurrentWatch] = useState<WatchProduct>(watchCollection[0]);
   const [swapLoading, setSwapLoading] = useState(false);
+  const { data: settings } = useSettings();
 
   const handleSelectWatch = useCallback((watch: WatchProduct) => {
     setSwapLoading(true);
@@ -30,7 +32,10 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-surface">
       <LoadingOverlay visible={swapLoading} />
-      <AnnouncementBar />
+      <AnnouncementBar
+        discountPercent={settings?.discount_percent}
+        countdownHours={settings?.countdown_hours}
+      />
 
       <motion.div
         key={currentWatch.id}
@@ -51,7 +56,6 @@ const Index = () => {
       <DeliveryChecker />
       <CollectionGrid currentWatchId={currentWatch.id} onSelectWatch={handleSelectWatch} />
 
-      {/* Footer CTA */}
       <section className="bg-ink py-16 px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -72,7 +76,6 @@ const Index = () => {
         </motion.div>
       </section>
 
-      {/* Footer */}
       <footer className="bg-ink border-t border-surface/10 py-8 px-4">
         <div className="max-w-6xl mx-auto text-center">
           <p className="text-surface/40 text-sm">© ২০২৬ Kronos Premium Watch। সর্বস্বত্ব সংরক্ষিত।</p>
@@ -84,6 +87,8 @@ const Index = () => {
         onClose={() => setOrderOpen(false)}
         unitPrice={currentWatch.price}
         watchName={currentWatch.name}
+        deliveryChargeInside={settings?.delivery_charge_inside}
+        deliveryChargeOutside={settings?.delivery_charge_outside}
       />
       <FloatingNotification />
     </div>
