@@ -1,50 +1,42 @@
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import watchHero1 from '@/assets/watch-hero-1.jpg';
-import watchHero2 from '@/assets/watch-hero-2.jpg';
-import watchHero3 from '@/assets/watch-hero-3.jpg';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-
-const slides = [
-  { src: watchHero1, label: 'Kronos Sovereign — গোল্ড এডিশন' },
-  { src: watchHero2, label: 'Kronos Elite — রিস্ট শট' },
-  { src: watchHero3, label: 'Kronos Classic — সিলভার এডিশন' },
-];
 
 interface HeroSliderProps {
   onOrderClick: () => void;
+  images: { src: string; label: string }[];
+  subtitle: string;
 }
 
-const HeroSlider = ({ onOrderClick }: HeroSliderProps) => {
+const HeroSlider = ({ onOrderClick, images, subtitle }: HeroSliderProps) => {
   const [current, setCurrent] = useState(0);
 
-  const next = useCallback(() => setCurrent((c) => (c + 1) % slides.length), []);
-  const prev = useCallback(() => setCurrent((c) => (c - 1 + slides.length) % slides.length), []);
+  const next = useCallback(() => setCurrent((c) => (c + 1) % images.length), [images.length]);
+  const prev = useCallback(() => setCurrent((c) => (c - 1 + images.length) % images.length), [images.length]);
 
   return (
     <section className="bg-surface">
-      {/* Subtitle */}
       <div className="text-center pt-16 pb-8 px-4">
         <motion.p
+          key={subtitle}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.77, 0, 0.18, 1] }}
           className="text-xl md:text-2xl text-muted-foreground font-light leading-relaxed max-w-2xl mx-auto"
         >
-          সময়ের সাথে যারা এগিয়ে থাকে, তাদের হাতে থাকে Kronos।
+          {subtitle}
           <br />
           <span className="text-foreground font-normal">প্রিমিয়াম ক্রাফটসম্যানশিপ, অতুলনীয় ডিজাইন।</span>
         </motion.p>
       </div>
 
-      {/* Slider */}
       <div className="relative max-w-6xl mx-auto px-4 pb-6">
         <div className="relative aspect-[16/9] rounded-2xl overflow-hidden bg-muted">
           <AnimatePresence mode="wait">
             <motion.img
-              key={current}
-              src={slides[current].src}
-              alt={slides[current].label}
+              key={`${images[current]?.src}-${current}`}
+              src={images[current]?.src}
+              alt={images[current]?.label}
               className="absolute inset-0 w-full h-full object-cover"
               initial={{ opacity: 0, scale: 1.05 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -53,19 +45,17 @@ const HeroSlider = ({ onOrderClick }: HeroSliderProps) => {
             />
           </AnimatePresence>
 
-          {/* Model label */}
           <div className="absolute bottom-4 left-4 md:bottom-6 md:left-6">
             <motion.span
-              key={current}
+              key={`label-${current}`}
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               className="inline-block bg-ink/80 backdrop-blur-sm text-surface text-xs md:text-sm px-3 py-1.5 rounded-lg font-medium"
             >
-              {slides[current].label}
+              {images[current]?.label}
             </motion.span>
           </div>
 
-          {/* Nav arrows */}
           <button
             onClick={prev}
             className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-surface/80 backdrop-blur-sm flex items-center justify-center hover:bg-surface transition-colors"
@@ -80,9 +70,8 @@ const HeroSlider = ({ onOrderClick }: HeroSliderProps) => {
           </button>
         </div>
 
-        {/* Dots */}
         <div className="flex justify-center gap-2 mt-4">
-          {slides.map((_, i) => (
+          {images.map((_, i) => (
             <button
               key={i}
               onClick={() => setCurrent(i)}
@@ -94,7 +83,6 @@ const HeroSlider = ({ onOrderClick }: HeroSliderProps) => {
         </div>
       </div>
 
-      {/* CTA Buttons */}
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pb-16 px-4">
         <button
           onClick={onOrderClick}

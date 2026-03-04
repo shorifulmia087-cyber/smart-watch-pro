@@ -3,14 +3,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Minus, Plus, Loader2, Check } from 'lucide-react';
 import { toBengaliNum, formatBengaliPrice } from '@/lib/bengali';
 
-const UNIT_PRICE = 2990;
+const DELIVERY_DHAKA = 70;
+const DELIVERY_OUTSIDE = 150;
 
 interface OrderModalProps {
   isOpen: boolean;
   onClose: () => void;
+  unitPrice: number;
+  watchName: string;
 }
 
-const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
+const OrderModal = ({ isOpen, onClose, unitPrice, watchName }: OrderModalProps) => {
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState<'cod' | 'online'>('cod');
   const [name, setName] = useState('');
@@ -20,14 +23,17 @@ const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
   const [payMethod, setPayMethod] = useState('bkash');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [location, setLocation] = useState<'dhaka' | 'outside'>('dhaka');
 
   useEffect(() => {
     if (!isOpen) {
-      setQty(1); setTab('cod'); setName(''); setPhone(''); setAddress(''); setTxnId(''); setLoading(false); setSuccess(false);
+      setQty(1); setTab('cod'); setName(''); setPhone(''); setAddress(''); setTxnId(''); setLoading(false); setSuccess(false); setLocation('dhaka');
     }
   }, [isOpen]);
 
-  const total = qty * UNIT_PRICE;
+  const deliveryCharge = location === 'dhaka' ? DELIVERY_DHAKA : DELIVERY_OUTSIDE;
+  const subtotal = qty * unitPrice;
+  const grandTotal = subtotal + deliveryCharge;
 
   const handleSubmit = () => {
     if (!name || !phone || !address) return;
@@ -73,16 +79,11 @@ const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
               ঠিক আছে
             </button>
           </motion.div>
-          {/* Confetti */}
           <div className="fixed inset-0 pointer-events-none overflow-hidden">
             {Array.from({ length: 50 }).map((_, i) => (
               <motion.div
                 key={i}
-                initial={{
-                  x: '50vw',
-                  y: '50vh',
-                  scale: 0,
-                }}
+                initial={{ x: '50vw', y: '50vh', scale: 0 }}
                 animate={{
                   x: `${Math.random() * 100}vw`,
                   y: `${Math.random() * 100}vh`,
@@ -125,33 +126,83 @@ const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
         >
           {/* Header */}
           <div className="flex items-center justify-between p-5 border-b border-border">
-            <h3 className="text-lg font-bold">অর্ডার করুন</h3>
+            <div>
+              <h3 className="text-lg font-bold">অর্ডার করুন</h3>
+              <p className="text-xs text-muted-foreground">{watchName}</p>
+            </div>
             <button onClick={onClose} className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
               <X className="w-4 h-4" />
             </button>
           </div>
 
           <div className="p-5 space-y-5">
-            {/* Quantity */}
-            <div className="flex items-center justify-between bg-ash rounded-xl p-4">
-              <div>
-                <p className="text-sm text-muted-foreground">মোট মূল্য</p>
-                <p className="text-2xl font-bold text-gold">৳{formatBengaliPrice(total)}</p>
+            {/* Quantity & Price */}
+            <div className="bg-ash rounded-xl p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">পণ্যের মূল্য</p>
+                  <p className="text-xl font-bold text-gold">৳{formatBengaliPrice(subtotal)}</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setQty(Math.max(1, qty - 1))}
+                    className="w-9 h-9 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors"
+                  >
+                    <Minus className="w-4 h-4" />
+                  </button>
+                  <span className="text-lg font-bold w-6 text-center tabular-nums">{toBengaliNum(qty)}</span>
+                  <button
+                    onClick={() => setQty(qty + 1)}
+                    className="w-9 h-9 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setQty(Math.max(1, qty - 1))}
-                  className="w-9 h-9 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors"
-                >
-                  <Minus className="w-4 h-4" />
-                </button>
-                <span className="text-lg font-bold w-6 text-center tabular-nums">{toBengaliNum(qty)}</span>
-                <button
-                  onClick={() => setQty(qty + 1)}
-                  className="w-9 h-9 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors"
-                >
-                  <Plus className="w-4 h-4" />
-                </button>
+
+              {/* Delivery Location */}
+              <div className="border-t border-border pt-3">
+                <p className="text-sm text-muted-foreground mb-2">ডেলিভারি এলাকা</p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setLocation('dhaka')}
+                    className={`flex-1 py-2.5 rounded-xl border text-sm font-medium transition-all ${
+                      location === 'dhaka'
+                        ? 'border-gold bg-gold/10 text-gold'
+                        : 'border-border text-muted-foreground'
+                    }`}
+                  >
+                    ঢাকার ভেতরে
+                  </button>
+                  <button
+                    onClick={() => setLocation('outside')}
+                    className={`flex-1 py-2.5 rounded-xl border text-sm font-medium transition-all ${
+                      location === 'outside'
+                        ? 'border-gold bg-gold/10 text-gold'
+                        : 'border-border text-muted-foreground'
+                    }`}
+                  >
+                    ঢাকার বাইরে
+                  </button>
+                </div>
+                {location === 'outside' && (
+                  <motion.p
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className="text-xs text-destructive mt-2 leading-relaxed"
+                  >
+                    ⚠️ ঢাকার বাইরে ডেলিভারির জন্য ২০০ টাকা অগ্রিম প্রদান করতে হবে।
+                  </motion.p>
+                )}
+              </div>
+
+              {/* Total */}
+              <div className="border-t border-border pt-3 flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground">ডেলিভারি চার্জ: ৳{formatBengaliPrice(deliveryCharge)}</p>
+                  <p className="text-sm font-semibold text-foreground mt-0.5">সর্বমোট</p>
+                </div>
+                <p className="text-2xl font-bold text-gold">৳{formatBengaliPrice(grandTotal)}</p>
               </div>
             </div>
 
@@ -252,7 +303,7 @@ const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
                   প্রসেসিং...
                 </>
               ) : (
-                'অর্ডার নিশ্চিত করুন'
+                `অর্ডার নিশ্চিত করুন — ৳${formatBengaliPrice(grandTotal)}`
               )}
             </button>
           </div>
