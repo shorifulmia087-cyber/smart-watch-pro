@@ -5,9 +5,10 @@ import { formatBengaliPrice } from '@/lib/bengali';
 interface CollectionGridProps {
   currentWatchId: string;
   onSelectWatch: (watch: WatchProduct) => void;
+  sectionTitle?: string;
 }
 
-const CollectionGrid = ({ currentWatchId, onSelectWatch }: CollectionGridProps) => {
+const CollectionGrid = ({ currentWatchId, onSelectWatch, sectionTitle = 'আমাদের আরও কালেকশন' }: CollectionGridProps) => {
   const otherWatches = watchCollection.filter((w) => w.id !== currentWatchId);
 
   return (
@@ -19,7 +20,7 @@ const CollectionGrid = ({ currentWatchId, onSelectWatch }: CollectionGridProps) 
           viewport={{ once: true }}
           className="text-2xl md:text-3xl font-bold text-center mb-12"
         >
-          আমাদের আরও কালেকশন
+          {sectionTitle}
         </motion.h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

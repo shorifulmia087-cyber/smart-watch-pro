@@ -3,9 +3,10 @@ import type { WatchFeature } from '@/data/watchData';
 
 interface FeatureListProps {
   features?: WatchFeature[];
+  sectionTitle?: string;
 }
 
-const FeatureList = ({ features }: FeatureListProps) => {
+const FeatureList = ({ features, sectionTitle = 'কেন Kronos বেছে নেবেন?' }: FeatureListProps) => {
   const items = features || [];
 
   return (
@@ -17,7 +18,7 @@ const FeatureList = ({ features }: FeatureListProps) => {
           viewport={{ once: true }}
           className="text-2xl md:text-3xl font-bold text-center mb-12"
         >
-          কেন Kronos বেছে নেবেন?
+          {sectionTitle}
         </motion.h2>
         <div className="space-y-0">
           {items.map((f, i) => (

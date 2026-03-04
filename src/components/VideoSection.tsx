@@ -3,9 +3,10 @@ import { motion } from 'framer-motion';
 
 interface VideoSectionProps {
   videoId?: string;
+  sectionTitle?: string;
 }
 
-const VideoSection = ({ videoId = 'dQw4w9WgXcQ' }: VideoSectionProps) => {
+const VideoSection = ({ videoId = 'dQw4w9WgXcQ', sectionTitle = 'Kronos — কাছ থেকে দেখুন' }: VideoSectionProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -27,7 +28,7 @@ const VideoSection = ({ videoId = 'dQw4w9WgXcQ' }: VideoSectionProps) => {
           viewport={{ once: true }}
           className="text-2xl md:text-3xl font-bold text-center mb-10"
         >
-          Kronos — কাছ থেকে দেখুন
+          {sectionTitle}
         </motion.h2>
         <motion.div
           ref={ref}
@@ -38,7 +39,7 @@ const VideoSection = ({ videoId = 'dQw4w9WgXcQ' }: VideoSectionProps) => {
         >
           <iframe
             src={`https://www.youtube.com/embed/${videoId}?autoplay=${isVisible ? 1 : 0}&mute=1&loop=1&playlist=${videoId}&controls=1&modestbranding=1`}
-            title="Kronos Watch Video"
+            title="Product Video"
             className="w-full h-full"
             allow="autoplay; encrypted-media"
             allowFullScreen
