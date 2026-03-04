@@ -1,0 +1,265 @@
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X, Minus, Plus, Loader2, Check } from 'lucide-react';
+import { toBengaliNum, formatBengaliPrice } from '@/lib/bengali';
+
+const UNIT_PRICE = 2990;
+
+interface OrderModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
+  const [qty, setQty] = useState(1);
+  const [tab, setTab] = useState<'cod' | 'online'>('cod');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
+  const [txnId, setTxnId] = useState('');
+  const [payMethod, setPayMethod] = useState('bkash');
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setQty(1); setTab('cod'); setName(''); setPhone(''); setAddress(''); setTxnId(''); setLoading(false); setSuccess(false);
+    }
+  }, [isOpen]);
+
+  const total = qty * UNIT_PRICE;
+
+  const handleSubmit = () => {
+    if (!name || !phone || !address) return;
+    if (tab === 'online' && !txnId) return;
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      setSuccess(true);
+    }, 2000);
+  };
+
+  if (!isOpen) return null;
+
+  if (success) {
+    return (
+      <AnimatePresence>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 z-[100] bg-surface flex items-center justify-center p-4"
+        >
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', damping: 20 }}
+            className="text-center"
+          >
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2, type: 'spring', damping: 15 }}
+              className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-6"
+            >
+              <Check className="w-10 h-10 text-emerald-600" />
+            </motion.div>
+            <h2 className="text-2xl md:text-3xl font-bold mb-2">ধন্যবাদ! 🎉</h2>
+            <p className="text-muted-foreground mb-1">আপনার অর্ডার সফলভাবে গ্রহণ করা হয়েছে।</p>
+            <p className="text-muted-foreground text-sm mb-8">শীঘ্রই আমাদের টিম যোগাযোগ করবে।</p>
+            <button
+              onClick={onClose}
+              className="gradient-gold text-surface font-semibold px-8 py-3 rounded-xl hover:opacity-90 transition-opacity"
+            >
+              ঠিক আছে
+            </button>
+          </motion.div>
+          {/* Confetti */}
+          <div className="fixed inset-0 pointer-events-none overflow-hidden">
+            {Array.from({ length: 50 }).map((_, i) => (
+              <motion.div
+                key={i}
+                initial={{
+                  x: '50vw',
+                  y: '50vh',
+                  scale: 0,
+                }}
+                animate={{
+                  x: `${Math.random() * 100}vw`,
+                  y: `${Math.random() * 100}vh`,
+                  scale: [0, 1, 0],
+                  rotate: Math.random() * 720,
+                }}
+                transition={{
+                  duration: 2 + Math.random(),
+                  delay: Math.random() * 0.5,
+                  ease: 'easeOut',
+                }}
+                className="absolute w-2 h-2 rounded-full"
+                style={{
+                  background: ['#b8963e', '#e5c76b', '#0a0a0a', '#22c55e', '#ef4444'][i % 5],
+                }}
+              />
+            ))}
+          </div>
+        </motion.div>
+      </AnimatePresence>
+    );
+  }
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[100] bg-ink/40 backdrop-blur-sm flex items-end md:items-center justify-center"
+        onClick={onClose}
+      >
+        <motion.div
+          initial={{ y: 100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 100, opacity: 0 }}
+          transition={{ ease: [0.77, 0, 0.18, 1] }}
+          onClick={(e) => e.stopPropagation()}
+          className="bg-surface w-full md:max-w-md md:rounded-2xl rounded-t-2xl max-h-[90vh] overflow-y-auto"
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between p-5 border-b border-border">
+            <h3 className="text-lg font-bold">অর্ডার করুন</h3>
+            <button onClick={onClose} className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          <div className="p-5 space-y-5">
+            {/* Quantity */}
+            <div className="flex items-center justify-between bg-ash rounded-xl p-4">
+              <div>
+                <p className="text-sm text-muted-foreground">মোট মূল্য</p>
+                <p className="text-2xl font-bold text-gold">৳{formatBengaliPrice(total)}</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setQty(Math.max(1, qty - 1))}
+                  className="w-9 h-9 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors"
+                >
+                  <Minus className="w-4 h-4" />
+                </button>
+                <span className="text-lg font-bold w-6 text-center tabular-nums">{toBengaliNum(qty)}</span>
+                <button
+                  onClick={() => setQty(qty + 1)}
+                  className="w-9 h-9 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Form */}
+            <div className="space-y-3">
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="আপনার নাম"
+                className="w-full bg-ash border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30"
+              />
+              <input
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="মোবাইল নম্বর"
+                className="w-full bg-ash border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30"
+              />
+              <textarea
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="সম্পূর্ণ ঠিকানা"
+                rows={2}
+                className="w-full bg-ash border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 resize-none"
+              />
+            </div>
+
+            {/* Payment Tabs */}
+            <div>
+              <div className="flex rounded-xl bg-ash p-1 gap-1">
+                <button
+                  onClick={() => setTab('cod')}
+                  className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                    tab === 'cod' ? 'bg-surface shadow-sm text-foreground' : 'text-muted-foreground'
+                  }`}
+                >
+                  ক্যাশ অন ডেলিভারি
+                </button>
+                <button
+                  onClick={() => setTab('online')}
+                  className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                    tab === 'online' ? 'bg-surface shadow-sm text-foreground' : 'text-muted-foreground'
+                  }`}
+                >
+                  অনলাইন পেমেন্ট
+                </button>
+              </div>
+
+              {tab === 'cod' && (
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-sm text-muted-foreground mt-3 p-3 bg-ash rounded-xl"
+                >
+                  ✅ পণ্য হাতে পেয়ে টাকা দিন। কোনো অগ্রিম পেমেন্ট প্রয়োজন নেই।
+                </motion.p>
+              )}
+
+              {tab === 'online' && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="mt-3 space-y-3"
+                >
+                  <div className="flex gap-2">
+                    {['bkash', 'nagad', 'rocket'].map((m) => (
+                      <button
+                        key={m}
+                        onClick={() => setPayMethod(m)}
+                        className={`flex-1 py-2.5 rounded-xl border text-sm font-semibold capitalize transition-all ${
+                          payMethod === m
+                            ? 'border-gold bg-gold/10 text-gold'
+                            : 'border-border text-muted-foreground'
+                        }`}
+                      >
+                        {m === 'bkash' ? 'বিকাশ' : m === 'nagad' ? 'নগদ' : 'রকেট'}
+                      </button>
+                    ))}
+                  </div>
+                  <input
+                    value={txnId}
+                    onChange={(e) => setTxnId(e.target.value)}
+                    placeholder="ট্রানজেকশন আইডি"
+                    className="w-full bg-ash border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30"
+                  />
+                </motion.div>
+              )}
+            </div>
+
+            {/* Submit */}
+            <button
+              onClick={handleSubmit}
+              disabled={loading}
+              className="w-full gradient-gold text-surface font-semibold py-3.5 rounded-xl text-base hover:opacity-90 transition-opacity disabled:opacity-70 flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  প্রসেসিং...
+                </>
+              ) : (
+                'অর্ডার নিশ্চিত করুন'
+              )}
+            </button>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
+
+export default OrderModal;
