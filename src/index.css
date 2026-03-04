@@ -98,6 +98,6 @@
     font-family: 'Inter', sans-serif;
   }
   .glass-card {
-    @apply bg-card/80 backdrop-blur-sm border border-border/60 shadow-sm;
+    @apply bg-card border border-border/60 shadow-sm;
   }
 }
