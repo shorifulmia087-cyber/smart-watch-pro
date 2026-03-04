@@ -6,9 +6,10 @@ interface HeroSliderProps {
   onOrderClick: () => void;
   images: { src: string; label: string }[];
   subtitle: string;
+  tagline?: string;
 }
 
-const HeroSlider = ({ onOrderClick, images, subtitle }: HeroSliderProps) => {
+const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিমিয়াম ক্রাফটসম্যানশিপ, অতুলনীয় ডিজাইন।' }: HeroSliderProps) => {
   const [current, setCurrent] = useState(0);
 
   const next = useCallback(() => setCurrent((c) => (c + 1) % images.length), [images.length]);
@@ -26,7 +27,7 @@ const HeroSlider = ({ onOrderClick, images, subtitle }: HeroSliderProps) => {
         >
           {subtitle}
           <br />
-          <span className="text-foreground font-normal">প্রিমিয়াম ক্রাফটসম্যানশিপ, অতুলনীয় ডিজাইন।</span>
+          <span className="text-foreground font-normal">{tagline}</span>
         </motion.p>
       </div>
 
