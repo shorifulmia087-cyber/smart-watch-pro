@@ -70,10 +70,13 @@ export type Database = {
           created_at: string
           description_list: string[]
           discount_percent: number
+          features: Json
           id: string
           image_urls: string[]
+          is_featured: boolean
           name: string
           price: number
+          product_type: string
           sort_order: number
           stock_status: string
           subtitle: string | null
@@ -85,10 +88,13 @@ export type Database = {
           created_at?: string
           description_list?: string[]
           discount_percent?: number
+          features?: Json
           id?: string
           image_urls?: string[]
+          is_featured?: boolean
           name: string
           price: number
+          product_type?: string
           sort_order?: number
           stock_status?: string
           subtitle?: string | null
@@ -100,10 +106,13 @@ export type Database = {
           created_at?: string
           description_list?: string[]
           discount_percent?: number
+          features?: Json
           id?: string
           image_urls?: string[]
+          is_featured?: boolean
           name?: string
           price?: number
+          product_type?: string
           sort_order?: number
           stock_status?: string
           subtitle?: string | null
@@ -115,37 +124,79 @@ export type Database = {
       }
       site_settings: {
         Row: {
+          announcement_text: string
           bkash_number: string
+          brand_name: string
+          brand_tagline: string
+          collection_section_title: string
           countdown_hours: number
           delivery_charge_inside: number
           delivery_charge_outside: number
           discount_percent: number
+          features_section_title: string
+          footer_cta_subtitle: string
+          footer_cta_title: string
+          footer_text: string
+          hero_subtitle: string
           id: string
           nagad_number: string
+          online_payment_enabled: boolean
+          primary_color: string
+          product_type: string
           rocket_number: string
+          timer_enabled: boolean
           updated_at: string
+          video_section_title: string
         }
         Insert: {
+          announcement_text?: string
           bkash_number?: string
+          brand_name?: string
+          brand_tagline?: string
+          collection_section_title?: string
           countdown_hours?: number
           delivery_charge_inside?: number
           delivery_charge_outside?: number
           discount_percent?: number
+          features_section_title?: string
+          footer_cta_subtitle?: string
+          footer_cta_title?: string
+          footer_text?: string
+          hero_subtitle?: string
           id?: string
           nagad_number?: string
+          online_payment_enabled?: boolean
+          primary_color?: string
+          product_type?: string
           rocket_number?: string
+          timer_enabled?: boolean
           updated_at?: string
+          video_section_title?: string
         }
         Update: {
+          announcement_text?: string
           bkash_number?: string
+          brand_name?: string
+          brand_tagline?: string
+          collection_section_title?: string
           countdown_hours?: number
           delivery_charge_inside?: number
           delivery_charge_outside?: number
           discount_percent?: number
+          features_section_title?: string
+          footer_cta_subtitle?: string
+          footer_cta_title?: string
+          footer_text?: string
+          hero_subtitle?: string
           id?: string
           nagad_number?: string
+          online_payment_enabled?: boolean
+          primary_color?: string
+          product_type?: string
           rocket_number?: string
+          timer_enabled?: boolean
           updated_at?: string
+          video_section_title?: string
         }
         Relationships: []
       }

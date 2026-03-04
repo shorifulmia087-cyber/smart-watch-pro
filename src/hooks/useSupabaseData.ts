@@ -56,6 +56,17 @@ export const useProducts = () => {
   });
 };
 
+export const useFeaturedProduct = () => {
+  return useQuery({
+    queryKey: ['products', 'featured'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('products').select('*').eq('is_featured', true).order('sort_order').limit(1).maybeSingle();
+      if (error) throw error;
+      return data as Product | null;
+    },
+  });
+};
+
 export const useUpsertProduct = () => {
   const qc = useQueryClient();
   return useMutation({
@@ -79,6 +90,32 @@ export const useDeleteProduct = () => {
   });
 };
 
+export const useToggleStock = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, stock_status }: { id: string; stock_status: string }) => {
+      const { error } = await supabase.from('products').update({ stock_status }).eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['products'] }),
+  });
+};
+
+export const useToggleFeatured = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, is_featured }: { id: string; is_featured: boolean }) => {
+      // If setting as featured, unfeatured all others first
+      if (is_featured) {
+        await supabase.from('products').update({ is_featured: false }).neq('id', id);
+      }
+      const { error } = await supabase.from('products').update({ is_featured }).eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['products'] }),
+  });
+};
+
 // Settings
 export const useSettings = () => {
   return useQuery({
@@ -88,6 +125,7 @@ export const useSettings = () => {
       if (error) throw error;
       return data as Settings;
     },
+    staleTime: 30000,
   });
 };
 

@@ -12,9 +12,10 @@ interface OrderModalProps {
   watchName: string;
   deliveryChargeInside?: number;
   deliveryChargeOutside?: number;
+  onlinePaymentEnabled?: boolean;
 }
 
-const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInside = 70, deliveryChargeOutside = 150 }: OrderModalProps) => {
+const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInside = 70, deliveryChargeOutside = 150, onlinePaymentEnabled = true }: OrderModalProps) => {
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState<'cod' | 'online'>('cod');
   const [name, setName] = useState('');
@@ -39,8 +40,8 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
   const grandTotal = subtotal + deliveryCharge;
 
   const handleSubmit = async () => {
-    if (!name || !phone || !address) return;
-    if (tab === 'online' && !txnId) return;
+    if (!name.trim() || !phone.trim() || !address.trim()) return;
+    if (tab === 'online' && (!txnId || txnId.length < 8 || txnId.length > 15)) return;
     setLoading(true);
 
     const orderData = {
@@ -214,16 +215,18 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
                 <button onClick={() => setTab('cod')} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${tab === 'cod' ? 'bg-surface shadow-sm text-foreground' : 'text-muted-foreground'}`}>
                   ক্যাশ অন ডেলিভারি
                 </button>
-                <button onClick={() => setTab('online')} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${tab === 'online' ? 'bg-surface shadow-sm text-foreground' : 'text-muted-foreground'}`}>
-                  অনলাইন পেমেন্ট
-                </button>
+                {onlinePaymentEnabled && (
+                  <button onClick={() => setTab('online')} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${tab === 'online' ? 'bg-surface shadow-sm text-foreground' : 'text-muted-foreground'}`}>
+                    অনলাইন পেমেন্ট
+                  </button>
+                )}
               </div>
               {tab === 'cod' && (
                 <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-muted-foreground mt-3 p-3 bg-ash rounded-xl">
                   ✅ পণ্য হাতে পেয়ে টাকা দিন। কোনো অগ্রিম পেমেন্ট প্রয়োজন নেই।
                 </motion.p>
               )}
-              {tab === 'online' && (
+              {tab === 'online' && onlinePaymentEnabled && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-3 space-y-3">
                   <div className="flex gap-2">
                     {['bkash', 'nagad', 'rocket'].map((m) => (
@@ -232,7 +235,18 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
                       </button>
                     ))}
                   </div>
-                  <input value={txnId} onChange={(e) => setTxnId(e.target.value)} placeholder="ট্রানজেকশন আইডি" className="w-full bg-ash border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30" />
+                  <div>
+                    <input
+                      value={txnId}
+                      onChange={(e) => setTxnId(e.target.value.replace(/[^a-zA-Z0-9]/g, ''))}
+                      placeholder="ট্রানজেকশন আইডি (৮-১৫ অক্ষর)"
+                      maxLength={15}
+                      className="w-full bg-ash border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 font-mono"
+                    />
+                    {txnId && (txnId.length < 8 || txnId.length > 15) && (
+                      <p className="text-xs text-destructive mt-1">ট্রানজেকশন আইডি ৮-১৫ অক্ষরের হতে হবে।</p>
+                    )}
+                  </div>
                 </motion.div>
               )}
             </div>
