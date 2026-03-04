@@ -20,6 +20,8 @@ export const useOrders = (statusFilter?: OrderStatus) => {
       if (error) throw error;
       return data as Order[];
     },
+    staleTime: 10_000,
+    refetchInterval: 15_000,
   });
 };
 
@@ -53,6 +55,8 @@ export const useProducts = () => {
       if (error) throw error;
       return data as Product[];
     },
+    staleTime: 30_000,
+    refetchInterval: 60_000,
   });
 };
 
@@ -64,6 +68,8 @@ export const useFeaturedProduct = () => {
       if (error) throw error;
       return data as Product | null;
     },
+    staleTime: 30_000,
+    refetchInterval: 60_000,
   });
 };
 
@@ -125,7 +131,8 @@ export const useSettings = () => {
       if (error) throw error;
       return data as Settings;
     },
-    staleTime: 30000,
+    staleTime: 60_000,
+    refetchInterval: 120_000,
   });
 };
 
