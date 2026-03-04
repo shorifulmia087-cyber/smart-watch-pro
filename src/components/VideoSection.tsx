@@ -1,7 +1,11 @@
 import { useRef, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 
-const VideoSection = () => {
+interface VideoSectionProps {
+  videoId?: string;
+}
+
+const VideoSection = ({ videoId = 'dQw4w9WgXcQ' }: VideoSectionProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -33,7 +37,7 @@ const VideoSection = () => {
           className="relative aspect-video rounded-3xl overflow-hidden bg-muted shadow-lg"
         >
           <iframe
-            src={`https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=${isVisible ? 1 : 0}&mute=1&loop=1&playlist=dQw4w9WgXcQ&controls=1&modestbranding=1`}
+            src={`https://www.youtube.com/embed/${videoId}?autoplay=${isVisible ? 1 : 0}&mute=1&loop=1&playlist=${videoId}&controls=1&modestbranding=1`}
             title="Kronos Watch Video"
             className="w-full h-full"
             allow="autoplay; encrypted-media"
