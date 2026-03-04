@@ -42,7 +42,7 @@ const AdminSidebar = () => {
   };
 
   return (
-    <Sidebar collapsible="icon" className="border-r-0">
+    <Sidebar collapsible="icon" className="border-r border-sidebar-border">
       <SidebarContent className="pt-4">
         {/* Brand */}
         <div className="px-4 pb-6 pt-2">
