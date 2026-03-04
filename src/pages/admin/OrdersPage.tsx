@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useOrders, useUpdateOrderStatus } from '@/hooks/useSupabaseData';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
-import { Search, Filter } from 'lucide-react';
+import { Search, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
@@ -17,7 +17,7 @@ const statusLabels: Record<OrderStatus, string> = {
 const statusStyles: Record<OrderStatus, string> = {
   pending: 'bg-warning/10 text-warning border-warning/20',
   processing: 'bg-info/10 text-info border-info/20',
-  shipped: 'bg-purple-50 text-purple-600 border-purple-200',
+  shipped: 'bg-accent/10 text-accent border-accent/20',
   completed: 'bg-success/10 text-success border-success/20',
 };
 
@@ -49,7 +49,7 @@ const OrdersPage = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold">সকল অর্ডার</h2>
+          <h2 className="text-lg font-semibold text-foreground">সকল অর্ডার</h2>
           <p className="text-[11px] text-muted-foreground">মোট {toBengaliNum(filtered.length)} টি অর্ডার</p>
         </div>
         <div className="flex items-center gap-2 glass-card rounded-xl px-3 py-2 min-w-[240px]">
@@ -57,7 +57,7 @@ const OrdersPage = () => {
           <input
             type="text" value={search} onChange={e => { setSearch(e.target.value); setPage(0); }}
             placeholder="নাম, ফোন বা TrxID দিয়ে খুঁজুন..."
-            className="bg-transparent border-none outline-none w-full text-sm"
+            className="bg-transparent border-none outline-none w-full text-sm text-foreground placeholder:text-muted-foreground"
           />
         </div>
       </div>
@@ -108,16 +108,16 @@ const OrdersPage = () => {
               </TableHeader>
               <TableBody>
                 {paged.map((o) => (
-                  <TableRow key={o.id} className="group hover:bg-muted/30 transition-colors border-b border-border/40">
+                  <TableRow key={o.id} className="group hover:bg-muted/30 transition-colors duration-200 border-b border-border/40">
                     <TableCell>
                       <div>
-                        <p className="font-medium text-sm">{o.customer_name}</p>
+                        <p className="font-medium text-sm text-foreground">{o.customer_name}</p>
                         <p className="text-[11px] text-muted-foreground truncate max-w-[200px]">{o.address}</p>
                       </div>
                     </TableCell>
-                    <TableCell className="font-inter text-sm tabular-nums">{o.phone}</TableCell>
-                    <TableCell className="text-sm">{o.watch_model}</TableCell>
-                    <TableCell className="text-center font-inter text-sm">{toBengaliNum(o.quantity)}</TableCell>
+                    <TableCell className="font-inter text-sm tabular-nums text-foreground">{o.phone}</TableCell>
+                    <TableCell className="text-sm text-foreground">{o.watch_model}</TableCell>
+                    <TableCell className="text-center font-inter text-sm text-foreground">{toBengaliNum(o.quantity)}</TableCell>
                     <TableCell className="font-semibold text-accent font-inter text-sm">
                       ৳{formatBengaliPrice(o.total_price)}
                     </TableCell>
@@ -130,7 +130,7 @@ const OrdersPage = () => {
                         <span className="text-muted-foreground text-[11px]">COD</span>
                       )}
                     </TableCell>
-                    <TableCell className="text-[11px]">
+                    <TableCell className="text-[11px] text-foreground">
                       {o.delivery_location === 'dhaka' ? 'ঢাকা' : 'ঢাকার বাইরে'}
                     </TableCell>
                     <TableCell className="text-[11px] text-muted-foreground font-inter tabular-nums">
@@ -162,16 +162,16 @@ const OrdersPage = () => {
                 <button
                   onClick={() => setPage(p => Math.max(0, p - 1))}
                   disabled={page === 0}
-                  className="px-3.5 py-1.5 rounded-lg text-[11px] font-medium bg-card border border-border hover:bg-muted disabled:opacity-40 transition-colors"
+                  className="px-3 py-1.5 rounded-lg text-[11px] font-medium bg-card border border-border hover:bg-muted disabled:opacity-40 transition-colors flex items-center gap-1"
                 >
-                  পূর্ববর্তী
+                  <ChevronLeft className="h-3.5 w-3.5" /> পূর্ববর্তী
                 </button>
                 <button
                   onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
                   disabled={page >= totalPages - 1}
-                  className="px-3.5 py-1.5 rounded-lg text-[11px] font-medium bg-card border border-border hover:bg-muted disabled:opacity-40 transition-colors"
+                  className="px-3 py-1.5 rounded-lg text-[11px] font-medium bg-card border border-border hover:bg-muted disabled:opacity-40 transition-colors flex items-center gap-1"
                 >
-                  পরবর্তী
+                  পরবর্তী <ChevronRight className="h-3.5 w-3.5" />
                 </button>
               </div>
             </div>
