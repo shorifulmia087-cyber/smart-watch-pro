@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import AnnouncementBar from '@/components/AnnouncementBar';
 import HeroSlider from '@/components/HeroSlider';
 import FeatureList from '@/components/FeatureList';
@@ -9,27 +9,68 @@ import OrderModal from '@/components/OrderModal';
 import FloatingNotification from '@/components/FloatingNotification';
 import CollectionGrid from '@/components/CollectionGrid';
 import LoadingOverlay from '@/components/LoadingOverlay';
-import { watchCollection, WatchProduct } from '@/data/watchData';
 import { formatBengaliPrice } from '@/lib/bengali';
-import { useSettings } from '@/hooks/useSupabaseData';
+import { useSettings, useFeaturedProduct, useProducts } from '@/hooks/useSupabaseData';
 import { motion } from 'framer-motion';
+import type { Database } from '@/integrations/supabase/types';
+
+type Product = Database['public']['Tables']['products']['Row'];
 
 const Index = () => {
   const [orderOpen, setOrderOpen] = useState(false);
-  const [currentWatch, setCurrentWatch] = useState<WatchProduct>(watchCollection[0]);
+  const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
   const [swapLoading, setSwapLoading] = useState(false);
   const { data: settings } = useSettings();
+  const { data: featuredProduct } = useFeaturedProduct();
+  const { data: allProducts } = useProducts();
 
-  const handleSelectWatch = useCallback((watch: WatchProduct) => {
+  // Set current product to featured or first available
+  useEffect(() => {
+    if (!currentProduct) {
+      if (featuredProduct) {
+        setCurrentProduct(featuredProduct);
+      } else if (allProducts?.length) {
+        setCurrentProduct(allProducts[0]);
+      }
+    }
+  }, [featuredProduct, allProducts, currentProduct]);
+
+  const handleSelectProduct = useCallback((product: Product) => {
     setSwapLoading(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setTimeout(() => {
-      setCurrentWatch(watch);
+      setCurrentProduct(product);
       setSwapLoading(false);
     }, 800);
   }, []);
 
   const brandName = settings?.brand_name || 'Kronos Premium Watch';
+
+  // Build hero images from product image_urls
+  const heroImages = (currentProduct?.image_urls || []).map((url, i) => ({
+    src: url,
+    label: `${currentProduct?.name || ''} — ছবি ${i + 1}`,
+  }));
+
+  // Build features from product features jsonb
+  const features = Array.isArray(currentProduct?.features)
+    ? (currentProduct.features as any[]).map((f: any) => ({
+        icon: f.icon || '⭐',
+        title: f.title || '',
+        desc: f.desc || '',
+      }))
+    : [];
+
+  if (!currentProduct) {
+    return (
+      <div className="min-h-screen bg-surface flex items-center justify-center">
+        <div className="text-center text-muted-foreground">
+          <div className="animate-pulse text-lg mb-2">লোড হচ্ছে...</div>
+          <p className="text-sm">প্রোডাক্ট লোড হচ্ছে, অনুগ্রহ করে অপেক্ষা করুন।</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-surface">
@@ -42,22 +83,22 @@ const Index = () => {
       />
 
       <motion.div
-        key={currentWatch.id}
+        key={currentProduct.id}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: [0.77, 0, 0.18, 1] }}
       >
         <HeroSlider
           onOrderClick={() => setOrderOpen(true)}
-          images={currentWatch.images}
-          subtitle={settings?.hero_subtitle || currentWatch.subtitle}
+          images={heroImages}
+          subtitle={settings?.hero_subtitle || currentProduct.subtitle || ''}
         />
         <FeatureList
-          features={currentWatch.features}
+          features={features}
           sectionTitle={settings?.features_section_title}
         />
         <VideoSection
-          videoId={currentWatch.videoUrl}
+          videoId={currentProduct.video_url || undefined}
           sectionTitle={settings?.video_section_title}
         />
       </motion.div>
@@ -65,8 +106,8 @@ const Index = () => {
       <ReviewGallery />
       <DeliveryChecker />
       <CollectionGrid
-        currentWatchId={currentWatch.id}
-        onSelectWatch={handleSelectWatch}
+        currentProductId={currentProduct.id}
+        onSelectProduct={handleSelectProduct}
         sectionTitle={settings?.collection_section_title}
       />
 
@@ -78,7 +119,7 @@ const Index = () => {
           className="max-w-2xl mx-auto text-center"
         >
           <h2 className="text-2xl md:text-3xl font-bold text-surface mb-3">
-            {settings?.footer_cta_title || `আজই আপনার ${currentWatch.name} অর্ডার করুন`}
+            {settings?.footer_cta_title || `আজই আপনার ${currentProduct.name} অর্ডার করুন`}
           </h2>
           <p className="text-surface/60 mb-8">
             {settings?.footer_cta_subtitle || 'সীমিত সময়ের অফার। স্টক শেষ হওয়ার আগেই অর্ডার করুন।'}
@@ -87,7 +128,7 @@ const Index = () => {
             onClick={() => setOrderOpen(true)}
             className="gradient-gold text-surface font-semibold px-10 py-4 rounded-xl text-lg hover:opacity-90 transition-opacity"
           >
-            এখনই অর্ডার করুন — ৳{formatBengaliPrice(currentWatch.price)}
+            এখনই অর্ডার করুন — ৳{formatBengaliPrice(currentProduct.price)}
           </button>
         </motion.div>
       </section>
@@ -103,8 +144,8 @@ const Index = () => {
       <OrderModal
         isOpen={orderOpen}
         onClose={() => setOrderOpen(false)}
-        unitPrice={currentWatch.price}
-        watchName={currentWatch.name}
+        unitPrice={currentProduct.price}
+        watchName={currentProduct.name}
         deliveryChargeInside={settings?.delivery_charge_inside}
         deliveryChargeOutside={settings?.delivery_charge_outside}
         onlinePaymentEnabled={settings?.online_payment_enabled}
