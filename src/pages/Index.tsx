@@ -24,16 +24,23 @@ const Index = () => {
   const { data: featuredProduct } = useFeaturedProduct();
   const { data: allProducts } = useProducts();
 
-  // Set current product to featured or first available
+  // Set current product to featured or first available, and sync with DB updates
   useEffect(() => {
-    if (!currentProduct) {
-      if (featuredProduct) {
-        setCurrentProduct(featuredProduct);
-      } else if (allProducts?.length) {
-        setCurrentProduct(allProducts[0]);
-      }
+    if (featuredProduct) {
+      setCurrentProduct(prev => {
+        // If no product selected yet, or current product is the featured one, update it
+        if (!prev || prev.id === featuredProduct.id) return featuredProduct;
+        return prev;
+      });
+    } else if (allProducts?.length) {
+      setCurrentProduct(prev => {
+        if (!prev) return allProducts[0];
+        // Sync current product with latest DB data
+        const updated = allProducts.find(p => p.id === prev.id);
+        return updated || allProducts[0];
+      });
     }
-  }, [featuredProduct, allProducts, currentProduct]);
+  }, [featuredProduct, allProducts]);
 
   const handleSelectProduct = useCallback((product: Product) => {
     setSwapLoading(true);

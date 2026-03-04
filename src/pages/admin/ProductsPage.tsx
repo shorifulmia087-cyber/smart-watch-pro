@@ -243,7 +243,7 @@ const ProductsPage = () => {
                       </button>
                     </TableCell>
                     <TableCell className="text-right" onClick={e => e.stopPropagation()}>
-                      <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center justify-end gap-1">
                         <button onClick={() => openEdit(p)} className="p-2 rounded-lg hover:bg-muted transition-colors">
                           <Pencil className="h-4 w-4 text-muted-foreground" />
                         </button>
