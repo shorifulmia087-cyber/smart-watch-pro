@@ -24,6 +24,15 @@ export default {
         ink: "hsl(var(--ink))",
         ash: "hsl(var(--ash))",
         surface: "hsl(var(--surface))",
+        success: {
+          DEFAULT: "hsl(var(--success))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+        },
+        info: {
+          DEFAULT: "hsl(var(--info))",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

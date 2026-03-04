@@ -2,12 +2,21 @@ import { useMemo, useState } from 'react';
 import { useOrders } from '@/hooks/useSupabaseData';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
 import { Skeleton } from '@/components/ui/skeleton';
+import { TrendingUp, Users, Wallet } from 'lucide-react';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, PieChart, Pie, Cell,
 } from 'recharts';
 
-const COLORS = ['hsl(41, 52%, 48%)', 'hsl(217, 91%, 60%)', 'hsl(280, 55%, 55%)', 'hsl(152, 60%, 40%)'];
+const COLORS = ['hsl(var(--accent))', 'hsl(var(--info))', 'hsl(var(--success))', 'hsl(var(--warning))'];
+
+const tooltipStyle = {
+  background: 'hsl(var(--card))',
+  border: '1px solid hsl(var(--border))',
+  borderRadius: '12px',
+  fontSize: '12px',
+  boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+};
 
 const AnalyticsPage = () => {
   const { data: orders, isLoading } = useOrders();
@@ -47,19 +56,11 @@ const AnalyticsPage = () => {
     return Math.round(orders.reduce((s, o) => s + o.total_price, 0) / orders.length);
   }, [orders]);
 
-  const tooltipStyle = {
-    background: 'hsl(0, 0%, 100%)',
-    border: '1px solid hsl(214, 15%, 91%)',
-    borderRadius: '12px',
-    fontSize: '12px',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-  };
-
   return (
     <div className="space-y-6 max-w-[1400px]">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold">বিস্তারিত অ্যানালিটিক্স</h2>
+          <h2 className="text-lg font-semibold text-foreground">বিস্তারিত অ্যানালিটিক্স</h2>
           <p className="text-[11px] text-muted-foreground">বিক্রয় ও ব্যবহারকারীর আচরণ</p>
         </div>
         <div className="flex gap-0.5 glass-card rounded-xl p-1">
@@ -67,7 +68,7 @@ const AnalyticsPage = () => {
             <button
               key={r}
               onClick={() => setRange(r)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
                 range === r ? 'bg-foreground text-background shadow-sm' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
@@ -77,116 +78,116 @@ const AnalyticsPage = () => {
         </div>
       </div>
 
+      {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {isLoading ? (
-          Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-20 rounded-2xl" />)
+          Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-24 rounded-2xl" />)
         ) : (
           <>
-            <MiniStat label="গড় অর্ডার মূল্য" value={`৳${formatBengaliPrice(avgOrderValue)}`} />
-            <MiniStat label="মোট অর্ডার সংখ্যা" value={toBengaliNum(orders?.length ?? 0)} />
-            <MiniStat label="মোট রাজস্ব" value={`৳${formatBengaliPrice(orders?.reduce((s, o) => s + o.total_price, 0) ?? 0)}`} />
+            <MiniStat icon={Wallet} label="গড় অর্ডার মূল্য" value={`৳${formatBengaliPrice(avgOrderValue)}`} variant="accent" />
+            <MiniStat icon={Users} label="মোট অর্ডার সংখ্যা" value={toBengaliNum(orders?.length ?? 0)} variant="info" />
+            <MiniStat icon={TrendingUp} label="মোট রাজস্ব" value={`৳${formatBengaliPrice(orders?.reduce((s, o) => s + o.total_price, 0) ?? 0)}`} variant="success" />
           </>
         )}
       </div>
 
+      {/* Revenue Trend */}
       <div className="glass-card rounded-2xl p-5 md:p-6">
-        <h3 className="font-semibold text-sm mb-1">আয়ের ট্রেন্ড</h3>
+        <h3 className="font-semibold text-sm text-foreground mb-1">আয়ের ট্রেন্ড</h3>
         <p className="text-[11px] text-muted-foreground mb-5">দৈনিক আয় ও অর্ডার সংখ্যা</p>
         {isLoading ? <Skeleton className="h-[300px] rounded-xl" /> : (
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart data={dailyData}>
               <defs>
                 <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="hsl(41, 52%, 48%)" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="hsl(41, 52%, 48%)" stopOpacity={0} />
+                  <stop offset="5%" stopColor="hsl(var(--accent))" stopOpacity={0.25} />
+                  <stop offset="95%" stopColor="hsl(var(--accent))" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(214, 15%, 91%)" vertical={false} />
-              <XAxis dataKey="day" tick={{ fontSize: 11 }} stroke="hsl(215, 10%, 46%)" axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11 }} stroke="hsl(215, 10%, 46%)" axisLine={false} tickLine={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+              <XAxis dataKey="day" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fontFamily: 'Inter' }} stroke="hsl(var(--muted-foreground))" axisLine={false} tickLine={false} />
               <Tooltip contentStyle={tooltipStyle} formatter={(value: number, name: string) => [`৳${value.toLocaleString()}`, name === 'revenue' ? 'আয়' : 'অর্ডার']} />
-              <Area type="monotone" dataKey="revenue" stroke="hsl(41,52%,48%)" strokeWidth={2.5} fill="url(#colorRev)" />
+              <Area type="monotone" dataKey="revenue" stroke="hsl(var(--accent))" strokeWidth={2.5} fill="url(#colorRev)" />
             </AreaChart>
           </ResponsiveContainer>
         )}
       </div>
 
+      {/* Bottom Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="glass-card rounded-2xl p-5 md:p-6">
-          <h3 className="font-semibold text-sm mb-1">দৈনিক অর্ডার</h3>
+          <h3 className="font-semibold text-sm text-foreground mb-1">দৈনিক অর্ডার</h3>
           <p className="text-[11px] text-muted-foreground mb-5">প্রতিদিন কতটি অর্ডার এসেছে</p>
           {isLoading ? <Skeleton className="h-[250px] rounded-xl" /> : (
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={dailyData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(214, 15%, 91%)" vertical={false} />
-                <XAxis dataKey="day" tick={{ fontSize: 11 }} stroke="hsl(215, 10%, 46%)" axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 11 }} stroke="hsl(215, 10%, 46%)" allowDecimals={false} axisLine={false} tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                <XAxis dataKey="day" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" allowDecimals={false} axisLine={false} tickLine={false} />
                 <Tooltip contentStyle={tooltipStyle} />
-                <Bar dataKey="orders" fill="hsl(217, 91%, 60%)" radius={[6, 6, 0, 0]} barSize={24} name="অর্ডার" />
+                <Bar dataKey="orders" fill="hsl(var(--info))" radius={[6, 6, 0, 0]} barSize={24} name="অর্ডার" />
               </BarChart>
             </ResponsiveContainer>
           )}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="glass-card rounded-2xl p-5 md:p-6">
-            <h3 className="font-semibold text-sm mb-4">পেমেন্ট মেথড</h3>
-            {isLoading ? <Skeleton className="h-[180px] rounded-xl" /> : (
-              <>
-                <ResponsiveContainer width="100%" height={140}>
-                  <PieChart>
-                    <Pie data={paymentData} cx="50%" cy="50%" innerRadius={35} outerRadius={55} paddingAngle={4} dataKey="value">
-                      {paymentData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-                    </Pie>
-                    <Tooltip contentStyle={{ fontSize: '11px', borderRadius: '8px' }} />
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {paymentData.map((d, i) => (
-                    <span key={d.name} className="text-[10px] flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full" style={{ background: COLORS[i % COLORS.length] }} />
-                      {d.name} ({toBengaliNum(d.value)})
-                    </span>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
-
-          <div className="glass-card rounded-2xl p-5 md:p-6">
-            <h3 className="font-semibold text-sm mb-4">ডেলিভারি অঞ্চল</h3>
-            {isLoading ? <Skeleton className="h-[180px] rounded-xl" /> : (
-              <>
-                <ResponsiveContainer width="100%" height={140}>
-                  <PieChart>
-                    <Pie data={locationData} cx="50%" cy="50%" innerRadius={35} outerRadius={55} paddingAngle={4} dataKey="value">
-                      {locationData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-                    </Pie>
-                    <Tooltip contentStyle={{ fontSize: '11px', borderRadius: '8px' }} />
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {locationData.map((d, i) => (
-                    <span key={d.name} className="text-[10px] flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full" style={{ background: COLORS[i % COLORS.length] }} />
-                      {d.name} ({toBengaliNum(d.value)})
-                    </span>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
+          <PieCard title="পেমেন্ট মেথড" data={paymentData} isLoading={isLoading} />
+          <PieCard title="ডেলিভারি অঞ্চল" data={locationData} isLoading={isLoading} />
         </div>
       </div>
     </div>
   );
 };
 
-const MiniStat = ({ label, value }: { label: string; value: string }) => (
-  <div className="glass-card rounded-2xl p-4">
-    <p className="text-[11px] text-muted-foreground">{label}</p>
-    <p className="text-xl font-bold font-inter mt-1">{value}</p>
+const PieCard = ({ title, data, isLoading }: { title: string; data: { name: string; value: number }[]; isLoading: boolean }) => (
+  <div className="glass-card rounded-2xl p-5 md:p-6">
+    <h3 className="font-semibold text-sm text-foreground mb-4">{title}</h3>
+    {isLoading ? <Skeleton className="h-[180px] rounded-xl" /> : (
+      <>
+        <ResponsiveContainer width="100%" height={140}>
+          <PieChart>
+            <Pie data={data} cx="50%" cy="50%" innerRadius={35} outerRadius={55} paddingAngle={4} dataKey="value">
+              {data.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+            </Pie>
+            <Tooltip contentStyle={{ fontSize: '11px', borderRadius: '8px', background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }} />
+          </PieChart>
+        </ResponsiveContainer>
+        <div className="flex flex-wrap gap-2 mt-2">
+          {data.map((d, i) => (
+            <span key={d.name} className="text-[10px] text-muted-foreground flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full" style={{ background: COLORS[i % COLORS.length] }} />
+              {d.name} ({toBengaliNum(d.value)})
+            </span>
+          ))}
+        </div>
+      </>
+    )}
   </div>
 );
+
+const variantMap: Record<string, { bg: string; color: string }> = {
+  accent: { bg: 'bg-accent/10', color: 'text-accent' },
+  info: { bg: 'bg-info/10', color: 'text-info' },
+  success: { bg: 'bg-success/10', color: 'text-success' },
+};
+
+const MiniStat = ({ icon: Icon, label, value, variant }: { icon: any; label: string; value: string; variant: string }) => {
+  const v = variantMap[variant] || variantMap.accent;
+  return (
+    <div className="glass-card rounded-2xl p-5 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">
+      <div className="flex items-center gap-3">
+        <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${v.bg}`}>
+          <Icon className={`h-4 w-4 ${v.color}`} />
+        </div>
+        <div>
+          <p className="text-[11px] text-muted-foreground">{label}</p>
+          <p className="text-xl font-bold font-inter text-foreground">{value}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default AnalyticsPage;
