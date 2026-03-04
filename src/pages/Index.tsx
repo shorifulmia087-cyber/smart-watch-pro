@@ -99,6 +99,7 @@ const Index = () => {
           onOrderClick={() => setOrderOpen(true)}
           images={heroImages}
           subtitle={settings?.hero_subtitle || currentProduct.subtitle || ''}
+          tagline={settings?.brand_tagline || 'প্রিমিয়াম ক্রাফটসম্যানশিপ, অতুলনীয় ডিজাইন।'}
         />
         <FeatureList
           features={features}

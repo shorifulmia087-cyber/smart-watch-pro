@@ -264,74 +264,92 @@ const ProductsPage = () => {
       )}
 
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-        <SheetContent className="w-full sm:max-w-xl overflow-y-auto">
-          <SheetHeader>
-            <SheetTitle>{editingId ? 'প্রোডাক্ট এডিট' : 'নতুন প্রোডাক্ট'}</SheetTitle>
-            <SheetDescription>প্রোডাক্টের সমস্ত তথ্য পূরণ করুন</SheetDescription>
-          </SheetHeader>
-          <div className="space-y-5 mt-6">
-            {/* Basic Info */}
-            <FormField label="নাম *" value={form.name} onChange={v => setForm({ ...form, name: v })} />
-            <div className="grid grid-cols-2 gap-3">
-              <FormField label="মূল্য (৳) *" type="number" value={String(form.price)} onChange={v => setForm({ ...form, price: Number(v) })} />
-              <FormField label="ছাড় %" type="number" value={String(form.discount_percent)} onChange={v => setForm({ ...form, discount_percent: Number(v) })} />
-            </div>
-            <FormField label="সাবটাইটেল" value={form.subtitle} onChange={v => setForm({ ...form, subtitle: v })} />
-            <FormField label="ভিডিও URL (YouTube ID)" value={form.video_url} onChange={v => setForm({ ...form, video_url: v })} />
+        <SheetContent className="w-full sm:max-w-2xl overflow-y-auto bg-gradient-to-b from-background to-muted/20 p-0">
+          <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-xl border-b border-border/40 px-6 py-5">
+            <SheetHeader className="space-y-1">
+              <SheetTitle className="text-xl font-bold flex items-center gap-2.5">
+                {editingId ? (
+                  <><Pencil className="h-5 w-5 text-accent" /> প্রোডাক্ট এডিট</>
+                ) : (
+                  <><Plus className="h-5 w-5 text-accent" /> নতুন প্রোডাক্ট</>
+                )}
+              </SheetTitle>
+              <SheetDescription className="text-xs">প্রোডাক্টের সমস্ত তথ্য পূরণ করুন</SheetDescription>
+            </SheetHeader>
+          </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">টাইপ</label>
-                <select value={form.product_type} onChange={e => setForm({ ...form, product_type: e.target.value })} className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30">
-                  <option value="watch">ঘড়ি</option>
-                  <option value="clothing">পোশাক</option>
-                  <option value="electronics">ইলেকট্রনিক্স</option>
-                  <option value="accessories">আনুষাঙ্গিক</option>
-                </select>
+          <div className="px-6 py-6 space-y-7">
+            {/* Basic Info Card */}
+            <div className="rounded-2xl border border-border/50 bg-background p-5 space-y-4 shadow-sm">
+              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-accent" /> মৌলিক তথ্য
+              </h3>
+              <FormField label="নাম *" value={form.name} onChange={v => setForm({ ...form, name: v })} />
+              <div className="grid grid-cols-2 gap-3">
+                <FormField label="মূল্য (৳) *" type="number" value={String(form.price)} onChange={v => setForm({ ...form, price: Number(v) })} />
+                <FormField label="ছাড় %" type="number" value={String(form.discount_percent)} onChange={v => setForm({ ...form, discount_percent: Number(v) })} />
               </div>
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">স্টক</label>
-                <select value={form.stock_status} onChange={e => setForm({ ...form, stock_status: e.target.value })} className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30">
-                  <option value="in_stock">ইন স্টক</option>
-                  <option value="out_of_stock">আউট অফ স্টক</option>
-                </select>
+              <FormField label="সাবটাইটেল" value={form.subtitle} onChange={v => setForm({ ...form, subtitle: v })} />
+              <FormField label="ভিডিও URL (YouTube ID)" value={form.video_url} onChange={v => setForm({ ...form, video_url: v })} />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">টাইপ</label>
+                  <select value={form.product_type} onChange={e => setForm({ ...form, product_type: e.target.value })} className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all">
+                    <option value="watch">ঘড়ি</option>
+                    <option value="clothing">পোশাক</option>
+                    <option value="electronics">ইলেকট্রনিক্স</option>
+                    <option value="accessories">আনুষাঙ্গিক</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">স্টক</label>
+                  <select value={form.stock_status} onChange={e => setForm({ ...form, stock_status: e.target.value })} className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all">
+                    <option value="in_stock">ইন স্টক</option>
+                    <option value="out_of_stock">আউট অফ স্টক</option>
+                  </select>
+                </div>
               </div>
+              <label className="flex items-center gap-2.5 text-sm cursor-pointer bg-accent/5 rounded-xl px-4 py-3 border border-accent/20 hover:bg-accent/10 transition-colors">
+                <input type="checkbox" checked={form.is_featured} onChange={e => setForm({ ...form, is_featured: e.target.checked })} className="rounded accent-accent w-4 h-4" />
+                <div>
+                  <span className="font-medium text-foreground">ফিচার্ড প্রোডাক্ট</span>
+                  <p className="text-[11px] text-muted-foreground">ওয়েবসাইটে প্রধান প্রোডাক্ট হিসেবে দেখাবে</p>
+                </div>
+              </label>
             </div>
 
-            <label className="flex items-center gap-2 text-sm cursor-pointer">
-              <input type="checkbox" checked={form.is_featured} onChange={e => setForm({ ...form, is_featured: e.target.checked })} className="rounded accent-accent" />
-              ফিচার্ড প্রোডাক্ট (ওয়েবসাইটে প্রধান প্রোডাক্ট হিসেবে দেখাবে)
-            </label>
-
-            {/* Image Upload */}
-            <div>
-              <label className="text-xs font-medium text-muted-foreground mb-2 block">প্রোডাক্ট ছবি</label>
-              <div className="grid grid-cols-3 gap-2 mb-3">
+            {/* Image Upload Card */}
+            <div className="rounded-2xl border border-border/50 bg-background p-5 space-y-4 shadow-sm">
+              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-info" /> প্রোডাক্ট ছবি
+              </h3>
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
                 {form.image_urls.map((url, i) => (
-                  <div key={i} className="relative group aspect-square rounded-xl overflow-hidden bg-muted border border-border">
+                  <div key={i} className="relative group aspect-square rounded-xl overflow-hidden bg-muted border border-border/50 shadow-sm hover:shadow-md transition-shadow">
                     <img src={url} alt={`Product ${i + 1}`} className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                     <button
                       onClick={() => removeImage(i)}
-                      className="absolute top-1 right-1 w-6 h-6 bg-destructive text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute top-1.5 right-1.5 w-7 h-7 bg-destructive/90 backdrop-blur-sm text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100 shadow-lg"
                     >
-                      <X className="w-3 h-3" />
+                      <X className="w-3.5 h-3.5" />
                     </button>
                     {i === 0 && (
-                      <span className="absolute bottom-1 left-1 text-[9px] bg-accent text-white px-1.5 py-0.5 rounded-md font-medium">থাম্বনেইল</span>
+                      <span className="absolute bottom-1.5 left-1.5 text-[9px] bg-accent/90 backdrop-blur-sm text-white px-2 py-0.5 rounded-md font-semibold shadow-sm">থাম্বনেইল</span>
                     )}
                   </div>
                 ))}
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploading}
-                  className="aspect-square rounded-xl border-2 border-dashed border-border hover:border-accent/50 flex flex-col items-center justify-center gap-1 transition-colors text-muted-foreground hover:text-accent"
+                  className="aspect-square rounded-xl border-2 border-dashed border-border hover:border-accent/60 flex flex-col items-center justify-center gap-1.5 transition-all text-muted-foreground hover:text-accent hover:bg-accent/5"
                 >
                   {uploading ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <Loader2 className="w-6 h-6 animate-spin" />
                   ) : (
                     <>
-                      <Upload className="w-5 h-5" />
-                      <span className="text-[10px]">আপলোড</span>
+                      <Upload className="w-6 h-6" />
+                      <span className="text-[10px] font-medium">আপলোড</span>
                     </>
                   )}
                 </button>
@@ -346,14 +364,17 @@ const ProductsPage = () => {
               />
             </div>
 
-            {/* Description List */}
-            <div>
-              <label className="text-xs font-medium text-muted-foreground mb-2 block">বিবরণ তালিকা</label>
-              <div className="space-y-1.5 mb-2">
+            {/* Description List Card */}
+            <div className="rounded-2xl border border-border/50 bg-background p-5 space-y-4 shadow-sm">
+              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-success" /> বিবরণ তালিকা
+              </h3>
+              <div className="space-y-2">
                 {form.description_list.map((desc, i) => (
-                  <div key={i} className="flex items-center gap-2 bg-muted rounded-lg px-3 py-2 text-sm">
+                  <div key={i} className="flex items-center gap-2 bg-muted/60 rounded-xl px-4 py-2.5 text-sm group hover:bg-muted transition-colors">
+                    <span className="w-5 h-5 rounded-full bg-accent/10 text-accent text-[10px] flex items-center justify-center font-bold shrink-0">{i + 1}</span>
                     <span className="flex-1">{desc}</span>
-                    <button onClick={() => removeDescription(i)} className="text-destructive hover:text-destructive/80">
+                    <button onClick={() => removeDescription(i)} className="text-destructive/60 hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity">
                       <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -365,44 +386,47 @@ const ProductsPage = () => {
                   onChange={e => setNewDesc(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && addDescription()}
                   placeholder="নতুন বিবরণ লিখুন..."
-                  className="flex-1 bg-muted border border-border rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
+                  className="flex-1 bg-muted border border-border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all"
                 />
-                <button onClick={addDescription} className="px-3 py-2 rounded-xl bg-accent/10 text-accent text-sm font-medium hover:bg-accent/20 transition-colors">
+                <button onClick={addDescription} className="px-4 py-2.5 rounded-xl bg-accent/10 text-accent text-sm font-semibold hover:bg-accent/20 transition-colors">
                   যোগ
                 </button>
               </div>
             </div>
 
-            {/* Features */}
-            <div>
-              <label className="text-xs font-medium text-muted-foreground mb-2 block">ফিচার্স (ওয়েবসাইটে দেখাবে)</label>
-              <div className="space-y-1.5 mb-2">
+            {/* Features Card */}
+            <div className="rounded-2xl border border-border/50 bg-background p-5 space-y-4 shadow-sm">
+              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-accent" /> ফিচার্স
+                <span className="text-[10px] font-normal normal-case text-muted-foreground/60 ml-auto">ওয়েবসাইটে দেখাবে</span>
+              </h3>
+              <div className="space-y-2">
                 {form.features.map((f, i) => (
-                  <div key={i} className="flex items-center gap-2 bg-muted rounded-lg px-3 py-2 text-sm">
-                    <span className="text-base">{f.icon}</span>
+                  <div key={i} className="flex items-center gap-3 bg-muted/60 rounded-xl px-4 py-3 group hover:bg-muted transition-colors">
+                    <span className="text-xl">{f.icon}</span>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium truncate">{f.title}</p>
+                      <p className="font-semibold text-sm truncate">{f.title}</p>
                       <p className="text-[11px] text-muted-foreground truncate">{f.desc}</p>
                     </div>
-                    <button onClick={() => removeFeature(i)} className="text-destructive hover:text-destructive/80 shrink-0">
+                    <button onClick={() => removeFeature(i)} className="text-destructive/60 hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                       <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 ))}
               </div>
-              <div className="space-y-2 p-3 border border-border rounded-xl bg-muted/30">
+              <div className="space-y-2.5 p-4 border border-border/60 rounded-xl bg-muted/20">
                 <div className="grid grid-cols-[60px_1fr] gap-2">
                   <input
                     value={newFeature.icon}
                     onChange={e => setNewFeature({ ...newFeature, icon: e.target.value })}
                     placeholder="🛡️"
-                    className="bg-muted border border-border rounded-lg px-2 py-2 text-sm text-center focus:outline-none focus:ring-2 focus:ring-accent/30"
+                    className="bg-muted border border-border rounded-xl px-2 py-2.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all"
                   />
                   <input
                     value={newFeature.title}
                     onChange={e => setNewFeature({ ...newFeature, title: e.target.value })}
                     placeholder="ফিচার শিরোনাম"
-                    className="bg-muted border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
+                    className="bg-muted border border-border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all"
                   />
                 </div>
                 <div className="flex gap-2">
@@ -411,26 +435,26 @@ const ProductsPage = () => {
                     onChange={e => setNewFeature({ ...newFeature, desc: e.target.value })}
                     onKeyDown={e => e.key === 'Enter' && addFeature()}
                     placeholder="ফিচার বর্ণনা"
-                    className="flex-1 bg-muted border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
+                    className="flex-1 bg-muted border border-border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all"
                   />
-                  <button onClick={addFeature} className="px-3 py-2 rounded-lg bg-accent/10 text-accent text-sm font-medium hover:bg-accent/20 transition-colors">
+                  <button onClick={addFeature} className="px-4 py-2.5 rounded-xl bg-accent/10 text-accent text-sm font-semibold hover:bg-accent/20 transition-colors">
                     যোগ
                   </button>
                 </div>
               </div>
             </div>
 
-            {/* Save */}
-            <div className="flex gap-2 pt-4 pb-8">
+            {/* Save Actions */}
+            <div className="flex gap-3 pt-2 pb-8">
               <button
                 onClick={saveProduct}
                 disabled={upsertProduct.isPending || !form.name || !form.price}
-                className="flex-1 gradient-gold text-white font-semibold py-3 rounded-xl text-sm hover:opacity-90 flex items-center justify-center gap-2 transition-all shadow-sm disabled:opacity-50"
+                className="flex-1 gradient-gold text-white font-semibold py-3.5 rounded-xl text-sm hover:opacity-90 flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg disabled:opacity-50"
               >
                 {upsertProduct.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                {editingId ? 'আপডেট' : 'তৈরি করুন'}
+                {editingId ? 'আপডেট করুন' : 'প্রোডাক্ট তৈরি করুন'}
               </button>
-              <button onClick={() => setSheetOpen(false)} className="px-5 py-3 rounded-xl text-sm border border-border text-muted-foreground hover:bg-muted transition-colors">
+              <button onClick={() => setSheetOpen(false)} className="px-6 py-3.5 rounded-xl text-sm border border-border text-muted-foreground hover:bg-muted transition-colors font-medium">
                 বাতিল
               </button>
             </div>
