@@ -126,7 +126,7 @@ const DashboardPage = () => {
               <button
                 key={p.label}
                 onClick={() => handlePreset(i)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
+                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
                   activePreset === i ? 'bg-foreground text-background shadow-sm' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
