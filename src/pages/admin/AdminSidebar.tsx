@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useSettings } from '@/hooks/useSupabaseData';
 import {
   LayoutDashboard, ShoppingCart, Package, BarChart3, Settings2,
-  LogOut, ChevronRight,
+  LogOut, ChevronRight, X,
 } from 'lucide-react';
 import {
   Sidebar, SidebarContent, SidebarFooter, SidebarGroup,
@@ -47,16 +47,26 @@ const AdminSidebar = () => {
         {/* Brand */}
         <div className="px-4 pb-6 pt-2">
           {!collapsed && (
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl gradient-gold flex items-center justify-center shadow-md">
-                <span className="text-white font-bold text-sm font-inter">K</span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl gradient-gold flex items-center justify-center shadow-md">
+                  <span className="text-white font-bold text-sm font-inter">K</span>
+                </div>
+                <div className="min-w-0">
+                  <p className="font-semibold text-sm text-sidebar-foreground truncate">
+                    {settings?.brand_name || 'Admin'}
+                  </p>
+                  <p className="text-[11px] text-sidebar-foreground/50">এন্টারপ্রাইজ প্যানেল</p>
+                </div>
               </div>
-              <div className="min-w-0">
-                <p className="font-semibold text-sm text-sidebar-foreground truncate">
-                  {settings?.brand_name || 'Admin'}
-                </p>
-                <p className="text-[11px] text-sidebar-foreground/50">এন্টারপ্রাইজ প্যানেল</p>
-              </div>
+              {isMobile && (
+                <button
+                  onClick={() => setOpenMobile(false)}
+                  className="p-1.5 rounded-lg hover:bg-sidebar-accent transition-colors"
+                >
+                  <X className="h-5 w-5 text-sidebar-foreground/60" />
+                </button>
+              )}
             </div>
           )}
           {collapsed && (
@@ -81,7 +91,7 @@ const AdminSidebar = () => {
                         : 'border-l-[3px] border-transparent hover:bg-sidebar-accent/50'
                     }`}
                   >
-                    <item.icon className={`h-[18px] w-[18px] shrink-0 ${isActive(item.url) ? 'text-sidebar-primary' : ''}`} />
+                    <item.icon className={`h-5 w-5 shrink-0 ${isActive(item.url) ? 'text-sidebar-primary' : ''}`} />
                     {!collapsed && <span className="text-sm">{item.title}</span>}
                     {!collapsed && isActive(item.url) && (
                       <ChevronRight className="ml-auto h-4 w-4 opacity-50" />
