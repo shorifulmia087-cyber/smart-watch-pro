@@ -10,6 +10,7 @@ import {
   SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const navItems = [
   { title: 'ড্যাশবোর্ড', url: '/admin', icon: LayoutDashboard },
@@ -23,13 +24,21 @@ const AdminSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
-  const { state } = useSidebar();
+  const { state, setOpenMobile } = useSidebar();
   const collapsed = state === 'collapsed';
   const { data: settings } = useSettings();
+  const isMobile = useIsMobile();
 
   const isActive = (url: string) => {
     if (url === '/admin') return location.pathname === '/admin';
     return location.pathname.startsWith(url);
+  };
+
+  const handleNav = (url: string) => {
+    navigate(url);
+    if (isMobile) {
+      setOpenMobile(false);
+    }
   };
 
   return (
@@ -39,8 +48,8 @@ const AdminSidebar = () => {
         <div className="px-4 pb-6 pt-2">
           {!collapsed && (
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl gradient-gold flex items-center justify-center">
-                <span className="text-surface font-bold text-sm font-inter">K</span>
+              <div className="w-9 h-9 rounded-xl gradient-gold flex items-center justify-center shadow-md">
+                <span className="text-white font-bold text-sm font-inter">K</span>
               </div>
               <div className="min-w-0">
                 <p className="font-semibold text-sm text-sidebar-foreground truncate">
@@ -51,8 +60,8 @@ const AdminSidebar = () => {
             </div>
           )}
           {collapsed && (
-            <div className="w-9 h-9 rounded-xl gradient-gold flex items-center justify-center mx-auto">
-              <span className="text-surface font-bold text-sm font-inter">K</span>
+            <div className="w-9 h-9 rounded-xl gradient-gold flex items-center justify-center mx-auto shadow-md">
+              <span className="text-white font-bold text-sm font-inter">K</span>
             </div>
           )}
         </div>
@@ -63,12 +72,16 @@ const AdminSidebar = () => {
               {navItems.map((item) => (
                 <SidebarMenuItem key={item.url}>
                   <SidebarMenuButton
-                    onClick={() => navigate(item.url)}
+                    onClick={() => handleNav(item.url)}
                     isActive={isActive(item.url)}
                     tooltip={item.title}
-                    className="h-10 px-3 gap-3 transition-all duration-200"
+                    className={`h-10 px-3 gap-3 transition-all duration-200 rounded-xl ${
+                      isActive(item.url)
+                        ? 'bg-sidebar-accent text-sidebar-primary border-l-[3px] border-sidebar-primary'
+                        : 'border-l-[3px] border-transparent hover:bg-sidebar-accent/50'
+                    }`}
                   >
-                    <item.icon className="h-[18px] w-[18px] shrink-0" />
+                    <item.icon className={`h-[18px] w-[18px] shrink-0 ${isActive(item.url) ? 'text-sidebar-primary' : ''}`} />
                     {!collapsed && <span className="text-sm">{item.title}</span>}
                     {!collapsed && isActive(item.url) && (
                       <ChevronRight className="ml-auto h-4 w-4 opacity-50" />

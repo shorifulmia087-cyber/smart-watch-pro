@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useOrders, useUpdateOrderStatus } from '@/hooks/useSupabaseData';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
-import { Search, Filter, Download } from 'lucide-react';
+import { Search, Filter } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
@@ -15,10 +15,10 @@ const statusLabels: Record<OrderStatus, string> = {
 };
 
 const statusStyles: Record<OrderStatus, string> = {
-  pending: 'bg-amber-100 text-amber-700 border-amber-200',
-  processing: 'bg-blue-100 text-blue-700 border-blue-200',
-  shipped: 'bg-purple-100 text-purple-700 border-purple-200',
-  completed: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+  pending: 'bg-warning/10 text-warning border-warning/20',
+  processing: 'bg-info/10 text-info border-info/20',
+  shipped: 'bg-purple-50 text-purple-600 border-purple-200',
+  completed: 'bg-success/10 text-success border-success/20',
 };
 
 const OrdersPage = () => {
@@ -50,9 +50,9 @@ const OrdersPage = () => {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold">সকল অর্ডার</h2>
-          <p className="text-xs text-muted-foreground">মোট {toBengaliNum(filtered.length)} টি অর্ডার</p>
+          <p className="text-[11px] text-muted-foreground">মোট {toBengaliNum(filtered.length)} টি অর্ডার</p>
         </div>
-        <div className="flex items-center gap-2 bg-card rounded-xl px-3 py-2 border border-border min-w-[240px]">
+        <div className="flex items-center gap-2 glass-card rounded-xl px-3 py-2 min-w-[240px]">
           <Search className="h-4 w-4 text-muted-foreground shrink-0" />
           <input
             type="text" value={search} onChange={e => { setSearch(e.target.value); setPage(0); }}
@@ -69,10 +69,10 @@ const OrdersPage = () => {
           <button
             key={s ?? 'all'}
             onClick={() => { setFilter(s as OrderStatus | undefined); setPage(0); }}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all border ${
+            className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 border ${
               filter === s
-                ? 'bg-foreground text-background border-foreground'
-                : 'bg-card text-muted-foreground border-border hover:border-foreground/20'
+                ? 'bg-foreground text-background border-foreground shadow-sm'
+                : 'bg-card text-muted-foreground border-border hover:border-foreground/20 hover:bg-muted'
             }`}
           >
             {s ? statusLabels[s as OrderStatus] : 'সব'}
@@ -82,38 +82,37 @@ const OrdersPage = () => {
 
       {/* Table */}
       {isLoading ? (
-        <div className="space-y-3">
+        <div className="space-y-2">
           {Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} className="h-14 rounded-xl" />)}
         </div>
       ) : !paged.length ? (
-        <div className="bg-card rounded-2xl p-16 text-center text-muted-foreground border border-border">
+        <div className="glass-card rounded-2xl p-16 text-center text-muted-foreground">
           কোনো অর্ডার পাওয়া যায়নি।
         </div>
       ) : (
-        <div className="bg-card rounded-2xl border border-border overflow-hidden">
+        <div className="glass-card rounded-2xl overflow-hidden">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="bg-muted/30 hover:bg-muted/30">
-                  <TableHead className="text-xs font-semibold">কাস্টমার</TableHead>
-                  <TableHead className="text-xs font-semibold">ফোন</TableHead>
-                  <TableHead className="text-xs font-semibold">মডেল</TableHead>
-                  <TableHead className="text-xs font-semibold text-center">পরিমাণ</TableHead>
-                  <TableHead className="text-xs font-semibold">মোট</TableHead>
-                  <TableHead className="text-xs font-semibold">TrxID</TableHead>
-                  <TableHead className="text-xs font-semibold">এলাকা</TableHead>
-                  <TableHead className="text-xs font-semibold">তারিখ</TableHead>
-                  <TableHead className="text-xs font-semibold">স্ট্যাটাস</TableHead>
+                <TableRow className="bg-muted/40 hover:bg-muted/40 border-b border-border/60">
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">কাস্টমার</TableHead>
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">ফোন</TableHead>
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">মডেল</TableHead>
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground text-center">পরিমাণ</TableHead>
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">মোট</TableHead>
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">TrxID</TableHead>
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">এলাকা</TableHead>
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">তারিখ</TableHead>
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">স্ট্যাটাস</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {paged.map((o) => (
-                  <TableRow key={o.id} className="group hover:bg-muted/30 transition-colors">
+                  <TableRow key={o.id} className="group hover:bg-muted/30 transition-colors border-b border-border/40">
                     <TableCell>
                       <div>
                         <p className="font-medium text-sm">{o.customer_name}</p>
-                        <p className="text-xs text-muted-foreground truncate max-w-[200px]">{o.address}</p>
-                        {o.customer_email && <p className="text-xs text-accent truncate">{o.customer_email}</p>}
+                        <p className="text-[11px] text-muted-foreground truncate max-w-[200px]">{o.address}</p>
                       </div>
                     </TableCell>
                     <TableCell className="font-inter text-sm tabular-nums">{o.phone}</TableCell>
@@ -124,24 +123,24 @@ const OrdersPage = () => {
                     </TableCell>
                     <TableCell>
                       {o.trx_id ? (
-                        <span className="bg-accent/10 text-accent px-2 py-1 rounded-lg text-xs font-mono font-semibold">
+                        <span className="bg-accent/10 text-accent px-2 py-1 rounded-lg text-[11px] font-mono font-semibold">
                           {o.trx_id}
                         </span>
                       ) : (
-                        <span className="text-muted-foreground text-xs">COD</span>
+                        <span className="text-muted-foreground text-[11px]">COD</span>
                       )}
                     </TableCell>
-                    <TableCell className="text-xs">
+                    <TableCell className="text-[11px]">
                       {o.delivery_location === 'dhaka' ? 'ঢাকা' : 'ঢাকার বাইরে'}
                     </TableCell>
-                    <TableCell className="text-xs text-muted-foreground font-inter">
+                    <TableCell className="text-[11px] text-muted-foreground font-inter tabular-nums">
                       {new Date(o.created_at).toLocaleDateString('bn-BD')}
                     </TableCell>
                     <TableCell>
                       <select
                         value={o.status}
                         onChange={(e) => updateStatus.mutate({ id: o.id, status: e.target.value as OrderStatus })}
-                        className={`text-xs font-medium px-3 py-1.5 rounded-full border cursor-pointer appearance-none ${statusStyles[o.status]}`}
+                        className={`text-[11px] font-medium px-3 py-1.5 rounded-full border cursor-pointer appearance-none transition-colors ${statusStyles[o.status]}`}
                       >
                         {Object.entries(statusLabels).map(([k, v]) => (
                           <option key={k} value={k}>{v}</option>
@@ -154,24 +153,23 @@ const OrdersPage = () => {
             </Table>
           </div>
 
-          {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between px-4 py-3 border-t border-border">
-              <p className="text-xs text-muted-foreground">
+            <div className="flex items-center justify-between px-5 py-3 border-t border-border/60 bg-muted/20">
+              <p className="text-[11px] text-muted-foreground">
                 পৃষ্ঠা {toBengaliNum(page + 1)} / {toBengaliNum(totalPages)}
               </p>
-              <div className="flex gap-1">
+              <div className="flex gap-1.5">
                 <button
                   onClick={() => setPage(p => Math.max(0, p - 1))}
                   disabled={page === 0}
-                  className="px-3 py-1.5 rounded-lg text-xs bg-muted hover:bg-muted/80 disabled:opacity-40 transition-colors"
+                  className="px-3.5 py-1.5 rounded-lg text-[11px] font-medium bg-card border border-border hover:bg-muted disabled:opacity-40 transition-colors"
                 >
                   পূর্ববর্তী
                 </button>
                 <button
                   onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
                   disabled={page >= totalPages - 1}
-                  className="px-3 py-1.5 rounded-lg text-xs bg-muted hover:bg-muted/80 disabled:opacity-40 transition-colors"
+                  className="px-3.5 py-1.5 rounded-lg text-[11px] font-medium bg-card border border-border hover:bg-muted disabled:opacity-40 transition-colors"
                 >
                   পরবর্তী
                 </button>

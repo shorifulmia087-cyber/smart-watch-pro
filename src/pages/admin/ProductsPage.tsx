@@ -4,7 +4,7 @@ import {
 } from '@/hooks/useSupabaseData';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
 import {
-  Plus, Trash2, Save, Star, StarOff, ToggleLeft, ToggleRight, Pencil, X, Loader2, Search,
+  Plus, Trash2, Save, Star, StarOff, ToggleLeft, ToggleRight, Pencil, Loader2, Search,
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -68,14 +68,13 @@ const ProductsPage = () => {
 
   return (
     <div className="space-y-5 max-w-[1400px]">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold">প্রোডাক্ট ক্যাটালগ</h2>
-          <p className="text-xs text-muted-foreground">মোট {toBengaliNum(products?.length ?? 0)} টি প্রোডাক্ট</p>
+          <p className="text-[11px] text-muted-foreground">মোট {toBengaliNum(products?.length ?? 0)} টি প্রোডাক্ট</p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 bg-card rounded-xl px-3 py-2 border border-border min-w-[200px]">
+          <div className="flex items-center gap-2 glass-card rounded-xl px-3 py-2 min-w-[200px]">
             <Search className="h-4 w-4 text-muted-foreground shrink-0" />
             <input
               type="text" value={search} onChange={e => setSearch(e.target.value)}
@@ -85,41 +84,40 @@ const ProductsPage = () => {
           </div>
           <button
             onClick={openNew}
-            className="gradient-gold text-surface font-semibold px-5 py-2.5 rounded-xl text-sm hover:opacity-90 flex items-center gap-2 shrink-0 transition-opacity"
+            className="gradient-gold text-white font-semibold px-5 py-2.5 rounded-xl text-sm hover:opacity-90 flex items-center gap-2 shrink-0 transition-all duration-200 shadow-sm"
           >
             <Plus className="h-4 w-4" /> নতুন প্রোডাক্ট
           </button>
         </div>
       </div>
 
-      {/* Table */}
       {isLoading ? (
-        <div className="space-y-3">
+        <div className="space-y-2">
           {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)}
         </div>
       ) : !filtered.length ? (
-        <div className="bg-card rounded-2xl p-16 text-center text-muted-foreground border border-border">
+        <div className="glass-card rounded-2xl p-16 text-center text-muted-foreground">
           কোনো প্রোডাক্ট পাওয়া যায়নি।
         </div>
       ) : (
-        <div className="bg-card rounded-2xl border border-border overflow-hidden">
+        <div className="glass-card rounded-2xl overflow-hidden">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="bg-muted/30 hover:bg-muted/30">
-                  <TableHead className="text-xs font-semibold w-[50px]">ছবি</TableHead>
-                  <TableHead className="text-xs font-semibold">নাম</TableHead>
-                  <TableHead className="text-xs font-semibold">টাইপ</TableHead>
-                  <TableHead className="text-xs font-semibold">মূল্য</TableHead>
-                  <TableHead className="text-xs font-semibold text-center">ছাড়</TableHead>
-                  <TableHead className="text-xs font-semibold text-center">স্টক</TableHead>
-                  <TableHead className="text-xs font-semibold text-center">ফিচার্ড</TableHead>
-                  <TableHead className="text-xs font-semibold text-right">অ্যাকশন</TableHead>
+                <TableRow className="bg-muted/40 hover:bg-muted/40 border-b border-border/60">
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground w-[50px]">ছবি</TableHead>
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">নাম</TableHead>
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">টাইপ</TableHead>
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">মূল্য</TableHead>
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground text-center">ছাড়</TableHead>
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground text-center">স্টক</TableHead>
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground text-center">ফিচার্ড</TableHead>
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground text-right">অ্যাকশন</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filtered.map((p) => (
-                  <TableRow key={p.id} className="group hover:bg-muted/30 transition-colors cursor-pointer" onClick={() => openEdit(p)}>
+                  <TableRow key={p.id} className="group hover:bg-muted/30 transition-colors cursor-pointer border-b border-border/40" onClick={() => openEdit(p)}>
                     <TableCell>
                       {p.thumbnail_url ? (
                         <img src={p.thumbnail_url} alt={p.name} className="w-10 h-10 rounded-lg object-cover bg-muted" />
@@ -132,10 +130,10 @@ const ProductsPage = () => {
                         <span className="font-medium text-sm">{p.name}</span>
                         {p.is_featured && <Star className="h-3.5 w-3.5 text-accent fill-accent shrink-0" />}
                       </div>
-                      {p.subtitle && <p className="text-xs text-muted-foreground">{p.subtitle}</p>}
+                      {p.subtitle && <p className="text-[11px] text-muted-foreground">{p.subtitle}</p>}
                     </TableCell>
                     <TableCell>
-                      <span className="text-xs bg-muted px-2.5 py-1 rounded-full">{p.product_type}</span>
+                      <span className="text-[11px] bg-muted px-2.5 py-1 rounded-full">{p.product_type}</span>
                     </TableCell>
                     <TableCell className="font-inter font-semibold text-sm text-accent">
                       ৳{formatBengaliPrice(p.price)}
@@ -151,7 +149,7 @@ const ProductsPage = () => {
                         className="p-1.5 rounded-lg hover:bg-muted transition-colors"
                       >
                         {p.stock_status === 'in_stock' ? (
-                          <ToggleRight className="h-5 w-5 text-emerald-500" />
+                          <ToggleRight className="h-5 w-5 text-success" />
                         ) : (
                           <ToggleLeft className="h-5 w-5 text-muted-foreground" />
                         )}
@@ -170,7 +168,7 @@ const ProductsPage = () => {
                       </button>
                     </TableCell>
                     <TableCell className="text-right" onClick={e => e.stopPropagation()}>
-                      <div className="flex items-center justify-end gap-1">
+                      <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
                           onClick={() => openEdit(p)}
                           className="p-2 rounded-lg hover:bg-muted transition-colors"
@@ -193,7 +191,6 @@ const ProductsPage = () => {
         </div>
       )}
 
-      {/* Edit Sheet / Slide-over */}
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
         <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
           <SheetHeader>
@@ -209,8 +206,8 @@ const ProductsPage = () => {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">টাইপ</label>
-                <select value={form.product_type} onChange={e => setForm({ ...form, product_type: e.target.value })} className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm">
+                <label className="text-[11px] font-medium text-muted-foreground mb-1.5 block">টাইপ</label>
+                <select value={form.product_type} onChange={e => setForm({ ...form, product_type: e.target.value })} className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30">
                   <option value="watch">ঘড়ি</option>
                   <option value="clothing">পোশাক</option>
                   <option value="electronics">ইলেকট্রনিক্স</option>
@@ -218,8 +215,8 @@ const ProductsPage = () => {
                 </select>
               </div>
               <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">স্টক</label>
-                <select value={form.stock_status} onChange={e => setForm({ ...form, stock_status: e.target.value })} className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm">
+                <label className="text-[11px] font-medium text-muted-foreground mb-1.5 block">স্টক</label>
+                <select value={form.stock_status} onChange={e => setForm({ ...form, stock_status: e.target.value })} className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30">
                   <option value="in_stock">ইন স্টক</option>
                   <option value="out_of_stock">আউট অফ স্টক</option>
                 </select>
@@ -227,24 +224,24 @@ const ProductsPage = () => {
             </div>
 
             <label className="flex items-center gap-2 text-sm cursor-pointer">
-              <input type="checkbox" checked={form.is_featured} onChange={e => setForm({ ...form, is_featured: e.target.checked })} className="rounded" />
+              <input type="checkbox" checked={form.is_featured} onChange={e => setForm({ ...form, is_featured: e.target.checked })} className="rounded accent-accent" />
               ফিচার্ড প্রোডাক্ট
             </label>
 
             <div>
-              <label className="text-xs font-medium text-muted-foreground mb-1.5 block">ছবির URL (প্রতি লাইনে একটি)</label>
-              <textarea value={form.image_urls} onChange={e => setForm({ ...form, image_urls: e.target.value })} rows={3} className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm resize-none font-mono" />
+              <label className="text-[11px] font-medium text-muted-foreground mb-1.5 block">ছবির URL (প্রতি লাইনে একটি)</label>
+              <textarea value={form.image_urls} onChange={e => setForm({ ...form, image_urls: e.target.value })} rows={3} className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm resize-none font-mono focus:outline-none focus:ring-2 focus:ring-accent/30" />
             </div>
             <div>
-              <label className="text-xs font-medium text-muted-foreground mb-1.5 block">বিবরণ (প্রতি লাইনে একটি)</label>
-              <textarea value={form.description_list} onChange={e => setForm({ ...form, description_list: e.target.value })} rows={3} className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm resize-none" />
+              <label className="text-[11px] font-medium text-muted-foreground mb-1.5 block">বিবরণ (প্রতি লাইনে একটি)</label>
+              <textarea value={form.description_list} onChange={e => setForm({ ...form, description_list: e.target.value })} rows={3} className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-accent/30" />
             </div>
 
             <div className="flex gap-2 pt-4">
               <button
                 onClick={saveProduct}
                 disabled={upsertProduct.isPending}
-                className="flex-1 gradient-gold text-surface font-semibold py-3 rounded-xl text-sm hover:opacity-90 flex items-center justify-center gap-2 transition-opacity"
+                className="flex-1 gradient-gold text-white font-semibold py-3 rounded-xl text-sm hover:opacity-90 flex items-center justify-center gap-2 transition-all shadow-sm"
               >
                 {upsertProduct.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                 {editingId ? 'আপডেট' : 'তৈরি করুন'}
@@ -264,10 +261,10 @@ const FormField = ({ label, value, onChange, type = 'text' }: {
   label: string; value: string; onChange: (v: string) => void; type?: string;
 }) => (
   <div>
-    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">{label}</label>
+    <label className="text-[11px] font-medium text-muted-foreground mb-1.5 block">{label}</label>
     <input
       type={type} value={value} onChange={e => onChange(e.target.value)}
-      className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
+      className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all"
     />
   </div>
 );
