@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useSettings } from '@/hooks/useSupabaseData';
 import {
-  LayoutDashboard, ShoppingCart, Package, BarChart3, Settings2,
+  CircleGauge, Store, Boxes, PieChart, Wrench,
   LogOut, ChevronRight,
 } from 'lucide-react';
 import {
@@ -13,11 +13,11 @@ import {
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const navItems = [
-  { title: 'ড্যাশবোর্ড', url: '/admin', icon: LayoutDashboard },
-  { title: 'অর্ডার', url: '/admin/orders', icon: ShoppingCart },
-  { title: 'প্রোডাক্ট', url: '/admin/products', icon: Package },
-  { title: 'অ্যানালিটিক্স', url: '/admin/analytics', icon: BarChart3 },
-  { title: 'সাইট কন্ট্রোল', url: '/admin/settings', icon: Settings2 },
+  { title: 'ড্যাশবোর্ড', url: '/admin', icon: CircleGauge },
+  { title: 'অর্ডার', url: '/admin/orders', icon: Store },
+  { title: 'প্রোডাক্ট', url: '/admin/products', icon: Boxes },
+  { title: 'অ্যানালিটিক্স', url: '/admin/analytics', icon: PieChart },
+  { title: 'সাইট কন্ট্রোল', url: '/admin/settings', icon: Wrench },
 ];
 
 const AdminSidebar = () => {
