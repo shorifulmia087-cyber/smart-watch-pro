@@ -1,76 +1,167 @@
 import { useOrders, useProducts } from '@/hooks/useSupabaseData';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
-import { TrendingUp, ShoppingCart, Clock, DollarSign, Package, ArrowUpRight } from 'lucide-react';
+import { TrendingUp, ShoppingCart, Clock, DollarSign, Package, ArrowUpRight, CalendarIcon } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import { format, subDays, startOfDay, endOfDay, isWithinInterval } from 'date-fns';
+import { bn } from 'date-fns/locale';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, LineChart, Line,
 } from 'recharts';
 
+type DateRange = { from: Date; to: Date };
+
+const presets = [
+  { label: 'আজ', days: 0 },
+  { label: '৭ দিন', days: 7 },
+  { label: '১৪ দিন', days: 14 },
+  { label: '৩০ দিন', days: 30 },
+] as const;
+
 const DashboardPage = () => {
   const { data: orders, isLoading: ordersLoading } = useOrders();
   const { data: products, isLoading: productsLoading } = useProducts();
+  const [activePreset, setActivePreset] = useState(1); // default 7 days
+  const [dateRange, setDateRange] = useState<DateRange>({
+    from: subDays(new Date(), 7),
+    to: new Date(),
+  });
+  const [calendarOpen, setCalendarOpen] = useState(false);
+
+  const filteredOrders = useMemo(() => {
+    if (!orders) return [];
+    return orders.filter(o => {
+      const d = new Date(o.created_at);
+      return isWithinInterval(d, { start: startOfDay(dateRange.from), end: endOfDay(dateRange.to) });
+    });
+  }, [orders, dateRange]);
+
+  const handlePreset = (index: number) => {
+    setActivePreset(index);
+    const p = presets[index];
+    if (p.days === 0) {
+      setDateRange({ from: new Date(), to: new Date() });
+    } else {
+      setDateRange({ from: subDays(new Date(), p.days), to: new Date() });
+    }
+  };
 
   const stats = useMemo(() => {
-    if (!orders) return null;
-    const now = new Date();
-    const today = now.toDateString();
-    const todayOrders = orders.filter(o => new Date(o.created_at).toDateString() === today);
-    const totalRevenue = orders.reduce((s, o) => s + o.total_price, 0);
+    const today = new Date().toDateString();
+    const todayOrders = filteredOrders.filter(o => new Date(o.created_at).toDateString() === today);
+    const totalRevenue = filteredOrders.reduce((s, o) => s + o.total_price, 0);
     const todayRevenue = todayOrders.reduce((s, o) => s + o.total_price, 0);
-    const pending = orders.filter(o => o.status === 'pending').length;
-    return { total: orders.length, pending, todayRevenue, totalRevenue, todayOrders: todayOrders.length };
-  }, [orders]);
+    const pending = filteredOrders.filter(o => o.status === 'pending').length;
+    return { total: filteredOrders.length, pending, todayRevenue, totalRevenue, todayOrders: todayOrders.length };
+  }, [filteredOrders]);
+
+  const dayCount = useMemo(() => {
+    const diff = Math.ceil((dateRange.to.getTime() - dateRange.from.getTime()) / (1000 * 60 * 60 * 24));
+    return Math.max(diff, 1);
+  }, [dateRange]);
 
   const sparkData = useMemo(() => {
-    if (!orders) return { revenue: [], orders: [] };
-    const last7 = Array.from({ length: 7 }, (_, i) => {
-      const d = new Date();
-      d.setDate(d.getDate() - (6 - i));
+    const days = Math.min(dayCount, 7);
+    const last = Array.from({ length: days }, (_, i) => {
+      const d = new Date(dateRange.to);
+      d.setDate(d.getDate() - (days - 1 - i));
       return d;
     });
-    const revenueArr = last7.map(date => {
+    const revenueArr = last.map(date => {
       const dateStr = date.toDateString();
-      const dayOrders = orders.filter(o => new Date(o.created_at).toDateString() === dateStr);
+      const dayOrders = filteredOrders.filter(o => new Date(o.created_at).toDateString() === dateStr);
       return { v: dayOrders.reduce((s, o) => s + o.total_price, 0) };
     });
-    const ordersArr = last7.map(date => {
+    const ordersArr = last.map(date => {
       const dateStr = date.toDateString();
-      return { v: orders.filter(o => new Date(o.created_at).toDateString() === dateStr).length };
+      return { v: filteredOrders.filter(o => new Date(o.created_at).toDateString() === dateStr).length };
     });
     return { revenue: revenueArr, orders: ordersArr };
-  }, [orders]);
+  }, [filteredOrders, dayCount, dateRange]);
 
   const chartData = useMemo(() => {
-    if (!orders) return [];
-    const last7 = Array.from({ length: 7 }, (_, i) => {
-      const d = new Date();
-      d.setDate(d.getDate() - (6 - i));
+    const days = Math.min(dayCount, 30);
+    const last = Array.from({ length: days }, (_, i) => {
+      const d = new Date(dateRange.to);
+      d.setDate(d.getDate() - (days - 1 - i));
       return d;
     });
-    return last7.map(date => {
+    return last.map(date => {
       const dateStr = date.toDateString();
-      const dayOrders = orders.filter(o => new Date(o.created_at).toDateString() === dateStr);
+      const dayOrders = filteredOrders.filter(o => new Date(o.created_at).toDateString() === dateStr);
       return {
-        day: date.toLocaleDateString('bn-BD', { weekday: 'short' }),
+        day: date.toLocaleDateString('bn-BD', { day: 'numeric', month: 'short' }),
         revenue: dayOrders.reduce((s, o) => s + o.total_price, 0),
         orders: dayOrders.length,
       };
     });
-  }, [orders]);
+  }, [filteredOrders, dayCount, dateRange]);
 
   const statusData = useMemo(() => {
-    if (!orders) return [];
     const counts: Record<string, number> = {};
-    orders.forEach(o => { counts[o.status] = (counts[o.status] || 0) + 1; });
+    filteredOrders.forEach(o => { counts[o.status] = (counts[o.status] || 0) + 1; });
     return Object.entries(counts).map(([status, count]) => ({ status, count }));
-  }, [orders]);
+  }, [filteredOrders]);
 
   const isLoading = ordersLoading || productsLoading;
 
   return (
     <div className="space-y-6 max-w-[1400px]">
+      {/* Date Filter */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-semibold text-foreground">ড্যাশবোর্ড</h2>
+          <p className="text-[11px] text-muted-foreground">
+            {format(dateRange.from, 'd MMM', { locale: bn })} — {format(dateRange.to, 'd MMM, yyyy', { locale: bn })}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="flex gap-0.5 glass-card rounded-xl p-1">
+            {presets.map((p, i) => (
+              <button
+                key={p.label}
+                onClick={() => handlePreset(i)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
+                  activePreset === i ? 'bg-foreground text-background shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+          <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="h-8 gap-1.5 rounded-xl text-xs">
+                <CalendarIcon className="h-3.5 w-3.5" />
+                কাস্টম
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="end">
+              <Calendar
+                mode="range"
+                selected={{ from: dateRange.from, to: dateRange.to }}
+                onSelect={(range) => {
+                  if (range?.from) {
+                    setDateRange({ from: range.from, to: range.to || range.from });
+                    setActivePreset(-1);
+                    if (range.to) setCalendarOpen(false);
+                  }
+                }}
+                numberOfMonths={1}
+                disabled={(date) => date > new Date()}
+                initialFocus
+                className={cn("p-3 pointer-events-auto")}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+      </div>
+
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {isLoading ? (
@@ -81,28 +172,28 @@ const DashboardPage = () => {
           <>
             <StatCard
               icon={ShoppingCart} label="মোট অর্ডার"
-              value={toBengaliNum(stats?.total ?? 0)}
-              sub={`আজ +${toBengaliNum(stats?.todayOrders ?? 0)}`}
+              value={toBengaliNum(stats.total)}
+              sub={`আজ +${toBengaliNum(stats.todayOrders)}`}
               variant="info"
               sparkData={sparkData.orders}
             />
             <StatCard
               icon={Clock} label="পেন্ডিং"
-              value={toBengaliNum(stats?.pending ?? 0)}
+              value={toBengaliNum(stats.pending)}
               sub="অপেক্ষমাণ অর্ডার"
               variant="warning"
               sparkData={[]}
             />
             <StatCard
               icon={DollarSign} label="আজকের আয়"
-              value={`৳${formatBengaliPrice(stats?.todayRevenue ?? 0)}`}
+              value={`৳${formatBengaliPrice(stats.todayRevenue)}`}
               sub="আজকের মোট"
               variant="success"
               sparkData={sparkData.revenue}
             />
             <StatCard
               icon={Package} label="মোট আয়"
-              value={`৳${formatBengaliPrice(stats?.totalRevenue ?? 0)}`}
+              value={`৳${formatBengaliPrice(stats.totalRevenue)}`}
               sub={`${toBengaliNum(products?.length ?? 0)} প্রোডাক্ট`}
               variant="accent"
               sparkData={sparkData.revenue}
@@ -116,12 +207,12 @@ const DashboardPage = () => {
         <div className="lg:col-span-2 glass-card rounded-2xl p-5 md:p-6">
           <div className="flex items-center justify-between mb-5">
             <div>
-              <h3 className="font-semibold text-sm text-foreground">সাপ্তাহিক আয়</h3>
-              <p className="text-[11px] text-muted-foreground">শেষ ৭ দিনের আয়ের ট্রেন্ড</p>
+              <h3 className="font-semibold text-sm text-foreground">আয়ের ট্রেন্ড</h3>
+              <p className="text-[11px] text-muted-foreground">নির্বাচিত সময়ের আয়</p>
             </div>
             <div className="flex items-center gap-1.5 text-[11px] text-success font-medium">
               <ArrowUpRight className="h-3.5 w-3.5" />
-              <span className="font-inter">+12.5%</span>
+              <span className="font-inter">{toBengaliNum(stats.total)} অর্ডার</span>
             </div>
           </div>
           {isLoading ? (
@@ -204,7 +295,7 @@ const DashboardPage = () => {
           </div>
         ) : (
           <div className="space-y-1">
-            {orders?.slice(0, 5).map(o => (
+            {filteredOrders.slice(0, 5).map(o => (
               <div key={o.id} className="flex items-center justify-between p-3 rounded-xl hover:bg-muted/50 transition-colors duration-200">
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
