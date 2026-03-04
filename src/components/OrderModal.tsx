@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Minus, Plus, Loader2, Check } from 'lucide-react';
 import { toBengaliNum, formatBengaliPrice } from '@/lib/bengali';
 import { useCreateOrder } from '@/hooks/useSupabaseData';
+import { supabase } from '@/integrations/supabase/client';
 
 interface OrderModalProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState<'cod' | 'online'>('cod');
   const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
   const [txnId, setTxnId] = useState('');
@@ -28,7 +30,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
 
   useEffect(() => {
     if (!isOpen) {
-      setQty(1); setTab('cod'); setName(''); setPhone(''); setAddress(''); setTxnId(''); setLoading(false); setSuccess(false); setLocation('dhaka');
+      setQty(1); setTab('cod'); setName(''); setEmail(''); setPhone(''); setAddress(''); setTxnId(''); setLoading(false); setSuccess(false); setLocation('dhaka');
     }
   }, [isOpen]);
 
@@ -41,19 +43,24 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
     if (tab === 'online' && !txnId) return;
     setLoading(true);
 
+    const orderData = {
+      customer_name: name,
+      customer_email: email || null,
+      phone,
+      address,
+      watch_model: watchName,
+      quantity: qty,
+      payment_method: tab === 'cod' ? 'cod' : payMethod,
+      trx_id: tab === 'online' ? txnId : null,
+      delivery_location: location,
+      delivery_charge: deliveryCharge,
+      total_price: grandTotal,
+    };
+
     try {
-      await createOrder.mutateAsync({
-        customer_name: name,
-        phone,
-        address,
-        watch_model: watchName,
-        quantity: qty,
-        payment_method: tab === 'cod' ? 'cod' : payMethod,
-        trx_id: tab === 'online' ? txnId : null,
-        delivery_location: location,
-        delivery_charge: deliveryCharge,
-        total_price: grandTotal,
-      });
+      await createOrder.mutateAsync(orderData);
+      // Send emails in background (don't block success)
+      supabase.functions.invoke('send-order-email', { body: orderData }).catch(console.error);
       setLoading(false);
       setSuccess(true);
     } catch {
@@ -197,6 +204,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
 
             <div className="space-y-3">
               <input value={name} onChange={(e) => setName(e.target.value)} placeholder="আপনার নাম" className="w-full bg-ash border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30" />
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ইমেইল (ঐচ্ছিক)" className="w-full bg-ash border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30" />
               <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="মোবাইল নম্বর" className="w-full bg-ash border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30" />
               <textarea value={address} onChange={(e) => setAddress(e.target.value)} placeholder="সম্পূর্ণ ঠিকানা" rows={2} className="w-full bg-ash border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 resize-none" />
             </div>
