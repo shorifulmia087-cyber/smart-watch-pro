@@ -1,8 +1,17 @@
 import { useState, useEffect } from 'react';
 import { toBengaliNum } from '@/lib/bengali';
 
-const AnnouncementBar = () => {
-  const [time, setTime] = useState({ h: 1, m: 59, s: 59 });
+interface AnnouncementBarProps {
+  discountPercent?: number;
+  countdownHours?: number;
+}
+
+const AnnouncementBar = ({ discountPercent = 30, countdownHours = 2 }: AnnouncementBarProps) => {
+  const [time, setTime] = useState({ h: countdownHours, m: 0, s: 0 });
+
+  useEffect(() => {
+    setTime({ h: countdownHours, m: 0, s: 0 });
+  }, [countdownHours]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -24,7 +33,7 @@ const AnnouncementBar = () => {
   return (
     <div className="sticky top-0 z-50 bg-ink text-accent-foreground py-2.5 px-4">
       <div className="max-w-6xl mx-auto flex items-center justify-center gap-3 text-sm md:text-base">
-        <span className="text-gold font-semibold">🔥 ৩০% ছাড়</span>
+        <span className="text-gold font-semibold">🔥 {toBengaliNum(discountPercent)}% ছাড়</span>
         <span className="text-gold/60">|</span>
         <span className="text-gold/90 tabular-nums font-semibold tracking-wide">
           {pad(time.h)}:{pad(time.m)}:{pad(time.s)}
