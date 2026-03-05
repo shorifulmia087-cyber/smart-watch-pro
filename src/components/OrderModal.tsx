@@ -391,7 +391,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
                 <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="mt-3 space-y-3">
                   <div className="flex gap-2">
                     {['bkash', 'nagad', 'rocket'].map((m) => (
-                      <button key={m} onClick={() => setPayMethod(m)} className={`flex-1 py-2.5 rounded-lg border text-sm font-semibold transition-all ${payMethod === m ? 'border-gold bg-gold/10 text-gold shadow-sm' : 'border-border/60 bg-surface text-muted-foreground hover:border-border'}`}>
+                      <button key={m} onClick={() => setPayMethod(m)} className={`flex-1 py-2.5 rounded-sm border text-sm font-semibold transition-all ${payMethod === m ? 'border-gold bg-gold/10 text-gold shadow-sm' : 'border-border/60 bg-surface text-muted-foreground hover:border-border'}`}>
                         {m === 'bkash' ? 'বিকাশ' : m === 'nagad' ? 'নগদ' : 'রকেট'}
                       </button>
                     ))}
