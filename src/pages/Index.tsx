@@ -91,6 +91,7 @@ const Index = () => {
         announcementText={settings?.announcement_text}
         timerEnabled={settings?.timer_enabled}
       />
+      <Navbar />
 
       <motion.div
         key={currentProduct.id}
