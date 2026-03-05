@@ -5,3 +5,9 @@ verify_jwt = false
 
 [functions.book-redx-courier]
 verify_jwt = false
+
+[functions.book-pathao-courier]
+verify_jwt = false
+
+[functions.book-steadfast-courier]
+verify_jwt = false
