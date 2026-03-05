@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Minus, Plus, Loader2, Check } from 'lucide-react';
+import { X, Minus, Plus, Loader2, Check, Copy } from 'lucide-react';
 import { toBengaliNum, formatBengaliPrice } from '@/lib/bengali';
 import { useCreateOrder } from '@/hooks/useSupabaseData';
 import { useRateLimit } from '@/hooks/useRateLimit';
@@ -16,9 +16,12 @@ interface OrderModalProps {
   deliveryChargeInside?: number;
   deliveryChargeOutside?: number;
   onlinePaymentEnabled?: boolean;
+  bkashNumber?: string;
+  nagadNumber?: string;
+  rocketNumber?: string;
 }
 
-const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInside = 70, deliveryChargeOutside = 150, onlinePaymentEnabled = true }: OrderModalProps) => {
+const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInside = 70, deliveryChargeOutside = 150, onlinePaymentEnabled = true, bkashNumber = '', nagadNumber = '', rocketNumber = '' }: OrderModalProps) => {
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState<'cod' | 'online'>('cod');
   const [name, setName] = useState('');
@@ -301,6 +304,34 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
                       </button>
                     ))}
                   </div>
+
+                  {/* Payment number display with copy */}
+                  {(() => {
+                    const numberMap: Record<string, string> = { bkash: bkashNumber, nagad: nagadNumber, rocket: rocketNumber };
+                    const labelMap: Record<string, string> = { bkash: 'বিকাশ', nagad: 'নগদ', rocket: 'রকেট' };
+                    const currentNumber = numberMap[payMethod] || '';
+                    if (!currentNumber) return null;
+                    return (
+                      <div className="flex items-center justify-between p-3 rounded-lg bg-gold/5 border border-gold/20">
+                        <div>
+                          <p className="text-xs text-muted-foreground">{labelMap[payMethod]} নম্বর</p>
+                          <p className="text-sm font-bold text-foreground font-mono tracking-wider mt-0.5">{currentNumber}</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(currentNumber);
+                            toast({ title: 'কপি হয়েছে ✓', description: `${labelMap[payMethod]} নম্বর কপি করা হয়েছে।` });
+                          }}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-gold/10 text-gold text-xs font-medium hover:bg-gold/20 transition-colors"
+                        >
+                          <Copy className="w-3.5 h-3.5" />
+                          কপি
+                        </button>
+                      </div>
+                    );
+                  })()}
+
                   <div>
                     {(() => {
                       const requiredLen = payMethod === 'bkash' ? 10 : payMethod === 'nagad' ? 8 : 10;
