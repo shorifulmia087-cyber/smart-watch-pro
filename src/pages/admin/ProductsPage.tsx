@@ -285,7 +285,7 @@ const ProductsPage = () => {
       )}
 
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-        <SheetContent className="w-full sm:max-w-2xl overflow-y-auto p-0 border-l-0 shadow-2xl">
+        <SheetContent className="w-full sm:max-w-2xl overflow-y-auto p-0 border-l border-border/30 shadow-2xl bg-background">
           {/* Premium Header */}
           <div className="sticky top-0 z-10 border-b border-border/30">
             <div className="absolute inset-0 bg-background/90 backdrop-blur-2xl" />
@@ -314,7 +314,7 @@ const ProductsPage = () => {
             </div>
           </div>
 
-          <div className="px-6 py-6 space-y-6 bg-gradient-to-b from-muted/10 via-background to-muted/5">
+          <div className="px-6 py-6 space-y-6">
             {/* Basic Info Card */}
             <SectionCard icon={<Package className="w-4 h-4" />} title="মৌলিক তথ্য" color="accent">
               <PremiumField label="নাম *" value={form.name} onChange={v => setForm({ ...form, name: v })} />
@@ -327,8 +327,8 @@ const ProductsPage = () => {
               <PremiumField label="ভিডিও URL (YouTube ID)" value={form.video_url} onChange={v => setForm({ ...form, video_url: v })} />
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[11px] font-semibold text-muted-foreground/80 mb-1.5 block uppercase tracking-wider">টাইপ</label>
-                  <select value={form.product_type} onChange={e => setForm({ ...form, product_type: e.target.value })} className="w-full bg-muted/50 border border-border/50 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all hover:border-border">
+                  <label className="text-[11px] font-semibold text-muted-foreground mb-1.5 block uppercase tracking-wider">টাইপ</label>
+                  <select value={form.product_type} onChange={e => setForm({ ...form, product_type: e.target.value })} className="w-full bg-background border border-border/60 rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all hover:border-border">
                     <option value="watch">ঘড়ি</option>
                     <option value="clothing">পোশাক</option>
                     <option value="electronics">ইলেকট্রনিক্স</option>
@@ -336,8 +336,8 @@ const ProductsPage = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="text-[11px] font-semibold text-muted-foreground/80 mb-1.5 block uppercase tracking-wider">স্টক</label>
-                  <select value={form.stock_status} onChange={e => setForm({ ...form, stock_status: e.target.value })} className="w-full bg-muted/50 border border-border/50 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all hover:border-border">
+                  <label className="text-[11px] font-semibold text-muted-foreground mb-1.5 block uppercase tracking-wider">স্টক</label>
+                  <select value={form.stock_status} onChange={e => setForm({ ...form, stock_status: e.target.value })} className="w-full bg-background border border-border/60 rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all hover:border-border">
                     <option value="in_stock">ইন স্টক</option>
                     <option value="out_of_stock">আউট অফ স্টক</option>
                   </select>
@@ -384,7 +384,7 @@ const ProductsPage = () => {
                     }
                   }}
                   placeholder="কালার নাম লিখুন (যেমন: কালো, সিলভার)"
-                  className="flex-1 bg-muted/50 border border-border/50 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all hover:border-border"
+                  className="flex-1 bg-background border border-border/60 rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all hover:border-border placeholder:text-muted-foreground"
                 />
                 <button
                   onClick={() => {
@@ -404,13 +404,13 @@ const ProductsPage = () => {
             <SectionCard icon={<Globe className="w-4 h-4" />} title="SEO সেটিংস" color="warning">
               <PremiumField label="Meta Title" value={form.meta_title} onChange={v => setForm({ ...form, meta_title: v })} />
               <div>
-                <label className="text-[11px] font-semibold text-muted-foreground/80 mb-1.5 block uppercase tracking-wider">Meta Description</label>
+                <label className="text-[11px] font-semibold text-muted-foreground mb-1.5 block uppercase tracking-wider">Meta Description</label>
                 <textarea
                   value={form.meta_description}
                   onChange={e => setForm({ ...form, meta_description: e.target.value })}
                   rows={2}
                   placeholder="সার্চ ইঞ্জিনে দেখানো বিবরণ..."
-                  className="w-full bg-muted/50 border border-border/50 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all resize-none hover:border-border"
+                  className="w-full bg-background border border-border/60 rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all resize-none hover:border-border placeholder:text-muted-foreground"
                 />
               </div>
             </SectionCard>
@@ -482,7 +482,7 @@ const ProductsPage = () => {
                   onChange={e => setNewDesc(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && addDescription()}
                   placeholder="নতুন বিবরণ লিখুন..."
-                  className="flex-1 bg-muted/50 border border-border/50 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all hover:border-border"
+                  className="flex-1 bg-background border border-border/60 rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all hover:border-border placeholder:text-muted-foreground"
                 />
                 <button onClick={addDescription} className="px-4 py-2.5 rounded-xl bg-accent/10 text-accent text-sm font-semibold hover:bg-accent/20 transition-all border border-accent/20 hover:border-accent/30">
                   <Plus className="w-4 h-4" />
@@ -517,13 +517,13 @@ const ProductsPage = () => {
                     value={newFeature.icon}
                     onChange={e => setNewFeature({ ...newFeature, icon: e.target.value })}
                     placeholder="🛡️"
-                    className="bg-muted/50 border border-border/50 rounded-xl px-2 py-2.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all hover:border-border"
+                    className="bg-background border border-border/60 rounded-xl px-2 py-2.5 text-sm text-center text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all hover:border-border"
                   />
                   <input
                     value={newFeature.title}
                     onChange={e => setNewFeature({ ...newFeature, title: e.target.value })}
                     placeholder="ফিচার শিরোনাম"
-                    className="bg-muted/50 border border-border/50 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all hover:border-border"
+                    className="bg-background border border-border/60 rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all hover:border-border placeholder:text-muted-foreground"
                   />
                 </div>
                 <div className="flex gap-2">
@@ -532,7 +532,7 @@ const ProductsPage = () => {
                     onChange={e => setNewFeature({ ...newFeature, desc: e.target.value })}
                     onKeyDown={e => e.key === 'Enter' && addFeature()}
                     placeholder="ফিচার বর্ণনা"
-                    className="flex-1 bg-muted/50 border border-border/50 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all hover:border-border"
+                    className="flex-1 bg-background border border-border/60 rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all hover:border-border placeholder:text-muted-foreground"
                   />
                   <button onClick={addFeature} className="px-4 py-2.5 rounded-xl bg-accent/10 text-accent text-sm font-semibold hover:bg-accent/20 transition-all border border-accent/20 hover:border-accent/30">
                     <Plus className="w-4 h-4" />
@@ -606,14 +606,14 @@ const SectionCard = ({ icon, title, color, badge, children }: {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="rounded-2xl border border-border/40 bg-white dark:bg-slate-900 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+      className="rounded-2xl border border-border/40 bg-card overflow-hidden shadow-sm hover:shadow-md transition-shadow"
     >
-      <div className="px-5 py-3.5 border-b border-border/30 bg-white dark:bg-slate-900 flex items-center gap-3">
+      <div className="px-5 py-3.5 border-b border-border/20 bg-muted/30 flex items-center gap-3">
         <div className={`w-7 h-7 rounded-lg ${colorMap[color] || colorMap.accent} flex items-center justify-center border`}>
           {icon}
         </div>
         <h3 className="text-xs font-bold text-foreground/80 uppercase tracking-wider">{title}</h3>
-        {badge && <span className="text-[10px] font-normal text-muted-foreground/60 ml-auto bg-muted/60 px-2 py-0.5 rounded-full">{badge}</span>}
+        {badge && <span className="text-[10px] font-normal text-muted-foreground/60 ml-auto bg-muted/50 px-2 py-0.5 rounded-full">{badge}</span>}
       </div>
       <div className="p-5 space-y-4">{children}</div>
     </motion.div>
@@ -625,10 +625,10 @@ const PremiumField = ({ label, value, onChange, type = 'text' }: {
   label: string; value: string; onChange: (v: string) => void; type?: string;
 }) => (
   <div>
-    <label className="text-[11px] font-semibold text-muted-foreground/80 mb-1.5 block uppercase tracking-wider">{label}</label>
+    <label className="text-[11px] font-semibold text-muted-foreground mb-1.5 block uppercase tracking-wider">{label}</label>
     <input
       type={type} value={value} onChange={e => onChange(e.target.value)}
-      className="w-full bg-muted/50 border border-border/50 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all hover:border-border"
+      className="w-full bg-background border border-border/60 rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all hover:border-border placeholder:text-muted-foreground"
     />
   </div>
 );
