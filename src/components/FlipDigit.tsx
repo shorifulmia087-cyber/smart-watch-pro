@@ -21,7 +21,7 @@ const FlipDigit = ({ value }: FlipDigitProps) => {
       setPrevious(current);
       setCurrent(value);
       setFlipping(true);
-      const t = setTimeout(() => setFlipping(false), 600);
+      const t = setTimeout(() => setFlipping(false), 400);
       return () => clearTimeout(t);
     }
   }, [value]);
@@ -53,7 +53,7 @@ const FlipDigit = ({ value }: FlipDigitProps) => {
           className="absolute top-0 left-0 right-0 h-1/2 overflow-hidden rounded-t-[4px] bg-[#2c2c30] z-[3]"
           style={{
             transformOrigin: 'bottom center',
-            animation: 'flipTopDown 0.3s ease-in forwards',
+            animation: 'flipTopDown 0.2s cubic-bezier(0.32, 0, 0.67, 0) forwards',
             backfaceVisibility: 'hidden',
           }}
         >
@@ -69,7 +69,7 @@ const FlipDigit = ({ value }: FlipDigitProps) => {
           className="absolute bottom-0 left-0 right-0 h-1/2 overflow-hidden rounded-b-[4px] bg-[#232327] z-[3]"
           style={{
             transformOrigin: 'top center',
-            animation: 'flipBottomDown 0.3s 0.15s ease-out forwards',
+            animation: 'flipBottomDown 0.2s 0.1s cubic-bezier(0.33, 1, 0.68, 1) forwards',
             backfaceVisibility: 'hidden',
             transform: 'rotateX(90deg)',
           }}
