@@ -202,12 +202,12 @@ const ProductsPage = () => {
                         </div>
                       )}
                     </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-sm">{p.name}</span>
+                    <TableCell className="max-w-[180px]">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="font-medium text-sm truncate">{p.name}</span>
                         {p.is_featured && <Star className="h-3.5 w-3.5 text-accent fill-accent shrink-0" />}
                       </div>
-                      {p.subtitle && <p className="text-[11px] text-muted-foreground">{p.subtitle}</p>}
+                      {p.subtitle && <p className="text-[11px] text-muted-foreground truncate">{p.subtitle}</p>}
                     </TableCell>
                     <TableCell>
                       <span className="text-[11px] bg-muted px-2.5 py-1 rounded-full">{p.product_type}</span>
@@ -224,13 +224,13 @@ const ProductsPage = () => {
                       <div className="flex flex-col items-center gap-1">
                         <button
                           onClick={() => toggleStock.mutate({ id: p.id, stock_status: p.stock_status === 'in_stock' ? 'out_of_stock' : 'in_stock' })}
-                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none ${
-                            p.stock_status === 'in_stock' ? 'bg-success' : 'bg-muted-foreground/30'
+                          className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${
+                            p.stock_status === 'in_stock' ? 'bg-success' : 'bg-muted-foreground/25'
                           }`}
                         >
                           <span
-                            className={`inline-block h-4.5 w-4.5 transform rounded-full bg-background shadow-md transition-transform duration-300 ${
-                              p.stock_status === 'in_stock' ? 'translate-x-5.5' : 'translate-x-0.5'
+                            className={`inline-block h-6 w-6 transform rounded-full bg-background shadow-lg transition-transform duration-300 ${
+                              p.stock_status === 'in_stock' ? 'translate-x-7' : 'translate-x-1'
                             }`}
                           />
                         </button>
@@ -242,13 +242,13 @@ const ProductsPage = () => {
                     <TableCell className="text-center" onClick={e => e.stopPropagation()}>
                       <button
                         onClick={() => toggleFeatured.mutate({ id: p.id, is_featured: !p.is_featured })}
-                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none ${
-                          p.is_featured ? 'bg-accent' : 'bg-muted-foreground/30'
+                        className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${
+                          p.is_featured ? 'bg-accent' : 'bg-muted-foreground/25'
                         }`}
                       >
                         <span
-                          className={`inline-block h-4.5 w-4.5 transform rounded-full bg-background shadow-md transition-transform duration-300 ${
-                            p.is_featured ? 'translate-x-5.5' : 'translate-x-0.5'
+                          className={`inline-block h-6 w-6 transform rounded-full bg-background shadow-lg transition-transform duration-300 ${
+                            p.is_featured ? 'translate-x-7' : 'translate-x-1'
                           }`}
                         />
                       </button>
