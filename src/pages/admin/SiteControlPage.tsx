@@ -62,6 +62,14 @@ const SiteControlPage = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="ব্র্যান্ড নাম" value={form.brand_name || ''} onChange={v => setForm({ ...form, brand_name: v })} />
             <Field label="ট্যাগলাইন" value={form.brand_tagline || ''} onChange={v => setForm({ ...form, brand_tagline: v })} />
+            <div className="sm:col-span-2">
+              <Field label="লোগো URL (ছবির লিংক দিন)" value={(form as any).logo_url || ''} onChange={v => setForm({ ...form, logo_url: v } as any)} />
+              {(form as any).logo_url && (
+                <div className="mt-2 p-3 bg-muted rounded-xl inline-block">
+                  <img src={(form as any).logo_url} alt="Logo preview" className="h-10 w-auto object-contain" />
+                </div>
+              )}
+            </div>
             <div>
               <label className="text-[11px] font-medium text-muted-foreground mb-1.5 block">টাইপ</label>
               <select value={form.product_type || 'watch'} onChange={e => setForm({ ...form, product_type: e.target.value })} className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30">

@@ -23,6 +23,7 @@ const Navbar = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const brandName = settings?.brand_name || 'Kronos';
+  const logoUrl = (settings as any)?.logo_url;
 
   const handleMyOrders = () => {
     setMenuOpen(false);
@@ -41,91 +42,121 @@ const Navbar = () => {
       className="sticky top-0 z-40 bg-card/90 backdrop-blur-2xl border-b border-border/40 shadow-sm"
     >
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-        {/* Brand */}
-        <Link to="/" className="flex items-center gap-2.5 group">
-          <motion.div
-            whileHover={{ rotate: [0, -8, 8, 0] }}
-            transition={{ duration: 0.5 }}
-            className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center"
+        {/* Left: Menu toggle (mobile) + Nav links (desktop) */}
+        <div className="flex items-center gap-1">
+          {/* Mobile Toggle */}
+          <motion.button
+            whileTap={{ scale: 0.9 }}
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="md:hidden p-2 rounded-lg hover:bg-muted transition-colors"
           >
-            <span className="text-accent-foreground font-bold text-sm">
-              {brandName.charAt(0)}
-            </span>
-          </motion.div>
-          <span className="text-base font-bold text-foreground tracking-tight group-hover:text-accent transition-colors duration-200">
-            {brandName}
-          </span>
+            <AnimatePresence mode="wait">
+              {menuOpen ? (
+                <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }}>
+                  <X className="h-5 w-5" />
+                </motion.div>
+              ) : (
+                <motion.div key="menu" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }}>
+                  <Menu className="h-5 w-5" />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.button>
+
+          {/* Desktop Nav Links */}
+          <div className="hidden md:flex items-center gap-1">
+            <Link
+              to="/"
+              className={navLinkClass}
+              onMouseEnter={() => setHoveredLink('home')}
+              onMouseLeave={() => setHoveredLink(null)}
+            >
+              হোম
+              {hoveredLink === 'home' && <NavUnderline />}
+            </Link>
+            <Link
+              to="/track"
+              className={`${navLinkClass} flex items-center gap-1.5`}
+              onMouseEnter={() => setHoveredLink('track')}
+              onMouseLeave={() => setHoveredLink(null)}
+            >
+              <Package className="h-3.5 w-3.5" />
+              অর্ডার ট্র্যাকিং
+              {hoveredLink === 'track' && <NavUnderline />}
+            </Link>
+            <button
+              onClick={handleMyOrders}
+              className={`${navLinkClass} flex items-center gap-1.5`}
+              onMouseEnter={() => setHoveredLink('orders')}
+              onMouseLeave={() => setHoveredLink(null)}
+            >
+              <ShoppingBag className="h-3.5 w-3.5" />
+              মাই অর্ডার
+              {hoveredLink === 'orders' && <NavUnderline />}
+            </button>
+          </div>
+        </div>
+
+        {/* Center: Logo/Brand */}
+        <Link to="/" className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2.5 group">
+          {logoUrl ? (
+            <motion.img
+              src={logoUrl}
+              alt={brandName}
+              className="h-9 w-auto object-contain"
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.2 }}
+            />
+          ) : (
+            <>
+              <motion.div
+                whileHover={{ rotate: [0, -8, 8, 0] }}
+                transition={{ duration: 0.5 }}
+                className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center"
+              >
+                <span className="text-accent-foreground font-bold text-sm">
+                  {brandName.charAt(0)}
+                </span>
+              </motion.div>
+              <span className="text-base font-bold text-foreground tracking-tight group-hover:text-accent transition-colors duration-200">
+                {brandName}
+              </span>
+            </>
+          )}
         </Link>
 
-        {/* Desktop Nav */}
-        <div className="hidden md:flex items-center gap-1">
-          <Link
-            to="/"
-            className={navLinkClass}
-            onMouseEnter={() => setHoveredLink('home')}
-            onMouseLeave={() => setHoveredLink(null)}
-          >
-            হোম
-            {hoveredLink === 'home' && <NavUnderline />}
-          </Link>
-          <Link
-            to="/track"
-            className={`${navLinkClass} flex items-center gap-1.5`}
-            onMouseEnter={() => setHoveredLink('track')}
-            onMouseLeave={() => setHoveredLink(null)}
-          >
-            <Package className="h-3.5 w-3.5" />
-            অর্ডার ট্র্যাকিং
-            {hoveredLink === 'track' && <NavUnderline />}
-          </Link>
-          <button
-            onClick={handleMyOrders}
-            className={`${navLinkClass} flex items-center gap-1.5`}
-            onMouseEnter={() => setHoveredLink('orders')}
-            onMouseLeave={() => setHoveredLink(null)}
-          >
-            <ShoppingBag className="h-3.5 w-3.5" />
-            মাই অর্ডার
-            {hoveredLink === 'orders' && <NavUnderline />}
-          </button>
-
-          {/* Desktop Auth */}
+        {/* Right: Auth */}
+        <div className="hidden md:flex items-center">
           {!user ? (
             <Link
               to="/login"
-              className="ml-3 inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold bg-accent text-accent-foreground hover:opacity-90 transition-opacity"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold bg-accent text-accent-foreground hover:opacity-90 transition-opacity"
             >
               <LogIn className="h-3.5 w-3.5" />
               লগইন
             </Link>
           ) : (
             <Link
-              to="/track"
-              className="ml-3 w-8 h-8 rounded-full bg-accent/15 flex items-center justify-center text-accent hover:bg-accent/25 transition-colors"
+              to="/my-orders"
+              className="w-8 h-8 rounded-full bg-accent/15 flex items-center justify-center text-accent hover:bg-accent/25 transition-colors"
             >
               <User className="h-4 w-4" />
             </Link>
           )}
         </div>
 
-        {/* Mobile Toggle */}
-        <motion.button
-          whileTap={{ scale: 0.9 }}
-          onClick={() => setMenuOpen(!menuOpen)}
-          className="md:hidden p-2 rounded-lg hover:bg-muted transition-colors"
-        >
-          <AnimatePresence mode="wait">
-            {menuOpen ? (
-              <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }}>
-                <X className="h-5 w-5" />
-              </motion.div>
-            ) : (
-              <motion.div key="menu" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }}>
-                <Menu className="h-5 w-5" />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.button>
+        {/* Mobile: Auth icon */}
+        <div className="md:hidden">
+          {!user ? (
+            <Link to="/login" className="p-2 rounded-lg hover:bg-muted transition-colors">
+              <LogIn className="h-5 w-5 text-muted-foreground" />
+            </Link>
+          ) : (
+            <Link to="/my-orders" className="p-2 rounded-lg hover:bg-muted transition-colors">
+              <User className="h-5 w-5 text-accent" />
+            </Link>
+          )}
+        </div>
       </div>
 
       {/* Mobile Menu */}
@@ -180,7 +211,7 @@ const Navbar = () => {
                 </button>
               </motion.div>
 
-              {/* Auth section at bottom */}
+              {/* Auth section */}
               <motion.div
                 initial={{ y: 10, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
