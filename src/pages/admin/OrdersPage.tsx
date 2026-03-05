@@ -1,9 +1,10 @@
-import { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useOrders, useUpdateOrderStatus, useSettings } from '@/hooks/useSupabaseData';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
-import { Search, Filter, ChevronLeft, ChevronRight, Truck, FileText, CheckCircle2, Package, Loader2 } from 'lucide-react';
+import { Search, Filter, ChevronLeft, ChevronRight, Truck, FileText, CheckCircle2, Package, Loader2, Eye, X, MapPin } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Checkbox } from '@/components/ui/checkbox';
+import LiveTracking from '@/components/admin/LiveTracking';
 import jsPDF from 'jspdf';
 import {
   Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
@@ -33,6 +34,7 @@ const OrdersPage = () => {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(0);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
   const pageSize = 15;
   const { data: orders, isLoading } = useOrders(filter);
   const { data: settings } = useSettings();
@@ -385,6 +387,7 @@ const OrdersPage = () => {
                   <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">মোট</TableHead>
                   <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">TrxID</TableHead>
                   <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">ট্র্যাকিং</TableHead>
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">ট্র্যাক স্ট্যাটাস</TableHead>
                   <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">এলাকা</TableHead>
                   <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">তারিখ</TableHead>
                   <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">স্ট্যাটাস</TableHead>
@@ -395,8 +398,9 @@ const OrdersPage = () => {
                 {paged.map((o, index) => {
                   const serial = page * pageSize + index + 1;
                   const courierBooked = (o as any).courier_booked === true;
-                  return (
-                    <TableRow key={o.id} className={`group hover:bg-muted/30 transition-colors duration-200 border-b border-border/40 ${selectedIds.has(o.id) ? 'bg-accent/5' : ''}`}>
+                    return (
+                    <React.Fragment key={o.id}>
+                    <TableRow className={`group hover:bg-muted/30 transition-colors duration-200 border-b border-border/40 ${selectedIds.has(o.id) ? 'bg-accent/5' : ''}`}>
                       <TableCell>
                         <Checkbox
                           checked={selectedIds.has(o.id)}
@@ -442,6 +446,28 @@ const OrdersPage = () => {
                           <span className="text-muted-foreground text-[11px]">—</span>
                         )}
                       </TableCell>
+                      {/* Tracking Status Badge */}
+                      <TableCell>
+                        {courierBooked ? (
+                          <button
+                            onClick={() => setExpandedOrderId(expandedOrderId === o.id ? null : o.id)}
+                            className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-semibold border transition-colors cursor-pointer ${
+                              o.status === 'completed'
+                                ? 'bg-success/10 text-success border-success/20'
+                                : o.status === 'shipped'
+                                ? 'bg-info/10 text-info border-info/20'
+                                : o.status === 'returned'
+                                ? 'bg-destructive/10 text-destructive border-destructive/20'
+                                : 'bg-warning/10 text-warning border-warning/20'
+                            }`}
+                          >
+                            <Eye className="h-2.5 w-2.5" />
+                            {o.status === 'completed' ? 'ডেলিভারড' : o.status === 'shipped' ? 'ট্রানজিট' : o.status === 'returned' ? 'রিটার্ন' : 'পেন্ডিং'}
+                          </button>
+                        ) : (
+                          <span className="text-muted-foreground text-[10px]">—</span>
+                        )}
+                      </TableCell>
                       <TableCell className="text-[11px] text-foreground">
                         {o.delivery_location === 'dhaka' ? 'ঢাকা' : 'ঢাকার বাইরে'}
                       </TableCell>
@@ -473,7 +499,7 @@ const OrdersPage = () => {
                               onClick={() => bookCourier(o.id, o.customer_name)}
                               disabled={bookingInProgress === o.id || bookingInProgress === 'bulk'}
                               className="p-1.5 rounded-lg text-info/70 hover:text-info hover:bg-info/10 transition-all disabled:opacity-50"
-                              title="RedX কুরিয়ার বুক"
+                              title="কুরিয়ার বুক"
                             >
                               {bookingInProgress === o.id ? (
                                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -492,7 +518,28 @@ const OrdersPage = () => {
                         </div>
                       </TableCell>
                     </TableRow>
-                  );
+                    {/* Expandable Live Tracking Row */}
+                    {expandedOrderId === o.id && (
+                      <TableRow className="bg-muted/20 hover:bg-muted/20">
+                        <TableCell colSpan={14} className="py-4 px-6">
+                          <div className="flex items-start justify-between">
+                            <LiveTracking
+                              orderId={o.id}
+                              trackingId={(o as any).tracking_id}
+                              courierProvider={(o as any).courier_provider}
+                            />
+                            <button
+                              onClick={() => setExpandedOrderId(null)}
+                              className="p-1 rounded-lg hover:bg-muted text-muted-foreground"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </React.Fragment>
+                );
                 })}
               </TableBody>
             </Table>

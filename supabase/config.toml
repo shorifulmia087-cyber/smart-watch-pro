@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.fetch-areas]
 verify_jwt = false
+
+[functions.track-courier]
+verify_jwt = false
