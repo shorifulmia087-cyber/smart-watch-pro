@@ -3,7 +3,16 @@ import { useSettings } from '@/hooks/useSupabaseData';
 
 const WhatsAppButton = () => {
   const { data: settings } = useSettings();
-  const phoneNumber = (settings as any)?.whatsapp_number || '8801XXXXXXXXX';
+  const rawNumber = (settings as any)?.whatsapp_number || '';
+  
+  // Clean phone number: remove spaces, dashes, plus signs, keep only digits
+  const phoneNumber = rawNumber.replace(/[^0-9]/g, '');
+  
+  // Don't render if no valid number
+  if (!phoneNumber || phoneNumber === '8801XXXXXXXXX' || phoneNumber.includes('X')) {
+    return null;
+  }
+
   const message = encodeURIComponent('আমি একটি প্রোডাক্ট সম্পর্কে জানতে চাই।');
 
   return (

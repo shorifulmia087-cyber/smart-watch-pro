@@ -100,13 +100,18 @@ const Navbar = () => {
         {/* Center: Logo/Brand */}
         <Link to="/" className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2.5 group">
           {logoUrl ? (
-            <motion.img
-              src={logoUrl}
-              alt={brandName}
-              className="h-9 w-auto object-contain"
-              whileHover={{ scale: 1.05 }}
-              transition={{ duration: 0.2 }}
-            />
+            <>
+              <motion.img
+                src={logoUrl}
+                alt={brandName}
+                className="h-9 w-auto object-contain"
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.2 }}
+              />
+              <span className="text-base font-bold text-foreground tracking-tight group-hover:text-accent transition-colors duration-200">
+                {brandName}
+              </span>
+            </>
           ) : (
             <>
               <motion.div
