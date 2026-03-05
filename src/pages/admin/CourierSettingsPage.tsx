@@ -39,10 +39,11 @@ const CourierSettingsPage = () => {
         <h3 className="font-semibold text-sm flex items-center gap-2">
           <Truck className="h-4 w-4 text-accent" /> কুরিয়ার প্রোভাইডার
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {[
             { id: 'redx', name: 'RedX', desc: 'দ্রুত ডেলিভারি সার্ভিস', url: 'https://redx.com.bd' },
             { id: 'pathao', name: 'Pathao Courier', desc: 'পাঠাও কুরিয়ার সার্ভিস', url: 'https://pathao.com' },
+            { id: 'steadfast', name: 'Steadfast Courier', desc: 'স্টেডফাস্ট কুরিয়ার সার্ভিস', url: 'https://steadfast.com.bd' },
           ].map(p => (
             <button
               key={p.id}
@@ -71,7 +72,7 @@ const CourierSettingsPage = () => {
           <div className="w-1.5 h-1.5 rounded-full bg-info" /> API ক্রেডেনশিয়াল
         </h3>
         <p className="text-[11px] text-muted-foreground">
-          {courierProvider === 'redx' ? 'RedX' : 'Pathao'} ড্যাশবোর্ড থেকে API Key ও Secret সংগ্রহ করুন।
+          {courierProvider === 'redx' ? 'RedX' : courierProvider === 'pathao' ? 'Pathao' : 'Steadfast'} ড্যাশবোর্ড থেকে API Key ও Secret সংগ্রহ করুন।
         </p>
         <div className="space-y-3">
           <div>

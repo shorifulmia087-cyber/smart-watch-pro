@@ -41,15 +41,14 @@ const OrdersPage = () => {
   const queryClient = useQueryClient();
 
   // Mock courier provider selection — defaults to 'redx'
-  const [courierProvider, setCourierProvider] = useState<'redx' | 'pathao'>('redx');
+  const [courierProvider, setCourierProvider] = useState<'redx' | 'pathao' | 'steadfast'>('redx');
 
-  const generateMockTrackingId = (provider: 'redx' | 'pathao') => {
+  const generateMockTrackingId = (provider: 'redx' | 'pathao' | 'steadfast') => {
     const ts = Date.now().toString().slice(-8);
     const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
-    if (provider === 'redx') {
-      return `RDX${ts}${rand}`; // RedX style: RDX + 12 chars
-    }
-    return `PT-${ts}-${rand}`; // Pathao style: PT-XXXXXXXX-XXXX
+    if (provider === 'redx') return `RDX${ts}${rand}`;
+    if (provider === 'pathao') return `PT-${ts}-${rand}`;
+    return `SF-${ts}${rand}`; // Steadfast style
   };
 
   const bookCourier = useCallback(async (orderId: string, customerName: string) => {
@@ -66,7 +65,7 @@ const OrdersPage = () => {
     queryClient.invalidateQueries({ queryKey: ['orders'] });
     toast({
       title: '✅ কুরিয়ার বুক সফল!',
-      description: `${customerName} — ${courierProvider === 'redx' ? 'RedX' : 'Pathao'} ট্র্যাকিং: ${trackingId}`,
+      description: `${customerName} — ${courierProvider === 'redx' ? 'RedX' : courierProvider === 'pathao' ? 'Pathao' : 'Steadfast'} ট্র্যাকিং: ${trackingId}`,
     });
   }, [toast, queryClient, courierProvider]);
 
@@ -98,7 +97,7 @@ const OrdersPage = () => {
     setSelectedIds(new Set());
     toast({
       title: '✅ বাল্ক কুরিয়ার বুক সফল!',
-      description: `${toBengaliNum(unbookedIds.length)} টি অর্ডার ${courierProvider === 'redx' ? 'RedX' : 'Pathao'} কুরিয়ারে যুক্ত হয়েছে`,
+      description: `${toBengaliNum(unbookedIds.length)} টি অর্ডার ${courierProvider === 'redx' ? 'RedX' : courierProvider === 'pathao' ? 'Pathao' : 'Steadfast'} কুরিয়ারে যুক্ত হয়েছে`,
     });
   }, [orders, toast, queryClient, courierProvider]);
 
@@ -235,11 +234,12 @@ const OrdersPage = () => {
             <Truck className="h-4 w-4 text-muted-foreground" />
             <select
               value={courierProvider}
-              onChange={e => setCourierProvider(e.target.value as 'redx' | 'pathao')}
+              onChange={e => setCourierProvider(e.target.value as 'redx' | 'pathao' | 'steadfast')}
               className="bg-transparent border-none outline-none text-sm font-medium text-foreground cursor-pointer"
             >
               <option value="redx">RedX</option>
               <option value="pathao">Pathao</option>
+              <option value="steadfast">Steadfast</option>
             </select>
           </div>
           <div className="flex items-center gap-2 glass-card rounded-xl px-3 py-2 min-w-[240px]">
@@ -375,7 +375,7 @@ const OrdersPage = () => {
                               {(o as any).tracking_id}
                             </span>
                             <span className="text-[10px] text-muted-foreground">
-                              {(o as any).courier_provider === 'pathao' ? 'Pathao' : 'RedX'}
+                              {(o as any).courier_provider === 'pathao' ? 'Pathao' : (o as any).courier_provider === 'steadfast' ? 'Steadfast' : 'RedX'}
                             </span>
                           </div>
                         ) : (
