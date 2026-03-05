@@ -404,7 +404,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
                     const currentNumber = numberMap[payMethod] || '';
                     if (!currentNumber) return null;
                     return (
-                      <div className="flex items-center justify-between p-3 rounded-lg bg-gold/5 border border-gold/20">
+                      <div className="flex items-center justify-between p-3 rounded-sm bg-gold/5 border border-gold/15">
                         <div>
                           <p className="text-xs text-muted-foreground">{labelMap[payMethod]} নম্বর</p>
                           <p className="text-sm font-bold text-foreground font-mono tracking-wider mt-0.5">{currentNumber}</p>
