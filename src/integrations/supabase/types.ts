@@ -73,6 +73,7 @@ export type Database = {
           payment_method: string
           phone: string
           quantity: number
+          selected_color: string | null
           status: Database["public"]["Enums"]["order_status"]
           total_price: number
           tracking_id: string | null
@@ -92,6 +93,7 @@ export type Database = {
           payment_method: string
           phone: string
           quantity?: number
+          selected_color?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           total_price: number
           tracking_id?: string | null
@@ -111,6 +113,7 @@ export type Database = {
           payment_method?: string
           phone?: string
           quantity?: number
+          selected_color?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           total_price?: number
           tracking_id?: string | null
@@ -121,6 +124,7 @@ export type Database = {
       }
       products: {
         Row: {
+          available_colors: string[]
           created_at: string
           description_list: string[]
           discount_percent: number
@@ -142,6 +146,7 @@ export type Database = {
           video_url: string | null
         }
         Insert: {
+          available_colors?: string[]
           created_at?: string
           description_list?: string[]
           discount_percent?: number
@@ -163,6 +168,7 @@ export type Database = {
           video_url?: string | null
         }
         Update: {
+          available_colors?: string[]
           created_at?: string
           description_list?: string[]
           discount_percent?: number

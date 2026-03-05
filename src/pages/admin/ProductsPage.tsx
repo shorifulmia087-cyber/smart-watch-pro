@@ -40,10 +40,12 @@ const ProductsPage = () => {
     image_urls: [] as string[], description_list: [] as string[],
     features: [] as { icon: string; title: string; desc: string }[],
     sourcing_cost: 0, meta_title: '', meta_description: '',
+    available_colors: [] as string[],
   });
 
   const [newDesc, setNewDesc] = useState('');
   const [newFeature, setNewFeature] = useState({ icon: '', title: '', desc: '' });
+  const [newColor, setNewColor] = useState('');
 
   const openNew = () => {
     setEditingId(null);
@@ -52,9 +54,11 @@ const ProductsPage = () => {
       discount_percent: 0, product_type: 'watch', is_featured: false,
       image_urls: [], description_list: [],
       features: [], sourcing_cost: 0, meta_title: '', meta_description: '',
+      available_colors: [],
     });
     setNewDesc('');
     setNewFeature({ icon: '', title: '', desc: '' });
+    setNewColor('');
     setSheetOpen(true);
   };
 
@@ -72,9 +76,11 @@ const ProductsPage = () => {
       description_list: p.description_list || [],
       features, sourcing_cost: (p as any).sourcing_cost || 0,
       meta_title: (p as any).meta_title || '', meta_description: (p as any).meta_description || '',
+      available_colors: (p as any).available_colors || [],
     });
     setNewDesc('');
     setNewFeature({ icon: '', title: '', desc: '' });
+    setNewColor('');
     setSheetOpen(true);
   };
 
@@ -133,6 +139,7 @@ const ProductsPage = () => {
       sourcing_cost: form.sourcing_cost,
       meta_title: form.meta_title || null,
       meta_description: form.meta_description || null,
+      available_colors: form.available_colors,
       ...(editingId ? { id: editingId } : {}),
     } as any, {
       onSuccess: () => {
@@ -338,7 +345,49 @@ const ProductsPage = () => {
               </label>
             </div>
 
-            {/* SEO Card */}
+            {/* Available Colors Card */}
+            <div className="rounded-2xl border border-border/50 bg-background p-5 space-y-4 shadow-sm">
+              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-pink-500" /> এভেইলেবল কালার
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {form.available_colors.map((color, i) => (
+                  <span key={i} className="inline-flex items-center gap-1.5 bg-muted/60 rounded-full px-3 py-1.5 text-sm group hover:bg-muted transition-colors">
+                    <span className="w-3 h-3 rounded-full border border-border/60 shrink-0" style={{ backgroundColor: color }} />
+                    <span>{color}</span>
+                    <button onClick={() => setForm(prev => ({ ...prev, available_colors: prev.available_colors.filter((_, idx) => idx !== i) }))} className="text-destructive/60 hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity ml-1">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <input
+                  value={newColor}
+                  onChange={e => setNewColor(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' && newColor.trim()) {
+                      setForm(prev => ({ ...prev, available_colors: [...prev.available_colors, newColor.trim()] }));
+                      setNewColor('');
+                    }
+                  }}
+                  placeholder="কালার নাম লিখুন (যেমন: কালো, সিলভার, গোল্ড)"
+                  className="flex-1 bg-muted border border-border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all"
+                />
+                <button
+                  onClick={() => {
+                    if (newColor.trim()) {
+                      setForm(prev => ({ ...prev, available_colors: [...prev.available_colors, newColor.trim()] }));
+                      setNewColor('');
+                    }
+                  }}
+                  className="px-4 py-2.5 rounded-xl bg-accent/10 text-accent text-sm font-semibold hover:bg-accent/20 transition-colors"
+                >
+                  যোগ
+                </button>
+              </div>
+            </div>
+
             <div className="rounded-2xl border border-border/50 bg-background p-5 space-y-4 shadow-sm">
               <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-warning" /> SEO সেটিংস

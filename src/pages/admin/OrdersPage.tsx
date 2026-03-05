@@ -418,7 +418,14 @@ const OrdersPage = () => {
                         </div>
                       </TableCell>
                       <TableCell className="font-inter text-sm tabular-nums text-foreground">{o.phone}</TableCell>
-                      <TableCell className="text-sm text-foreground">{o.watch_model}</TableCell>
+                      <TableCell className="text-sm text-foreground">
+                        <div>
+                          <span>{o.watch_model}</span>
+                          {(o as any).selected_color && (
+                            <span className="block text-[11px] text-accent font-medium mt-0.5">🎨 {(o as any).selected_color}</span>
+                          )}
+                        </div>
+                      </TableCell>
                       <TableCell className="text-center font-inter text-sm text-foreground">{toBengaliNum(o.quantity)}</TableCell>
                       <TableCell className="font-semibold text-accent font-inter text-sm">
                         ৳{formatBengaliPrice(o.total_price)}

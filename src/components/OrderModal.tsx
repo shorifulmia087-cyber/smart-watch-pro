@@ -19,9 +19,10 @@ interface OrderModalProps {
   bkashNumber?: string;
   nagadNumber?: string;
   rocketNumber?: string;
+  availableColors?: string[];
 }
 
-const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInside = 70, deliveryChargeOutside = 150, onlinePaymentEnabled = true, bkashNumber = '', nagadNumber = '', rocketNumber = '' }: OrderModalProps) => {
+const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInside = 70, deliveryChargeOutside = 150, onlinePaymentEnabled = true, bkashNumber = '', nagadNumber = '', rocketNumber = '', availableColors = [] }: OrderModalProps) => {
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState<'cod' | 'online'>('cod');
   const [name, setName] = useState('');
@@ -33,6 +34,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [location, setLocation] = useState<'dhaka' | 'outside'>('dhaka');
+  const [selectedColor, setSelectedColor] = useState('');
   // Honeypot fields - hidden from real users, bots will fill them
   const [honeypot, setHoneypot] = useState('');
   const [honeypot2, setHoneypot2] = useState('');
@@ -42,7 +44,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
 
   useEffect(() => {
     if (!isOpen) {
-      setQty(1); setTab('cod'); setName(''); setEmail(''); setPhone(''); setAddress(''); setTxnId(''); setLoading(false); setSuccess(false); setLocation('dhaka'); setHoneypot(''); setHoneypot2('');
+      setQty(1); setTab('cod'); setName(''); setEmail(''); setPhone(''); setAddress(''); setTxnId(''); setLoading(false); setSuccess(false); setLocation('dhaka'); setHoneypot(''); setHoneypot2(''); setSelectedColor('');
     }
   }, [isOpen]);
 
@@ -68,6 +70,10 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
     const cleanAddress = sanitizeForDisplay(address);
 
     if (!cleanName || !cleanPhone || !cleanAddress) return;
+    if (availableColors.length > 0 && !selectedColor) {
+      toast({ title: 'কালার সিলেক্ট করুন', variant: 'destructive' });
+      return;
+    }
     if (!isValidPhone(cleanPhone)) {
       toast({ title: 'সঠিক মোবাইল নম্বর দিন', variant: 'destructive' });
       return;
@@ -91,7 +97,8 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
       delivery_location: location,
       delivery_charge: deliveryCharge,
       total_price: grandTotal,
-    };
+      selected_color: selectedColor || null,
+    } as any;
 
     try {
       await createOrder.mutateAsync(orderData);
@@ -270,6 +277,28 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
               <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="মোবাইল নম্বর" className="w-full bg-muted/40 border border-border/60 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/40 transition-all" maxLength={15} />
               <textarea value={address} onChange={(e) => setAddress(e.target.value)} placeholder="সম্পূর্ণ ঠিকানা" rows={2} className="w-full bg-muted/40 border border-border/60 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/40 transition-all resize-none" maxLength={500} />
               
+              {/* Color Selection */}
+              {availableColors.length > 0 && (
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium mb-2">কালার সিলেক্ট করুন *</p>
+                  <div className="flex flex-wrap gap-2">
+                    {availableColors.map((color) => (
+                      <button
+                        key={color}
+                        type="button"
+                        onClick={() => setSelectedColor(color)}
+                        className={`px-3.5 py-2 rounded-lg border text-sm font-medium transition-all ${
+                          selectedColor === color
+                            ? 'border-gold bg-gold/10 text-gold shadow-sm ring-1 ring-gold/30'
+                            : 'border-border/60 bg-surface text-muted-foreground hover:border-border'
+                        }`}
+                      >
+                        {color}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
               {/* Honeypot fields */}
               <div className="absolute left-[-9999px] top-[-9999px]" aria-hidden="true" tabIndex={-1}>
                 <input type="text" name="website_url" value={honeypot} onChange={(e) => setHoneypot(e.target.value)} tabIndex={-1} autoComplete="off" />
