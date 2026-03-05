@@ -10,13 +10,20 @@ const ReviewGallery = () => {
   if (isLoading || !images?.length) return null;
 
   return (
-    <section className="bg-surface py-12 px-4">
+    <section
+      className="py-12 px-4 relative"
+      style={{
+        backgroundImage: `linear-gradient(hsl(var(--border) / 0.18) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--border) / 0.18) 1px, transparent 1px)`,
+        backgroundSize: '32px 32px',
+        backgroundColor: 'hsl(var(--surface))',
+      }}
+    >
       <div className="max-w-6xl mx-auto">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-2xl md:text-3xl font-bold text-center mb-10"
+          className="text-2xl md:text-3xl font-bold text-center mb-10 text-gold drop-shadow-[0_0_10px_hsl(var(--gold)/0.25)]"
         >
           গ্রাহকদের মতামত
         </motion.h2>
@@ -29,9 +36,10 @@ const ReviewGallery = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
+              transition={{ delay: i * 0.08 }}
+              whileHover={{ scale: 1.03, boxShadow: '0 12px 32px -8px hsl(var(--gold) / 0.15)' }}
               onClick={() => setLightboxIdx(i)}
-              className="min-w-[220px] md:min-w-[260px] aspect-[9/16] rounded-2xl overflow-hidden cursor-pointer snap-center hover:scale-[1.02] transition-transform bg-muted"
+              className="min-w-[220px] md:min-w-[260px] aspect-[9/16] rounded-lg overflow-hidden cursor-pointer snap-center bg-muted border border-border/60 shadow-sm"
             >
               <img
                 src={img.image_url}
