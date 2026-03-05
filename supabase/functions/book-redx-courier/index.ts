@@ -97,10 +97,40 @@ serve(async (req) => {
 
     const cashCollection = order.payment_method === "cod" ? order.total_price : 0;
 
+    // Fetch area list from RedX to get a valid delivery_area_id
+    let deliveryAreaId = 1; // fallback default
+    try {
+      const areaRes = await fetch(`${baseUrl}/v1.0.0-beta/areas`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "API-ACCESS-TOKEN": apiKey.startsWith("Bearer ") ? apiKey : `Bearer ${apiKey}`,
+        },
+      });
+      if (areaRes.ok) {
+        const areaData = await areaRes.json();
+        const areas = areaData?.areas || areaData?.data || areaData || [];
+        if (Array.isArray(areas) && areas.length > 0) {
+          // Try to match by address or district name
+          const addressLower = (order.address || "").toLowerCase();
+          const matched = areas.find((a: any) => 
+            addressLower.includes((a.name || "").toLowerCase()) ||
+            addressLower.includes((a.district_name || "").toLowerCase())
+          );
+          deliveryAreaId = matched?.id || areas[0]?.id || 1;
+        }
+      }
+      console.log("RedX area lookup result:", deliveryAreaId);
+    } catch (e) {
+      console.log("RedX area lookup failed, using fallback:", e);
+    }
+
     const redxPayload = {
       customer_name: order.customer_name,
       customer_phone: order.phone,
       delivery_area: order.delivery_location === "dhaka" ? "Dhaka" : order.address,
+      delivery_area_id: deliveryAreaId,
       customer_address: order.address,
       merchant_invoice_id: order.id.slice(0, 8).toUpperCase(),
       cash_collection_amount: cashCollection,
