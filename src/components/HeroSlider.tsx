@@ -1,16 +1,27 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { formatBengaliPrice } from '@/lib/bengali';
 
 interface HeroSliderProps {
   onOrderClick: () => void;
   images: { src: string; label: string }[];
   subtitle: string;
   tagline?: string;
+  price?: number;
+  discountPercent?: number;
 }
 
-const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিমিয়াম ক্রাফটসম্যানশিপ, অতুলনীয় ডিজাইন।' }: HeroSliderProps) => {
+const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিমিয়াম ক্রাফটসম্যানশিপ, অতুলনীয় ডিজাইন।', price = 0, discountPercent = 0 }: HeroSliderProps) => {
   const [current, setCurrent] = useState(0);
+  const [flipKey, setFlipKey] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => setFlipKey(k => k + 1), 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const originalPrice = discountPercent > 0 ? Math.round(price / (1 - discountPercent / 100)) : price;
 
   const next = useCallback(() => setCurrent((c) => (c + 1) % images.length), [images.length]);
   const prev = useCallback(() => setCurrent((c) => (c - 1 + images.length) % images.length), [images.length]);
@@ -85,15 +96,32 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
       </div>
 
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pb-16 px-4">
-        <button
-          onClick={onOrderClick}
-          className="gradient-gold text-surface font-semibold px-8 py-3.5 rounded-xl text-base hover:opacity-90 transition-opacity w-full sm:w-auto"
-        >
-          এখনই কিনুন
-        </button>
-        <button className="border border-border text-foreground font-medium px-8 py-3.5 rounded-xl text-base hover:bg-muted transition-colors w-full sm:w-auto">
-          হাতে দেখুন 📸
-        </button>
+        <div className="relative w-full sm:w-auto" style={{ perspective: '600px' }}>
+          <AnimatePresence mode="wait">
+            <motion.button
+              key={flipKey}
+              onClick={onOrderClick}
+              className="gradient-gold text-surface font-semibold px-8 py-3.5 rounded-xl text-base hover:opacity-90 transition-opacity w-full sm:w-auto"
+              initial={{ rotateX: 90, opacity: 0 }}
+              animate={{ rotateX: 0, opacity: 1 }}
+              exit={{ rotateX: -90, opacity: 0 }}
+              transition={{ duration: 0.4, ease: 'easeOut' }}
+            >
+              এখনই কিনুন — ৳{formatBengaliPrice(price)}
+            </motion.button>
+          </AnimatePresence>
+        </div>
+        <div className="flex items-center gap-2 px-6 py-3.5 rounded-xl bg-muted w-full sm:w-auto justify-center">
+          {discountPercent > 0 ? (
+            <>
+              <span className="line-through text-muted-foreground text-sm">৳{formatBengaliPrice(originalPrice)}</span>
+              <span className="text-foreground font-bold text-base">৳{formatBengaliPrice(price)}</span>
+              <span className="bg-destructive/10 text-destructive text-xs font-semibold px-2 py-0.5 rounded-md">-{discountPercent}%</span>
+            </>
+          ) : (
+            <span className="text-foreground font-bold text-base">৳{formatBengaliPrice(price)}</span>
+          )}
+        </div>
       </div>
     </section>
   );

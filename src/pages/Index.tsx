@@ -28,14 +28,12 @@ const Index = () => {
   useEffect(() => {
     if (featuredProduct) {
       setCurrentProduct(prev => {
-        // If no product selected yet, or current product is the featured one, update it
         if (!prev || prev.id === featuredProduct.id) return featuredProduct;
         return prev;
       });
     } else if (allProducts?.length) {
       setCurrentProduct(prev => {
         if (!prev) return allProducts[0];
-        // Sync current product with latest DB data
         const updated = allProducts.find(p => p.id === prev.id);
         return updated || allProducts[0];
       });
@@ -53,13 +51,11 @@ const Index = () => {
 
   const brandName = settings?.brand_name || 'Kronos Premium Watch';
 
-  // Build hero images from product image_urls
   const heroImages = (currentProduct?.image_urls || []).map((url, i) => ({
     src: url,
     label: `${currentProduct?.name || ''} — ছবি ${i + 1}`,
   }));
 
-  // Build features from product features jsonb
   const features = Array.isArray(currentProduct?.features)
     ? (currentProduct.features as any[]).map((f: any) => ({
         icon: f.icon || '⭐',
@@ -100,6 +96,8 @@ const Index = () => {
           images={heroImages}
           subtitle={settings?.hero_subtitle || currentProduct.subtitle || ''}
           tagline={settings?.brand_tagline || 'প্রিমিয়াম ক্রাফটসম্যানশিপ, অতুলনীয় ডিজাইন।'}
+          price={currentProduct.price}
+          discountPercent={currentProduct.discount_percent}
         />
         <FeatureList
           features={features}
