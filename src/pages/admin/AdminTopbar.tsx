@@ -3,6 +3,7 @@ import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Bell, Search } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { toBengaliNum } from '@/lib/bengali';
+import ThemeToggle from '@/components/admin/ThemeToggle';
 
 const pageTitles: Record<string, string> = {
   '/admin': 'ড্যাশবোর্ড',
@@ -47,6 +48,8 @@ const AdminTopbar = () => {
             className="bg-transparent border-none outline-none w-full text-sm text-foreground placeholder:text-muted-foreground"
           />
         </div>
+
+        <ThemeToggle />
 
         <button className="relative p-2 rounded-xl hover:bg-muted transition-colors">
           <Bell className="h-[18px] w-[18px] text-muted-foreground" />
