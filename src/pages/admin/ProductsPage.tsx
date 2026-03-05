@@ -384,7 +384,7 @@ const ProductsPage = () => {
                     }
                   }}
                   placeholder="কালার নাম লিখুন (যেমন: কালো, সিলভার)"
-                  className="flex-1 bg-muted/50 border border-border/50 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all hover:border-border"
+                  className="flex-1 bg-background border border-border/60 rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all hover:border-border placeholder:text-muted-foreground"
                 />
                 <button
                   onClick={() => {
