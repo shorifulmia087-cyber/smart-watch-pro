@@ -32,7 +32,7 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
       </div>
 
       <div className="relative max-w-6xl mx-auto px-4 pb-6">
-        <div className="relative aspect-[16/9] rounded-2xl overflow-hidden bg-muted">
+        <div className="relative aspect-[4/3] md:aspect-[16/9] rounded-2xl overflow-hidden bg-muted">
           <AnimatePresence mode="wait">
             <motion.img
               key={`${images[current]?.src}-${current}`}

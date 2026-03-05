@@ -84,6 +84,11 @@
   }
   body {
     @apply bg-background text-foreground font-sans antialiased;
+    line-height: 1.6;
+  }
+  /* Fix Bengali font clipping */
+  h1, h2, h3, h4, h5, h6, p, span, a, button, label, li, td, th, div {
+    overflow: visible;
   }
 }
 

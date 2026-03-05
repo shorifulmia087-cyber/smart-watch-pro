@@ -39,7 +39,7 @@ const AnnouncementBar = ({
   const pad = (n: number) => toBengaliNum(String(n).padStart(2, '0'));
 
   return (
-    <div className="sticky top-0 z-50 bg-ink text-accent-foreground py-2.5 px-4">
+    <div className="sticky top-0 z-50 bg-ink text-accent-foreground py-3.5 px-4 leading-relaxed">
       <div className="max-w-6xl mx-auto flex items-center justify-center gap-3 text-sm md:text-base">
         <span className="text-gold font-semibold">
           {announcementText || `🔥 ${toBengaliNum(discountPercent)}% ছাড়`}
