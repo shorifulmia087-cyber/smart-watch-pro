@@ -221,29 +221,36 @@ const ProductsPage = () => {
                       ) : '-'}
                     </TableCell>
                     <TableCell className="text-center" onClick={e => e.stopPropagation()}>
-                      <button
-                        onClick={() => toggleStock.mutate({ id: p.id, stock_status: p.stock_status === 'in_stock' ? 'out_of_stock' : 'in_stock' })}
-                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none ${
-                          p.stock_status === 'in_stock' ? 'bg-success' : 'bg-muted-foreground/30'
-                        }`}
-                      >
-                        <span
-                          className={`inline-block h-4.5 w-4.5 transform rounded-full bg-background shadow-md transition-transform duration-300 ${
-                            p.stock_status === 'in_stock' ? 'translate-x-5.5' : 'translate-x-0.5'
+                      <div className="flex flex-col items-center gap-1">
+                        <button
+                          onClick={() => toggleStock.mutate({ id: p.id, stock_status: p.stock_status === 'in_stock' ? 'out_of_stock' : 'in_stock' })}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none ${
+                            p.stock_status === 'in_stock' ? 'bg-success' : 'bg-muted-foreground/30'
                           }`}
-                        />
-                      </button>
+                        >
+                          <span
+                            className={`inline-block h-4.5 w-4.5 transform rounded-full bg-background shadow-md transition-transform duration-300 ${
+                              p.stock_status === 'in_stock' ? 'translate-x-5.5' : 'translate-x-0.5'
+                            }`}
+                          />
+                        </button>
+                        <span className={`text-[10px] font-medium ${p.stock_status === 'in_stock' ? 'text-success' : 'text-muted-foreground'}`}>
+                          {p.stock_status === 'in_stock' ? 'ইন স্টক' : 'স্টক আউট'}
+                        </span>
+                      </div>
                     </TableCell>
                     <TableCell className="text-center" onClick={e => e.stopPropagation()}>
                       <button
                         onClick={() => toggleFeatured.mutate({ id: p.id, is_featured: !p.is_featured })}
-                        className="p-1.5 rounded-lg hover:bg-muted transition-colors"
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none ${
+                          p.is_featured ? 'bg-accent' : 'bg-muted-foreground/30'
+                        }`}
                       >
-                        {p.is_featured ? (
-                          <Star className="h-4 w-4 text-accent fill-accent" />
-                        ) : (
-                          <StarOff className="h-4 w-4 text-muted-foreground" />
-                        )}
+                        <span
+                          className={`inline-block h-4.5 w-4.5 transform rounded-full bg-background shadow-md transition-transform duration-300 ${
+                            p.is_featured ? 'translate-x-5.5' : 'translate-x-0.5'
+                          }`}
+                        />
                       </button>
                     </TableCell>
                     <TableCell className="text-right" onClick={e => e.stopPropagation()}>
