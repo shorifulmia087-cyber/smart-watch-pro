@@ -223,13 +223,15 @@ const ProductsPage = () => {
                     <TableCell className="text-center" onClick={e => e.stopPropagation()}>
                       <button
                         onClick={() => toggleStock.mutate({ id: p.id, stock_status: p.stock_status === 'in_stock' ? 'out_of_stock' : 'in_stock' })}
-                        className="p-1.5 rounded-lg hover:bg-muted transition-colors"
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none ${
+                          p.stock_status === 'in_stock' ? 'bg-success' : 'bg-muted-foreground/30'
+                        }`}
                       >
-                        {p.stock_status === 'in_stock' ? (
-                          <ToggleRight className="h-5 w-5 text-success" />
-                        ) : (
-                          <ToggleLeft className="h-5 w-5 text-muted-foreground" />
-                        )}
+                        <span
+                          className={`inline-block h-4.5 w-4.5 transform rounded-full bg-background shadow-md transition-transform duration-300 ${
+                            p.stock_status === 'in_stock' ? 'translate-x-5.5' : 'translate-x-0.5'
+                          }`}
+                        />
                       </button>
                     </TableCell>
                     <TableCell className="text-center" onClick={e => e.stopPropagation()}>
