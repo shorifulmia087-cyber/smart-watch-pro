@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Minus, Plus, Loader2, Check } from 'lucide-react';
+import { X, Minus, Plus, Loader2, Check, Copy } from 'lucide-react';
 import { toBengaliNum, formatBengaliPrice } from '@/lib/bengali';
 import { useCreateOrder } from '@/hooks/useSupabaseData';
 import { useRateLimit } from '@/hooks/useRateLimit';
