@@ -371,8 +371,8 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
 
             {/* Payment Tabs */}
             <div>
-              <div className="flex rounded-lg bg-muted/50 p-1 gap-1 border border-border/40">
-                <button onClick={() => setTab('cod')} className={`flex-1 py-2.5 rounded-md text-sm font-medium transition-all ${tab === 'cod' ? 'bg-surface shadow-sm text-foreground border border-border/40' : 'text-muted-foreground hover:text-foreground'}`}>
+              <div className="flex rounded-sm bg-muted/50 p-1 gap-1 border border-border/30">
+                <button onClick={() => setTab('cod')} className={`flex-1 py-2.5 rounded-sm text-sm font-medium transition-all ${tab === 'cod' ? 'bg-surface shadow-sm text-foreground border border-border/30' : 'text-muted-foreground hover:text-foreground'}`}>
                   ক্যাশ অন ডেলিভারি
                 </button>
                 {onlinePaymentEnabled && (
