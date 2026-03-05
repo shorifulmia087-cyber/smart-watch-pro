@@ -22,6 +22,7 @@ const navItems = [
   { title: 'টিম', url: '/admin/team', icon: UsersRound },
   { title: 'পেমেন্ট', url: '/admin/payment', icon: CreditCard },
   { title: 'কুরিয়ার', url: '/admin/courier', icon: Truck },
+  { title: 'কুরিয়ার পেমেন্ট', url: '/admin/courier-payments', icon: Wallet },
   { title: 'ট্র্যাকিং', url: '/admin/tracking', icon: Route },
   { title: 'SMS', url: '/admin/sms', icon: MessageSquare },
   { title: 'অ্যানালিটিক্স', url: '/admin/analytics', icon: BarChart3 },
