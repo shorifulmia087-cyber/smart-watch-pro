@@ -32,8 +32,6 @@ const VideoSection = ({ videoId = 'dQw4w9WgXcQ', sectionTitle = 'Kronos — ক�
       }}
     >
       <div className="max-w-4xl mx-auto">
-
-        {/* Title */}
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -43,17 +41,16 @@ const VideoSection = ({ videoId = 'dQw4w9WgXcQ', sectionTitle = 'Kronos — ক�
           {sectionTitle}
         </motion.h2>
 
-        {/* Video Container */}
         <motion.div
           ref={ref}
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          whileHover={{ scale: 1.02 }}
+          whileHover={{ scale: 1.01 }}
           transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-          className="relative aspect-video rounded-lg overflow-hidden border border-border/60 shadow-sm cursor-pointer"
+          className="relative aspect-video rounded-sm overflow-hidden border border-border/30 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
           style={{
-            boxShadow: '0 0 40px -10px hsl(var(--gold) / 0.15)',
+            boxShadow: '0 0 40px -10px hsl(var(--gold) / 0.1)',
           }}
           onClick={() => !isLoaded && setIsLoaded(true)}
         >
@@ -65,7 +62,7 @@ const VideoSection = ({ videoId = 'dQw4w9WgXcQ', sectionTitle = 'Kronos — ক�
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-ink/30 flex items-center justify-center">
-                <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-surface/90 backdrop-blur-sm flex items-center justify-center shadow-lg">
+                <div className="w-16 h-16 md:w-20 md:h-20 rounded-sm bg-surface/90 backdrop-blur-sm flex items-center justify-center shadow-lg border border-border/30">
                   <svg viewBox="0 0 24 24" className="w-8 h-8 md:w-10 md:h-10 fill-gold ml-1">
                     <path d="M8 5v14l11-7z" />
                   </svg>
