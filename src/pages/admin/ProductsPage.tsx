@@ -285,278 +285,199 @@ const ProductsPage = () => {
       )}
 
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-        <SheetContent className="w-full sm:max-w-2xl overflow-y-auto p-0 border-l border-border/30 shadow-2xl bg-background">
-          {/* Premium Header */}
-          <div className="sticky top-0 z-10 border-b border-border/30">
-            <div className="absolute inset-0 bg-background/90 backdrop-blur-2xl" />
-            <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
-            <div className="relative px-6 py-5">
-              <div className="flex items-start justify-between gap-4">
-                <SheetHeader className="space-y-1.5">
-                  <SheetTitle className="text-xl font-bold flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center">
-                      {editingId ? <Pencil className="h-5 w-5 text-accent" /> : <Plus className="h-5 w-5 text-accent" />}
+        <SheetContent className="w-full sm:max-w-4xl overflow-y-auto p-0 border-l border-slate-200 dark:border-border/30 shadow-2xl bg-slate-50 dark:bg-background">
+          {/* Clean SaaS Header */}
+          <div className="sticky top-0 z-10 bg-white dark:bg-card border-b border-slate-200 dark:border-border/30">
+            <div className="px-8 py-5">
+              <div className="flex items-center justify-between">
+                <SheetHeader className="space-y-0">
+                  <SheetTitle className="text-lg font-bold text-slate-900 dark:text-foreground flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-slate-900 dark:bg-accent flex items-center justify-center">
+                      {editingId ? <Pencil className="h-4 w-4 text-white" /> : <Plus className="h-4 w-4 text-white" />}
                     </div>
-                    <div>
-                      <span>{editingId ? 'প্রোডাক্ট এডিট' : 'নতুন প্রোডাক্ট'}</span>
-                      <p className="text-xs font-normal text-muted-foreground mt-0.5">প্রোডাক্টের সমস্ত তথ্য পূরণ করুন</p>
-                    </div>
+                    {editingId ? 'প্রোডাক্ট এডিট' : 'নতুন প্রোডাক্ট'}
                   </SheetTitle>
                   <SheetDescription className="sr-only">প্রোডাক্ট ফর্ম</SheetDescription>
                 </SheetHeader>
-                <button
-                  onClick={() => setSheetOpen(false)}
-                  className="p-2.5 rounded-xl hover:bg-muted/80 transition-colors text-muted-foreground hover:text-foreground shrink-0 border border-transparent hover:border-border/40"
-                >
-                  <X className="h-5 w-5" />
-                </button>
+                <div className="flex items-center gap-3">
+                  <button onClick={() => setSheetOpen(false)} className="px-4 py-2 rounded-lg text-sm border border-slate-200 dark:border-border text-slate-500 dark:text-muted-foreground hover:bg-slate-50 dark:hover:bg-muted transition-colors font-medium">
+                    বাতিল
+                  </button>
+                  <motion.button
+                    onClick={saveProduct}
+                    disabled={upsertProduct.isPending || !form.name || !form.price}
+                    whileTap={{ scale: 0.97 }}
+                    className="px-5 py-2 rounded-lg bg-slate-900 dark:bg-accent text-white text-sm font-semibold hover:bg-slate-800 dark:hover:bg-accent/90 flex items-center gap-2 transition-colors disabled:opacity-50"
+                  >
+                    {upsertProduct.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+                    {editingId ? 'আপডেট করুন' : 'তৈরি করুন'}
+                  </motion.button>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="px-6 py-6 space-y-6">
-            {/* Basic Info Card */}
-            <SectionCard icon={<Package className="w-4 h-4" />} title="মৌলিক তথ্য" color="accent">
-              <PremiumField label="নাম *" value={form.name} onChange={v => setForm({ ...form, name: v })} />
-              <div className="grid grid-cols-3 gap-3">
-                <PremiumField label="মূল্য (৳) *" type="number" value={String(form.price)} onChange={v => setForm({ ...form, price: Number(v) })} />
-                <PremiumField label="সোর্সিং কস্ট (৳)" type="number" value={String(form.sourcing_cost)} onChange={v => setForm({ ...form, sourcing_cost: Number(v) })} />
-                <PremiumField label="ছাড় %" type="number" value={String(form.discount_percent)} onChange={v => setForm({ ...form, discount_percent: Number(v) })} />
-              </div>
-              <PremiumField label="সাবটাইটেল" value={form.subtitle} onChange={v => setForm({ ...form, subtitle: v })} />
-              <PremiumField label="ভিডিও URL (YouTube ID)" value={form.video_url} onChange={v => setForm({ ...form, video_url: v })} />
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-[11px] font-semibold text-muted-foreground mb-1.5 block uppercase tracking-wider">টাইপ</label>
-                  <select value={form.product_type} onChange={e => setForm({ ...form, product_type: e.target.value })} className="w-full bg-background border border-border/60 rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all hover:border-border">
-                    <option value="watch">ঘড়ি</option>
-                    <option value="clothing">পোশাক</option>
-                    <option value="electronics">ইলেকট্রনিক্স</option>
-                    <option value="accessories">আনুষাঙ্গিক</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="text-[11px] font-semibold text-muted-foreground mb-1.5 block uppercase tracking-wider">স্টক</label>
-                  <select value={form.stock_status} onChange={e => setForm({ ...form, stock_status: e.target.value })} className="w-full bg-background border border-border/60 rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all hover:border-border">
-                    <option value="in_stock">ইন স্টক</option>
-                    <option value="out_of_stock">আউট অফ স্টক</option>
-                  </select>
-                </div>
-              </div>
-              <label className="flex items-center gap-3 text-sm cursor-pointer rounded-xl px-4 py-3.5 border border-accent/15 bg-gradient-to-r from-accent/5 to-transparent hover:from-accent/10 transition-all group">
-                <input type="checkbox" checked={form.is_featured} onChange={e => setForm({ ...form, is_featured: e.target.checked })} className="rounded accent-accent w-4 h-4" />
-                <div>
-                  <span className="font-semibold text-foreground group-hover:text-accent transition-colors">⭐ ফিচার্ড প্রোডাক্ট</span>
-                  <p className="text-[11px] text-muted-foreground">ওয়েবসাইটে প্রধান প্রোডাক্ট হিসেবে দেখাবে</p>
-                </div>
-              </label>
-            </SectionCard>
-
-            {/* Available Colors Card */}
-            <SectionCard icon={<Palette className="w-4 h-4" />} title="এভেইলেবল কালার" color="pink">
-              <div className="flex flex-wrap gap-2 min-h-[36px]">
-                {form.available_colors.map((color, i) => (
-                  <motion.span
-                    key={i}
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    className="inline-flex items-center gap-2 bg-muted/40 border border-border/40 rounded-full px-3.5 py-1.5 text-sm group hover:bg-muted/70 hover:border-border transition-all"
-                  >
-                    <span className="w-3.5 h-3.5 rounded-full border-2 border-background shadow-sm shrink-0" style={{ backgroundColor: color.toLowerCase().includes('গোল্ড') || color.toLowerCase().includes('gold') ? '#b8963e' : color.toLowerCase().includes('সিলভার') || color.toLowerCase().includes('silver') ? '#c0c0c0' : color.toLowerCase().includes('কালো') || color.toLowerCase().includes('black') ? '#1a1a1a' : color.toLowerCase().includes('সাদা') || color.toLowerCase().includes('white') ? '#f5f5f5' : '#888' }} />
-                    <span className="font-medium">{color}</span>
-                    <button onClick={() => setForm(prev => ({ ...prev, available_colors: prev.available_colors.filter((_, idx) => idx !== i) }))} className="text-destructive/50 hover:text-destructive opacity-0 group-hover:opacity-100 transition-all ml-0.5">
-                      <X className="w-3 h-3" />
-                    </button>
-                  </motion.span>
-                ))}
-                {form.available_colors.length === 0 && (
-                  <p className="text-xs text-muted-foreground/50 italic">কোনো কালার যোগ করা হয়নি</p>
-                )}
-              </div>
-              <div className="flex gap-2">
-                <input
-                  value={newColor}
-                  onChange={e => setNewColor(e.target.value)}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter' && newColor.trim()) {
-                      setForm(prev => ({ ...prev, available_colors: [...prev.available_colors, newColor.trim()] }));
-                      setNewColor('');
-                    }
-                  }}
-                  placeholder="কালার নাম লিখুন (যেমন: কালো, সিলভার)"
-                  className="flex-1 bg-background border border-border/60 rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all hover:border-border placeholder:text-muted-foreground"
-                />
-                <button
-                  onClick={() => {
-                    if (newColor.trim()) {
-                      setForm(prev => ({ ...prev, available_colors: [...prev.available_colors, newColor.trim()] }));
-                      setNewColor('');
-                    }
-                  }}
-                  className="px-4 py-2.5 rounded-xl bg-accent/10 text-accent text-sm font-semibold hover:bg-accent/20 transition-all border border-accent/20 hover:border-accent/30"
-                >
-                  <Plus className="w-4 h-4" />
-                </button>
-              </div>
-            </SectionCard>
-
-            {/* SEO Card */}
-            <SectionCard icon={<Globe className="w-4 h-4" />} title="SEO সেটিংস" color="warning">
-              <PremiumField label="Meta Title" value={form.meta_title} onChange={v => setForm({ ...form, meta_title: v })} />
-              <div>
-                <label className="text-[11px] font-semibold text-muted-foreground mb-1.5 block uppercase tracking-wider">Meta Description</label>
-                <textarea
-                  value={form.meta_description}
-                  onChange={e => setForm({ ...form, meta_description: e.target.value })}
-                  rows={2}
-                  placeholder="সার্চ ইঞ্জিনে দেখানো বিবরণ..."
-                  className="w-full bg-background border border-border/60 rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all resize-none hover:border-border placeholder:text-muted-foreground"
-                />
-              </div>
-            </SectionCard>
-
-            {/* Image Upload Card */}
-            <SectionCard icon={<Camera className="w-4 h-4" />} title="প্রোডাক্ট ছবি" color="info">
-              <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                {form.image_urls.map((url, i) => (
-                  <div key={i} className="relative group aspect-square rounded-xl overflow-hidden bg-muted border border-border/40 shadow-sm hover:shadow-lg transition-all hover:border-accent/30">
-                    <img src={url} alt={`Product ${i + 1}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <button
-                      onClick={() => removeImage(i)}
-                      className="absolute top-2 right-2 w-7 h-7 bg-destructive/90 backdrop-blur-sm text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100 shadow-lg"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                    {i === 0 && (
-                      <span className="absolute bottom-2 left-2 text-[9px] bg-accent/90 backdrop-blur-sm text-white px-2 py-0.5 rounded-md font-semibold shadow-sm">থাম্বনেইল</span>
-                    )}
-                  </div>
-                ))}
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={uploading}
-                  className="aspect-square rounded-xl border-2 border-dashed border-border/50 hover:border-accent/50 flex flex-col items-center justify-center gap-1.5 transition-all text-muted-foreground hover:text-accent hover:bg-accent/5 hover:shadow-sm"
-                >
-                  {uploading ? (
-                    <Loader2 className="w-6 h-6 animate-spin" />
-                  ) : (
-                    <>
-                      <Upload className="w-6 h-6" />
-                      <span className="text-[10px] font-semibold">আপলোড</span>
-                    </>
-                  )}
-                </button>
-              </div>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                multiple
-                className="hidden"
-                onChange={e => e.target.files && uploadImages(e.target.files)}
-              />
-            </SectionCard>
-
-            {/* Description List Card */}
-            <SectionCard icon={<ListChecks className="w-4 h-4" />} title="বিবরণ তালিকা" color="success">
-              <div className="space-y-2">
-                {form.description_list.map((desc, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ x: -10, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    className="flex items-center gap-2.5 bg-muted/30 border border-border/30 rounded-xl px-4 py-2.5 text-sm group hover:bg-muted/50 hover:border-border/50 transition-all"
-                  >
-                    <span className="w-6 h-6 rounded-lg bg-success/10 text-success text-[10px] flex items-center justify-center font-bold shrink-0 border border-success/20">{i + 1}</span>
-                    <span className="flex-1">{desc}</span>
-                    <button onClick={() => removeDescription(i)} className="text-destructive/50 hover:text-destructive opacity-0 group-hover:opacity-100 transition-all">
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  </motion.div>
-                ))}
-              </div>
-              <div className="flex gap-2">
-                <input
-                  value={newDesc}
-                  onChange={e => setNewDesc(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && addDescription()}
-                  placeholder="নতুন বিবরণ লিখুন..."
-                  className="flex-1 bg-background border border-border/60 rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all hover:border-border placeholder:text-muted-foreground"
-                />
-                <button onClick={addDescription} className="px-4 py-2.5 rounded-xl bg-accent/10 text-accent text-sm font-semibold hover:bg-accent/20 transition-all border border-accent/20 hover:border-accent/30">
-                  <Plus className="w-4 h-4" />
-                </button>
-              </div>
-            </SectionCard>
-
-            {/* Features Card */}
-            <SectionCard icon={<Sparkles className="w-4 h-4" />} title="ফিচার্স" color="accent" badge="ওয়েবসাইটে দেখাবে">
-              <div className="space-y-2">
-                {form.features.map((f, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ x: -10, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    className="flex items-center gap-3 bg-muted/30 border border-border/30 rounded-xl px-4 py-3 group hover:bg-muted/50 hover:border-border/50 transition-all"
-                  >
-                    <span className="text-xl w-8 h-8 flex items-center justify-center bg-accent/10 rounded-lg border border-accent/15">{f.icon}</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-sm truncate">{f.title}</p>
-                      <p className="text-[11px] text-muted-foreground truncate">{f.desc}</p>
+          {/* Bento Grid Layout */}
+          <div className="px-8 py-6">
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
+              {/* ─── Primary Column (Left 3/5) ─── */}
+              <div className="lg:col-span-3 space-y-5">
+                {/* Basic Info */}
+                <BentoCard title="মৌলিক তথ্য" icon={<Package className="w-4 h-4" />}>
+                  <BentoField label="প্রোডাক্ট নাম *" value={form.name} onChange={v => setForm({ ...form, name: v })} placeholder="প্রোডাক্টের নাম লিখুন" />
+                  <BentoField label="সাবটাইটেল" value={form.subtitle} onChange={v => setForm({ ...form, subtitle: v })} placeholder="সংক্ষিপ্ত বিবরণ" />
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-[11px] font-medium text-slate-500 dark:text-muted-foreground mb-1.5 block">প্রোডাক্ট টাইপ</label>
+                      <select value={form.product_type} onChange={e => setForm({ ...form, product_type: e.target.value })} className="w-full bg-transparent border border-slate-200 dark:border-border/60 rounded-lg px-3 py-2.5 text-sm text-slate-900 dark:text-foreground focus:outline-none focus:ring-2 focus:ring-slate-900/10 dark:focus:ring-accent/20 focus:border-slate-400 dark:focus:border-accent/40 transition-all">
+                        <option value="watch">ঘড়ি</option>
+                        <option value="clothing">পোশাক</option>
+                        <option value="electronics">ইলেকট্রনিক্স</option>
+                        <option value="accessories">আনুষাঙ্গিক</option>
+                      </select>
                     </div>
-                    <button onClick={() => removeFeature(i)} className="text-destructive/50 hover:text-destructive opacity-0 group-hover:opacity-100 transition-all shrink-0">
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  </motion.div>
-                ))}
-              </div>
-              <div className="space-y-2.5 p-4 border border-border/40 rounded-xl bg-muted/10">
-                <div className="grid grid-cols-[60px_1fr] gap-2">
-                  <input
-                    value={newFeature.icon}
-                    onChange={e => setNewFeature({ ...newFeature, icon: e.target.value })}
-                    placeholder="🛡️"
-                    className="bg-background border border-border/60 rounded-xl px-2 py-2.5 text-sm text-center text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all hover:border-border"
-                  />
-                  <input
-                    value={newFeature.title}
-                    onChange={e => setNewFeature({ ...newFeature, title: e.target.value })}
-                    placeholder="ফিচার শিরোনাম"
-                    className="bg-background border border-border/60 rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all hover:border-border placeholder:text-muted-foreground"
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <input
-                    value={newFeature.desc}
-                    onChange={e => setNewFeature({ ...newFeature, desc: e.target.value })}
-                    onKeyDown={e => e.key === 'Enter' && addFeature()}
-                    placeholder="ফিচার বর্ণনা"
-                    className="flex-1 bg-background border border-border/60 rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all hover:border-border placeholder:text-muted-foreground"
-                  />
-                  <button onClick={addFeature} className="px-4 py-2.5 rounded-xl bg-accent/10 text-accent text-sm font-semibold hover:bg-accent/20 transition-all border border-accent/20 hover:border-accent/30">
-                    <Plus className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            </SectionCard>
+                    <div>
+                      <label className="text-[11px] font-medium text-slate-500 dark:text-muted-foreground mb-1.5 block">স্টক স্ট্যাটাস</label>
+                      <select value={form.stock_status} onChange={e => setForm({ ...form, stock_status: e.target.value })} className="w-full bg-transparent border border-slate-200 dark:border-border/60 rounded-lg px-3 py-2.5 text-sm text-slate-900 dark:text-foreground focus:outline-none focus:ring-2 focus:ring-slate-900/10 dark:focus:ring-accent/20 focus:border-slate-400 dark:focus:border-accent/40 transition-all">
+                        <option value="in_stock">ইন স্টক</option>
+                        <option value="out_of_stock">আউট অফ স্টক</option>
+                      </select>
+                    </div>
+                  </div>
+                  <BentoField label="ভিডিও URL (YouTube ID)" value={form.video_url} onChange={v => setForm({ ...form, video_url: v })} placeholder="dQw4w9WgXcQ" />
+                  <label className="flex items-center gap-3 text-sm cursor-pointer rounded-lg px-4 py-3 border border-slate-200 dark:border-border/40 hover:bg-slate-50 dark:hover:bg-muted/30 transition-colors group">
+                    <input type="checkbox" checked={form.is_featured} onChange={e => setForm({ ...form, is_featured: e.target.checked })} className="rounded accent-slate-900 dark:accent-accent w-4 h-4" />
+                    <div>
+                      <span className="font-semibold text-slate-700 dark:text-foreground text-sm">⭐ ফিচার্ড প্রোডাক্ট</span>
+                      <p className="text-[11px] text-slate-400 dark:text-muted-foreground">হোমপেজে হাইলাইট হবে</p>
+                    </div>
+                  </label>
+                </BentoCard>
 
-            {/* Save Actions */}
-            <div className="flex gap-3 pt-3 pb-10">
-              <motion.button
-                onClick={saveProduct}
-                disabled={upsertProduct.isPending || !form.name || !form.price}
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.98 }}
-                className="flex-1 gradient-gold text-white font-semibold py-4 rounded-xl text-sm hover:opacity-90 flex items-center justify-center gap-2.5 transition-all disabled:opacity-50"
-                style={{ boxShadow: '0 6px 24px -6px hsl(var(--gold) / 0.35)' }}
-              >
-                {upsertProduct.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                {editingId ? 'আপডেট করুন' : 'প্রোডাক্ট তৈরি করুন'}
-              </motion.button>
-              <button onClick={() => setSheetOpen(false)} className="px-6 py-4 rounded-xl text-sm border border-border/60 text-muted-foreground hover:bg-muted/50 hover:border-border transition-all font-medium">
-                বাতিল
-              </button>
+                {/* Description List */}
+                <BentoCard title="বিবরণ তালিকা" icon={<ListChecks className="w-4 h-4" />}>
+                  <div className="space-y-2">
+                    {form.description_list.map((desc, i) => (
+                      <motion.div key={i} initial={{ x: -8, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="flex items-center gap-3 bg-slate-50 dark:bg-muted/20 border border-slate-100 dark:border-border/20 rounded-lg px-3 py-2.5 text-sm group hover:border-slate-200 dark:hover:border-border/40 transition-all">
+                        <span className="w-5 h-5 rounded-md bg-slate-200 dark:bg-muted text-slate-500 dark:text-muted-foreground text-[10px] flex items-center justify-center font-bold shrink-0">{i + 1}</span>
+                        <span className="flex-1 text-slate-700 dark:text-foreground">{desc}</span>
+                        <button onClick={() => removeDescription(i)} className="text-slate-300 hover:text-red-500 dark:text-muted-foreground/30 dark:hover:text-destructive opacity-0 group-hover:opacity-100 transition-all">
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </motion.div>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <input value={newDesc} onChange={e => setNewDesc(e.target.value)} onKeyDown={e => e.key === 'Enter' && addDescription()} placeholder="নতুন বিবরণ লিখুন..." className="flex-1 bg-transparent border border-slate-200 dark:border-border/60 rounded-lg px-3 py-2.5 text-sm text-slate-900 dark:text-foreground focus:outline-none focus:ring-2 focus:ring-slate-900/10 dark:focus:ring-accent/20 focus:border-slate-400 dark:focus:border-accent/40 transition-all placeholder:text-slate-400 dark:placeholder:text-muted-foreground" />
+                    <button onClick={addDescription} className="px-3.5 py-2.5 rounded-lg bg-slate-900 dark:bg-accent text-white text-sm hover:bg-slate-800 dark:hover:bg-accent/90 transition-colors">
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
+                </BentoCard>
+
+                {/* Features with drag handles */}
+                <BentoCard title="ফিচার্স (কেন বেছে নেবেন)" icon={<Sparkles className="w-4 h-4" />} badge="ওয়েবসাইটে দেখাবে">
+                  <div className="space-y-2">
+                    {form.features.map((f, i) => (
+                      <motion.div key={i} initial={{ x: -8, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="flex items-center gap-3 bg-slate-50 dark:bg-muted/20 border border-slate-100 dark:border-border/20 rounded-lg px-3 py-3 group hover:border-slate-200 dark:hover:border-border/40 transition-all">
+                        <GripVertical className="w-4 h-4 text-slate-300 dark:text-muted-foreground/30 shrink-0 cursor-grab" />
+                        <span className="text-lg w-8 h-8 flex items-center justify-center bg-slate-100 dark:bg-muted rounded-lg shrink-0">{f.icon}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-sm text-slate-800 dark:text-foreground truncate">{f.title}</p>
+                          <p className="text-[11px] text-slate-400 dark:text-muted-foreground truncate">{f.desc}</p>
+                        </div>
+                        <button onClick={() => removeFeature(i)} className="text-slate-300 hover:text-red-500 dark:text-muted-foreground/30 dark:hover:text-destructive opacity-0 group-hover:opacity-100 transition-all shrink-0">
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </motion.div>
+                    ))}
+                  </div>
+                  <div className="space-y-2 p-3.5 border border-dashed border-slate-200 dark:border-border/40 rounded-lg bg-slate-50/50 dark:bg-muted/5">
+                    <div className="grid grid-cols-[56px_1fr] gap-2">
+                      <input value={newFeature.icon} onChange={e => setNewFeature({ ...newFeature, icon: e.target.value })} placeholder="🛡️" className="bg-transparent border border-slate-200 dark:border-border/60 rounded-lg px-2 py-2.5 text-sm text-center text-slate-900 dark:text-foreground focus:outline-none focus:ring-2 focus:ring-slate-900/10 dark:focus:ring-accent/20 transition-all" />
+                      <input value={newFeature.title} onChange={e => setNewFeature({ ...newFeature, title: e.target.value })} placeholder="ফিচার শিরোনাম" className="bg-transparent border border-slate-200 dark:border-border/60 rounded-lg px-3 py-2.5 text-sm text-slate-900 dark:text-foreground focus:outline-none focus:ring-2 focus:ring-slate-900/10 dark:focus:ring-accent/20 transition-all placeholder:text-slate-400 dark:placeholder:text-muted-foreground" />
+                    </div>
+                    <div className="flex gap-2">
+                      <input value={newFeature.desc} onChange={e => setNewFeature({ ...newFeature, desc: e.target.value })} onKeyDown={e => e.key === 'Enter' && addFeature()} placeholder="ফিচার বর্ণনা" className="flex-1 bg-transparent border border-slate-200 dark:border-border/60 rounded-lg px-3 py-2.5 text-sm text-slate-900 dark:text-foreground focus:outline-none focus:ring-2 focus:ring-slate-900/10 dark:focus:ring-accent/20 transition-all placeholder:text-slate-400 dark:placeholder:text-muted-foreground" />
+                      <button onClick={addFeature} className="px-3.5 py-2.5 rounded-lg bg-slate-900 dark:bg-accent text-white text-sm hover:bg-slate-800 dark:hover:bg-accent/90 transition-colors">
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </BentoCard>
+              </div>
+
+              {/* ─── Secondary Column (Right 2/5) ─── */}
+              <div className="lg:col-span-2 space-y-5">
+                {/* Product Images */}
+                <BentoCard title="প্রোডাক্ট ছবি" icon={<Camera className="w-4 h-4" />}>
+                  <div className="grid grid-cols-2 gap-3">
+                    {form.image_urls.map((url, i) => (
+                      <div key={i} className="relative group aspect-square rounded-lg overflow-hidden bg-slate-100 dark:bg-muted border border-slate-100 dark:border-border/30 hover:shadow-lg transition-all">
+                        <img src={url} alt={`Product ${i + 1}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                        <button onClick={() => removeImage(i)} className="absolute top-1.5 right-1.5 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100 shadow-lg">
+                          <X className="w-3 h-3" />
+                        </button>
+                        {i === 0 && <span className="absolute bottom-1.5 left-1.5 text-[9px] bg-slate-900 dark:bg-accent text-white px-2 py-0.5 rounded-md font-medium">থাম্বনেইল</span>}
+                      </div>
+                    ))}
+                  </div>
+                  <button onClick={() => fileInputRef.current?.click()} disabled={uploading} className="w-full py-8 rounded-lg border-2 border-dashed border-slate-200 dark:border-border/40 hover:border-slate-400 dark:hover:border-accent/50 flex flex-col items-center justify-center gap-2 transition-all text-slate-400 dark:text-muted-foreground hover:text-slate-600 dark:hover:text-accent hover:bg-slate-50 dark:hover:bg-accent/5">
+                    {uploading ? <Loader2 className="w-6 h-6 animate-spin" /> : (
+                      <>
+                        <Upload className="w-6 h-6" />
+                        <span className="text-xs font-medium">ছবি আপলোড করুন</span>
+                        <span className="text-[10px] text-slate-400 dark:text-muted-foreground/60">PNG, JPG, WebP</span>
+                      </>
+                    )}
+                  </button>
+                  <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={e => e.target.files && uploadImages(e.target.files)} />
+                </BentoCard>
+
+                {/* Pricing */}
+                <BentoCard title="মূল্য ও খরচ" icon={<Tag className="w-4 h-4" />}>
+                  <BentoField label="বিক্রয় মূল্য (৳) *" type="number" value={String(form.price)} onChange={v => setForm({ ...form, price: Number(v) })} placeholder="0" />
+                  <BentoField label="সোর্সিং কস্ট (৳)" type="number" value={String(form.sourcing_cost)} onChange={v => setForm({ ...form, sourcing_cost: Number(v) })} placeholder="0" />
+                  <BentoField label="ছাড় %" type="number" value={String(form.discount_percent)} onChange={v => setForm({ ...form, discount_percent: Number(v) })} placeholder="0" />
+                  {form.price > 0 && form.sourcing_cost > 0 && (
+                    <div className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-emerald-50 dark:bg-success/10 border border-emerald-100 dark:border-success/20">
+                      <span className="text-[11px] font-medium text-emerald-600 dark:text-success">লাভ</span>
+                      <span className="text-sm font-bold text-emerald-700 dark:text-success font-inter">৳{formatBengaliPrice(form.price - form.sourcing_cost)}</span>
+                    </div>
+                  )}
+                </BentoCard>
+
+                {/* SEO */}
+                <BentoCard title="SEO সেটিংস" icon={<Globe className="w-4 h-4" />}>
+                  <BentoField label="Meta Title" value={form.meta_title} onChange={v => setForm({ ...form, meta_title: v })} placeholder="সার্চ ইঞ্জিনে দেখানো শিরোনাম" />
+                  <div>
+                    <label className="text-[11px] font-medium text-slate-500 dark:text-muted-foreground mb-1.5 block">Meta Description</label>
+                    <textarea value={form.meta_description} onChange={e => setForm({ ...form, meta_description: e.target.value })} rows={3} placeholder="সার্চ ইঞ্জিনে দেখানো বিবরণ..." className="w-full bg-transparent border border-slate-200 dark:border-border/60 rounded-lg px-3 py-2.5 text-sm text-slate-900 dark:text-foreground focus:outline-none focus:ring-2 focus:ring-slate-900/10 dark:focus:ring-accent/20 focus:border-slate-400 dark:focus:border-accent/40 transition-all resize-none placeholder:text-slate-400 dark:placeholder:text-muted-foreground" />
+                  </div>
+                </BentoCard>
+
+                {/* Color Variants */}
+                <BentoCard title="কালার ভ্যারিয়েন্ট" icon={<Palette className="w-4 h-4" />}>
+                  <div className="flex flex-wrap gap-2 min-h-[32px]">
+                    {form.available_colors.map((color, i) => (
+                      <motion.span key={i} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="inline-flex items-center gap-2 bg-white dark:bg-muted/30 border border-slate-200 dark:border-border/40 rounded-full px-3 py-1.5 text-sm group hover:border-slate-300 dark:hover:border-border transition-all shadow-sm">
+                        <span className="w-3 h-3 rounded-full border border-slate-200 dark:border-border shrink-0 shadow-inner" style={{ backgroundColor: color.toLowerCase().includes('গোল্ড') || color.toLowerCase().includes('gold') ? '#b8963e' : color.toLowerCase().includes('সিলভার') || color.toLowerCase().includes('silver') ? '#c0c0c0' : color.toLowerCase().includes('কালো') || color.toLowerCase().includes('black') ? '#1a1a1a' : color.toLowerCase().includes('সাদা') || color.toLowerCase().includes('white') ? '#f5f5f5' : '#888' }} />
+                        <span className="font-medium text-slate-700 dark:text-foreground text-xs">{color}</span>
+                        <button onClick={() => setForm(prev => ({ ...prev, available_colors: prev.available_colors.filter((_, idx) => idx !== i) }))} className="text-slate-300 hover:text-red-500 dark:text-muted-foreground/30 dark:hover:text-destructive opacity-0 group-hover:opacity-100 transition-all ml-0.5">
+                          <X className="w-3 h-3" />
+                        </button>
+                      </motion.span>
+                    ))}
+                    {form.available_colors.length === 0 && <p className="text-[11px] text-slate-400 dark:text-muted-foreground/50 italic">কোনো কালার যোগ করা হয়নি</p>}
+                  </div>
+                  <div className="flex gap-2">
+                    <input value={newColor} onChange={e => setNewColor(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && newColor.trim()) { setForm(prev => ({ ...prev, available_colors: [...prev.available_colors, newColor.trim()] })); setNewColor(''); } }} placeholder="কালার নাম (যেমন: কালো)" className="flex-1 bg-transparent border border-slate-200 dark:border-border/60 rounded-lg px-3 py-2.5 text-sm text-slate-900 dark:text-foreground focus:outline-none focus:ring-2 focus:ring-slate-900/10 dark:focus:ring-accent/20 focus:border-slate-400 dark:focus:border-accent/40 transition-all placeholder:text-slate-400 dark:placeholder:text-muted-foreground" />
+                    <button onClick={() => { if (newColor.trim()) { setForm(prev => ({ ...prev, available_colors: [...prev.available_colors, newColor.trim()] })); setNewColor(''); } }} className="px-3.5 py-2.5 rounded-lg bg-slate-900 dark:bg-accent text-white text-sm hover:bg-slate-800 dark:hover:bg-accent/90 transition-colors">
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
+                </BentoCard>
+              </div>
             </div>
           </div>
         </SheetContent>
@@ -582,53 +503,34 @@ const ProductsPage = () => {
   );
 };
 
-/* ─── Reusable Section Card ──────────────────────────────────── */
-const SectionCard = ({ icon, title, color, badge, children }: {
-  icon: React.ReactNode; title: string; color: string; badge?: string; children: React.ReactNode;
-}) => {
-  const colorMap: Record<string, string> = {
-    accent: 'bg-accent/15 text-accent border-accent/20',
-    pink: 'bg-pink-500/15 text-pink-500 border-pink-500/20',
-    warning: 'bg-warning/15 text-warning border-warning/20',
-    info: 'bg-info/15 text-info border-info/20',
-    success: 'bg-success/15 text-success border-success/20',
-  };
-  const dotColor: Record<string, string> = {
-    accent: 'from-accent to-accent/60',
-    pink: 'from-pink-500 to-pink-400',
-    warning: 'from-warning to-yellow-400',
-    info: 'from-info to-blue-400',
-    success: 'from-success to-emerald-400',
-  };
+/* ─── Bento Card ──────────────────────────────────── */
+const BentoCard = ({ title, icon, badge, children }: {
+  title: string; icon: React.ReactNode; badge?: string; children: React.ReactNode;
+}) => (
+  <motion.div
+    initial={{ opacity: 0, y: 8 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.3 }}
+    className="rounded-xl bg-white dark:bg-card border border-slate-100 dark:border-border/30 shadow-sm hover:shadow-md transition-shadow overflow-hidden"
+  >
+    <div className="px-5 py-3.5 border-b border-slate-100 dark:border-border/20 flex items-center gap-2.5">
+      <span className="text-slate-400 dark:text-muted-foreground">{icon}</span>
+      <h3 className="text-xs font-semibold text-slate-900 dark:text-foreground uppercase tracking-wider">{title}</h3>
+      {badge && <span className="text-[10px] text-slate-400 dark:text-muted-foreground/60 ml-auto bg-slate-50 dark:bg-muted/30 px-2 py-0.5 rounded-full border border-slate-100 dark:border-border/20">{badge}</span>}
+    </div>
+    <div className="p-5 space-y-4">{children}</div>
+  </motion.div>
+);
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="rounded-2xl border border-border/40 bg-card overflow-hidden shadow-sm hover:shadow-md transition-shadow"
-    >
-      <div className="px-5 py-3.5 border-b border-border/20 bg-muted/30 flex items-center gap-3">
-        <div className={`w-7 h-7 rounded-lg ${colorMap[color] || colorMap.accent} flex items-center justify-center border`}>
-          {icon}
-        </div>
-        <h3 className="text-xs font-bold text-foreground/80 uppercase tracking-wider">{title}</h3>
-        {badge && <span className="text-[10px] font-normal text-muted-foreground/60 ml-auto bg-muted/50 px-2 py-0.5 rounded-full">{badge}</span>}
-      </div>
-      <div className="p-5 space-y-4">{children}</div>
-    </motion.div>
-  );
-};
-
-/* ─── Reusable Premium Field ──────────────────────────────────── */
-const PremiumField = ({ label, value, onChange, type = 'text' }: {
-  label: string; value: string; onChange: (v: string) => void; type?: string;
+/* ─── Bento Field ──────────────────────────────────── */
+const BentoField = ({ label, value, onChange, type = 'text', placeholder }: {
+  label: string; value: string; onChange: (v: string) => void; type?: string; placeholder?: string;
 }) => (
   <div>
-    <label className="text-[11px] font-semibold text-muted-foreground mb-1.5 block uppercase tracking-wider">{label}</label>
+    <label className="text-[11px] font-medium text-slate-500 dark:text-muted-foreground mb-1.5 block">{label}</label>
     <input
-      type={type} value={value} onChange={e => onChange(e.target.value)}
-      className="w-full bg-background border border-border/60 rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all hover:border-border placeholder:text-muted-foreground"
+      type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
+      className="w-full bg-transparent border border-slate-200 dark:border-border/60 rounded-lg px-3 py-2.5 text-sm text-slate-900 dark:text-foreground focus:outline-none focus:ring-2 focus:ring-slate-900/10 dark:focus:ring-accent/20 focus:border-slate-400 dark:focus:border-accent/40 transition-all placeholder:text-slate-400 dark:placeholder:text-muted-foreground"
     />
   </div>
 );
