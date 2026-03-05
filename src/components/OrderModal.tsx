@@ -121,9 +121,9 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.2, type: 'spring', damping: 15 }}
-              className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-6"
+              className="w-20 h-20 rounded-full bg-success/15 flex items-center justify-center mx-auto mb-6"
             >
-              <Check className="w-10 h-10 text-emerald-600" />
+              <Check className="w-10 h-10 text-success" />
             </motion.div>
             <h2 className="text-2xl md:text-3xl font-bold mb-2">ধন্যবাদ! 🎉</h2>
             <p className="text-muted-foreground mb-1">আপনার অর্ডার সফলভাবে গ্রহণ করা হয়েছে।</p>
