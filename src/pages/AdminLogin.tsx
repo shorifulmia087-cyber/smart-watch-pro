@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { useRateLimit } from '@/hooks/useRateLimit';
 import { Loader2 } from 'lucide-react';
 
 const AdminLogin = () => {
@@ -11,12 +12,19 @@ const AdminLogin = () => {
   const [error, setError] = useState('');
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [success, setSuccess] = useState('');
+  const { checkLimit } = useRateLimit({ maxAttempts: 5, windowMs: 300_000 });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
     setSuccess('');
+
+    if (!checkLimit()) {
+      setError('অনেক বেশি চেষ্টা করা হয়েছে। ৫ মিনিট পর আবার চেষ্টা করুন।');
+      setLoading(false);
+      return;
+    }
 
     if (mode === 'signup') {
       const { error } = await supabase.auth.signUp({ email, password });

@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toBengaliNum, formatBengaliPrice } from '@/lib/bengali';
 import { useCreateOrder, useSettings, useFeaturedProduct } from '@/hooks/useSupabaseData';
+import { useRateLimit } from '@/hooks/useRateLimit';
+import { sanitizeForDisplay, isValidPhone, isBot } from '@/lib/security';
 import { Loader2, Check } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -12,10 +14,13 @@ const StickyOrderForm = () => {
   const [location, setLocation] = useState<'dhaka' | 'outside'>('dhaka');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  // Honeypot
+  const [honeypot, setHoneypot] = useState('');
   const { data: settings } = useSettings();
   const { data: product } = useFeaturedProduct();
   const createOrder = useCreateOrder();
   const { toast } = useToast();
+  const { checkLimit } = useRateLimit({ maxAttempts: 3, windowMs: 60_000 });
 
   const deliveryCharge = location === 'dhaka'
     ? (settings?.delivery_charge_inside ?? 70)
@@ -25,13 +30,35 @@ const StickyOrderForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !phone.trim() || !address.trim() || !product) return;
+
+    // Honeypot check
+    if (isBot(honeypot)) {
+      setSuccess(true);
+      return;
+    }
+
+    // Rate limiting
+    if (!checkLimit()) {
+      toast({ title: 'অনুগ্রহ করে কিছুক্ষণ অপেক্ষা করুন', variant: 'destructive' });
+      return;
+    }
+
+    const cleanName = sanitizeForDisplay(name);
+    const cleanPhone = phone.replace(/[\s-]/g, '');
+    const cleanAddress = sanitizeForDisplay(address);
+
+    if (!cleanName || !cleanPhone || !cleanAddress || !product) return;
+    if (!isValidPhone(cleanPhone)) {
+      toast({ title: 'সঠিক মোবাইল নম্বর দিন', variant: 'destructive' });
+      return;
+    }
+
     setLoading(true);
     try {
       await createOrder.mutateAsync({
-        customer_name: name,
-        phone,
-        address,
+        customer_name: cleanName,
+        phone: cleanPhone,
+        address: cleanAddress,
         watch_model: product.name,
         quantity: 1,
         payment_method: 'cod',
@@ -40,7 +67,7 @@ const StickyOrderForm = () => {
         total_price: total,
       });
       setSuccess(true);
-      setName(''); setPhone(''); setAddress('');
+      setName(''); setPhone(''); setAddress(''); setHoneypot('');
       setTimeout(() => setSuccess(false), 3000);
     } catch {
       toast({ title: 'ত্রুটি হয়েছে', variant: 'destructive' });
@@ -93,20 +120,33 @@ const StickyOrderForm = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <input
                   value={name} onChange={e => setName(e.target.value)} required
-                  placeholder="আপনার নাম *"
+                  placeholder="আপনার নাম *" maxLength={100}
                   className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
                 />
                 <input
                   value={phone} onChange={e => setPhone(e.target.value)} required
-                  placeholder="মোবাইল নম্বর *"
+                  placeholder="মোবাইল নম্বর *" maxLength={15}
                   className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
                 />
               </div>
               <textarea
                 value={address} onChange={e => setAddress(e.target.value)} required
-                placeholder="সম্পূর্ণ ঠিকানা *" rows={2}
+                placeholder="সম্পূর্ণ ঠিকানা *" rows={2} maxLength={500}
                 className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 resize-none"
               />
+              
+              {/* Honeypot - invisible to real users */}
+              <div className="absolute left-[-9999px] top-[-9999px]" aria-hidden="true" tabIndex={-1}>
+                <input
+                  type="text"
+                  name="fax_number"
+                  value={honeypot}
+                  onChange={(e) => setHoneypot(e.target.value)}
+                  tabIndex={-1}
+                  autoComplete="off"
+                />
+              </div>
+
               <div className="flex gap-2">
                 <button type="button" onClick={() => setLocation('dhaka')}
                   className={`flex-1 py-2.5 rounded-xl border text-sm font-medium transition-all ${location === 'dhaka' ? 'border-accent bg-accent/10 text-accent' : 'border-border text-muted-foreground'}`}>

@@ -14,11 +14,15 @@ import WhatsAppButton from '@/components/WhatsAppButton';
 import { formatBengaliPrice } from '@/lib/bengali';
 import { useSettings, useFeaturedProduct, useProducts } from '@/hooks/useSupabaseData';
 import { motion } from 'framer-motion';
+import { useAntiScraping } from '@/hooks/useAntiScraping';
+import { addSecurityHeaders } from '@/lib/security';
 import type { Database } from '@/integrations/supabase/types';
 
 type Product = Database['public']['Tables']['products']['Row'];
 
 const Index = () => {
+  useAntiScraping();
+  useEffect(() => { addSecurityHeaders(); }, []);
   const [orderOpen, setOrderOpen] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
   const [swapLoading, setSwapLoading] = useState(false);

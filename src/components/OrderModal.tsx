@@ -3,7 +3,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Minus, Plus, Loader2, Check } from 'lucide-react';
 import { toBengaliNum, formatBengaliPrice } from '@/lib/bengali';
 import { useCreateOrder } from '@/hooks/useSupabaseData';
+import { useRateLimit } from '@/hooks/useRateLimit';
+import { sanitizeForDisplay, isValidPhone, isBot } from '@/lib/security';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface OrderModalProps {
   isOpen: boolean;
@@ -27,11 +30,16 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [location, setLocation] = useState<'dhaka' | 'outside'>('dhaka');
+  // Honeypot fields - hidden from real users, bots will fill them
+  const [honeypot, setHoneypot] = useState('');
+  const [honeypot2, setHoneypot2] = useState('');
   const createOrder = useCreateOrder();
+  const { toast } = useToast();
+  const { checkLimit } = useRateLimit({ maxAttempts: 3, windowMs: 60_000 });
 
   useEffect(() => {
     if (!isOpen) {
-      setQty(1); setTab('cod'); setName(''); setEmail(''); setPhone(''); setAddress(''); setTxnId(''); setLoading(false); setSuccess(false); setLocation('dhaka');
+      setQty(1); setTab('cod'); setName(''); setEmail(''); setPhone(''); setAddress(''); setTxnId(''); setLoading(false); setSuccess(false); setLocation('dhaka'); setHoneypot(''); setHoneypot2('');
     }
   }, [isOpen]);
 
@@ -40,7 +48,28 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
   const grandTotal = subtotal + deliveryCharge;
 
   const handleSubmit = async () => {
-    if (!name.trim() || !phone.trim() || !address.trim()) return;
+    // Honeypot check
+    if (isBot(honeypot) || isBot(honeypot2)) {
+      setSuccess(true); // Silently "accept" to confuse bots
+      return;
+    }
+
+    // Rate limiting
+    if (!checkLimit()) {
+      toast({ title: 'অনুগ্রহ করে কিছুক্ষণ অপেক্ষা করুন', description: 'অনেক বেশি রিকোয়েস্ট পাঠানো হয়েছে।', variant: 'destructive' });
+      return;
+    }
+
+    const cleanName = sanitizeForDisplay(name);
+    const cleanPhone = phone.replace(/[\s-]/g, '');
+    const cleanAddress = sanitizeForDisplay(address);
+
+    if (!cleanName || !cleanPhone || !cleanAddress) return;
+    if (!isValidPhone(cleanPhone)) {
+      toast({ title: 'সঠিক মোবাইল নম্বর দিন', variant: 'destructive' });
+      return;
+    }
+
     if (tab === 'online') {
       const requiredLen = payMethod === 'bkash' ? 10 : payMethod === 'nagad' ? 8 : 10;
       if (!txnId || txnId.length !== requiredLen) return;
@@ -48,14 +77,14 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
     setLoading(true);
 
     const orderData = {
-      customer_name: name,
-      customer_email: email || null,
-      phone,
-      address,
+      customer_name: cleanName,
+      customer_email: email ? sanitizeForDisplay(email) : null,
+      phone: cleanPhone,
+      address: cleanAddress,
       watch_model: watchName,
       quantity: qty,
       payment_method: tab === 'cod' ? 'cod' : payMethod,
-      trx_id: tab === 'online' ? txnId : null,
+      trx_id: tab === 'online' ? txnId.replace(/[^a-zA-Z0-9]/g, '') : null,
       delivery_location: location,
       delivery_charge: deliveryCharge,
       total_price: grandTotal,
@@ -63,13 +92,12 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
 
     try {
       await createOrder.mutateAsync(orderData);
-      // Send emails in background (don't block success)
       supabase.functions.invoke('send-order-email', { body: orderData }).catch(console.error);
       setLoading(false);
       setSuccess(true);
     } catch {
       setLoading(false);
-      // Could show error toast here
+      toast({ title: 'ত্রুটি হয়েছে', variant: 'destructive' });
     }
   };
 
@@ -207,10 +235,30 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
             </div>
 
             <div className="space-y-3">
-              <input value={name} onChange={(e) => setName(e.target.value)} placeholder="আপনার নাম" className="w-full bg-ash border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30" />
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ইমেইল (ঐচ্ছিক)" className="w-full bg-ash border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30" />
-              <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="মোবাইল নম্বর" className="w-full bg-ash border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30" />
-              <textarea value={address} onChange={(e) => setAddress(e.target.value)} placeholder="সম্পূর্ণ ঠিকানা" rows={2} className="w-full bg-ash border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 resize-none" />
+              <input value={name} onChange={(e) => setName(e.target.value)} placeholder="আপনার নাম" className="w-full bg-ash border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30" maxLength={100} />
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ইমেইল (ঐচ্ছিক)" className="w-full bg-ash border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30" maxLength={255} />
+              <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="মোবাইল নম্বর" className="w-full bg-ash border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30" maxLength={15} />
+              <textarea value={address} onChange={(e) => setAddress(e.target.value)} placeholder="সম্পূর্ণ ঠিকানা" rows={2} className="w-full bg-ash border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 resize-none" maxLength={500} />
+              
+              {/* Honeypot fields - invisible to real users */}
+              <div className="absolute left-[-9999px] top-[-9999px]" aria-hidden="true" tabIndex={-1}>
+                <input
+                  type="text"
+                  name="website_url"
+                  value={honeypot}
+                  onChange={(e) => setHoneypot(e.target.value)}
+                  tabIndex={-1}
+                  autoComplete="off"
+                />
+                <input
+                  type="text"
+                  name="company_name"
+                  value={honeypot2}
+                  onChange={(e) => setHoneypot2(e.target.value)}
+                  tabIndex={-1}
+                  autoComplete="off"
+                />
+              </div>
             </div>
 
             <div>
