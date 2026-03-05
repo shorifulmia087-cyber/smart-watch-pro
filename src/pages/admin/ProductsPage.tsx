@@ -40,6 +40,7 @@ const ProductsPage = () => {
     image_urls: [] as string[], description_list: [] as string[],
     features: [] as { icon: string; title: string; desc: string }[],
     sourcing_cost: 0, meta_title: '', meta_description: '',
+    available_colors: [] as string[],
   });
 
   const [newDesc, setNewDesc] = useState('');
