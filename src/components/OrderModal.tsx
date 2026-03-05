@@ -349,7 +349,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
                         key={color}
                         type="button"
                         onClick={() => setSelectedColor(color)}
-                        className={`px-3.5 py-2 rounded-lg border text-sm font-medium transition-all ${
+                        className={`px-3.5 py-2 rounded-sm border text-sm font-medium transition-all ${
                           selectedColor === color
                             ? 'border-gold bg-gold/10 text-gold shadow-sm ring-1 ring-gold/30'
                             : 'border-border/60 bg-surface text-muted-foreground hover:border-border'
