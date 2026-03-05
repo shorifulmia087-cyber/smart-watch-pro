@@ -19,21 +19,20 @@ const CollectionGrid = ({ currentProductId, onSelectProduct, sectionTitle = 'আ
 
   return (
     <section
-      className="py-16 px-4 relative overflow-hidden"
+      className="py-12 px-4 relative overflow-hidden"
       style={{
         backgroundImage: `linear-gradient(hsl(var(--border) / 0.18) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--border) / 0.18) 1px, transparent 1px)`,
         backgroundSize: '32px 32px',
         backgroundColor: 'hsl(var(--surface))',
       }}
     >
-      {/* Decorative gold accent */}
       <div
         className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[250px] rounded-full opacity-[0.05] pointer-events-none"
         style={{ background: 'radial-gradient(ellipse, hsl(var(--gold)), transparent 70%)' }}
       />
 
       <div className="max-w-6xl mx-auto relative">
-        <div className="text-center mb-12">
+        <div className="text-center mb-10">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -53,7 +52,7 @@ const CollectionGrid = ({ currentProductId, onSelectProduct, sectionTitle = 'আ
           </motion.p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {otherProducts.map((product, i) => (
             <motion.button
               key={product.id}
@@ -61,12 +60,9 @@ const CollectionGrid = ({ currentProductId, onSelectProduct, sectionTitle = 'আ
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.08, duration: 0.4 }}
-              whileHover={{ y: -6 }}
+              whileHover={{ y: -4, boxShadow: '0 8px 30px -8px hsl(var(--gold) / 0.12)' }}
               onClick={() => onSelectProduct(product)}
-              className="group text-left rounded-xl overflow-hidden bg-surface"
-              style={{
-                boxShadow: '0 4px 20px -4px hsl(var(--ink) / 0.08), 0 0 0 1px hsl(var(--border) / 0.5)',
-              }}
+              className="group text-left rounded-sm overflow-hidden bg-surface border border-border/30 shadow-sm hover:shadow-md transition-shadow"
             >
               <div className="aspect-square overflow-hidden bg-muted relative">
                 {product.thumbnail_url ? (
@@ -80,22 +76,19 @@ const CollectionGrid = ({ currentProductId, onSelectProduct, sectionTitle = 'আ
                     ছবি নেই
                   </div>
                 )}
-                {/* Hover overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                {/* Discount badge */}
+                <div className="absolute inset-0 bg-gradient-to-t from-ink/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 {product.discount_percent > 0 && (
-                  <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-bold gradient-gold text-surface shadow-sm">
+                  <div className="absolute top-3 right-3 px-2.5 py-1 rounded-sm text-xs font-bold gradient-gold text-surface shadow-sm">
                     -{product.discount_percent}%
                   </div>
                 )}
-                {/* Gold border glow on hover */}
-                <div className="absolute inset-0 ring-0 group-hover:ring-1 ring-gold/20 transition-all duration-300 rounded-none" />
+                <div className="absolute inset-0 ring-0 group-hover:ring-1 ring-gold/20 transition-all duration-300" />
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-foreground text-lg group-hover:text-gold transition-colors duration-200">{product.name}</h3>
                 <p className="text-muted-foreground text-sm mt-1 line-clamp-2 leading-relaxed">{product.subtitle}</p>
                 <div className="flex items-center gap-2 mt-3">
-                  <span className="text-gold font-bold text-xl">৳{formatBengaliPrice(product.price)}</span>
+                  <span className="text-gold font-bold text-xl font-inter">৳{formatBengaliPrice(product.price)}</span>
                   {product.discount_percent > 0 && (
                     <span className="text-muted-foreground text-sm line-through">
                       ৳{formatBengaliPrice(Math.round(product.price / (1 - product.discount_percent / 100)))}

@@ -11,22 +11,20 @@ const ReviewGallery = () => {
 
   return (
     <section
-      className="py-16 px-4 relative overflow-hidden"
+      className="py-12 px-4 relative overflow-hidden"
       style={{
         backgroundImage: `linear-gradient(hsl(var(--border) / 0.18) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--border) / 0.18) 1px, transparent 1px)`,
         backgroundSize: '32px 32px',
         backgroundColor: 'hsl(var(--surface))',
       }}
     >
-      {/* Decorative gold accent */}
       <div
         className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full opacity-[0.06] pointer-events-none"
         style={{ background: 'radial-gradient(ellipse, hsl(var(--gold)), transparent 70%)' }}
       />
 
       <div className="max-w-6xl mx-auto relative">
-        {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-10">
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -57,7 +55,7 @@ const ReviewGallery = () => {
         </div>
 
         {/* Horizontal scroll gallery */}
-        <div className="flex gap-5 overflow-x-auto pb-6 snap-x snap-mandatory scrollbar-hide -mx-2 px-2">
+        <div className="flex gap-4 overflow-x-auto pb-6 snap-x snap-mandatory scrollbar-hide -mx-2 px-2">
           {images.map((img, i) => (
             <motion.div
               key={img.id}
@@ -65,12 +63,9 @@ const ReviewGallery = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.06, duration: 0.4 }}
-              whileHover={{ y: -6 }}
+              whileHover={{ y: -4, boxShadow: '0 8px 24px -8px hsl(var(--gold) / 0.12)' }}
               onClick={() => setLightboxIdx(i)}
-              className="group relative min-w-[200px] md:min-w-[240px] aspect-[9/16] rounded-xl overflow-hidden cursor-pointer snap-center"
-              style={{
-                boxShadow: '0 4px 20px -4px hsl(var(--ink) / 0.1), 0 0 0 1px hsl(var(--border) / 0.5)',
-              }}
+              className="group relative min-w-[200px] md:min-w-[240px] aspect-[9/16] rounded-sm overflow-hidden cursor-pointer snap-center border border-border/30 shadow-sm hover:shadow-md transition-shadow"
             >
               <img
                 src={img.image_url}
@@ -78,21 +73,17 @@ const ReviewGallery = () => {
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"
               />
-              {/* Gradient overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-ink/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              {/* Quote icon on hover */}
               <div className="absolute bottom-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <div className="w-8 h-8 rounded-full bg-surface/90 backdrop-blur-sm flex items-center justify-center">
+                <div className="w-8 h-8 rounded-sm bg-surface/90 backdrop-blur-sm flex items-center justify-center">
                   <Quote className="w-3.5 h-3.5 text-gold" />
                 </div>
               </div>
-              {/* Gold border glow on hover */}
-              <div className="absolute inset-0 rounded-xl ring-1 ring-border/40 group-hover:ring-gold/30 transition-all duration-300" />
+              <div className="absolute inset-0 ring-0 group-hover:ring-1 ring-gold/20 transition-all duration-300" />
             </motion.div>
           ))}
         </div>
 
-        {/* Scroll hint */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -119,9 +110,9 @@ const ReviewGallery = () => {
               exit={{ scale: 0.85, opacity: 0 }}
               transition={{ type: 'spring', stiffness: 300, damping: 25 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-sm aspect-[9/16] rounded-2xl overflow-hidden relative"
+              className="w-full max-w-sm aspect-[9/16] rounded-sm overflow-hidden relative border border-gold/15"
               style={{
-                boxShadow: '0 25px 60px -12px hsl(var(--ink) / 0.5), 0 0 0 1px hsl(var(--gold) / 0.15)',
+                boxShadow: '0 25px 60px -12px hsl(var(--ink) / 0.5)',
               }}
             >
               <img
@@ -129,36 +120,27 @@ const ReviewGallery = () => {
                 alt={`রিভিউ ${lightboxIdx + 1}`}
                 className="w-full h-full object-cover"
               />
-
-              {/* Top gradient for close button */}
               <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-ink/50 to-transparent" />
-
               <button
                 onClick={() => setLightboxIdx(null)}
-                className="absolute top-4 right-4 w-9 h-9 rounded-full bg-surface/90 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-surface transition-colors"
+                className="absolute top-4 right-4 w-9 h-9 rounded-sm bg-surface/90 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-surface transition-colors"
               >
                 <X className="w-4 h-4 text-foreground" />
               </button>
-
-              {/* Counter */}
-              <div className="absolute top-4 left-4 px-3 py-1 rounded-full bg-surface/90 backdrop-blur-sm text-xs font-medium text-foreground shadow-sm">
+              <div className="absolute top-4 left-4 px-3 py-1 rounded-sm bg-surface/90 backdrop-blur-sm text-xs font-medium text-foreground shadow-sm">
                 {lightboxIdx + 1} / {images.length}
               </div>
-
-              {/* Bottom gradient for nav */}
               <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-ink/60 to-transparent" />
-
-              {/* Nav buttons */}
               <div className="absolute bottom-5 left-0 right-0 flex justify-center gap-3">
                 <button
                   onClick={(e) => { e.stopPropagation(); setLightboxIdx((lightboxIdx - 1 + images.length) % images.length); }}
-                  className="w-10 h-10 rounded-full bg-surface/90 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-surface transition-colors"
+                  className="w-10 h-10 rounded-sm bg-surface/90 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-surface transition-colors"
                 >
                   <ChevronLeft className="w-5 h-5 text-foreground" />
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); setLightboxIdx((lightboxIdx + 1) % images.length); }}
-                  className="w-10 h-10 rounded-full bg-surface/90 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-surface transition-colors"
+                  className="w-10 h-10 rounded-sm bg-surface/90 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-surface transition-colors"
                 >
                   <ChevronRight className="w-5 h-5 text-foreground" />
                 </button>
