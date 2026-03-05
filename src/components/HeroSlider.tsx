@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { formatBengaliPrice } from '@/lib/bengali';
@@ -19,6 +19,13 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
 
   const next = useCallback(() => setCurrent((c) => (c + 1) % images.length), [images.length]);
   const prev = useCallback(() => setCurrent((c) => (c - 1 + images.length) % images.length), [images.length]);
+
+  // Auto-slide every 4 seconds when multiple images
+  useEffect(() => {
+    if (images.length <= 1) return;
+    const interval = setInterval(next, 4000);
+    return () => clearInterval(interval);
+  }, [images.length, next]);
 
   return (
     <section className="bg-surface">
