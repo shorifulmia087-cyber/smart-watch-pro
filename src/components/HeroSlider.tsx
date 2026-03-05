@@ -125,8 +125,9 @@ const HeroSlider = ({
   const closeUpIdx = (current + 1) % images.length;
 
   return (
-    <section className="bg-ink py-6 md:py-10">
-      <div className="max-w-6xl mx-auto px-4">
+    <section className="relative bg-[hsl(220,20%,4%)] py-6 md:py-10 overflow-hidden">
+      <BentoGridBackground />
+      <div className="relative max-w-6xl mx-auto px-4" style={{ zIndex: 1 }}>
         {/* Bento Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 auto-rows-[minmax(80px,auto)]">
 
