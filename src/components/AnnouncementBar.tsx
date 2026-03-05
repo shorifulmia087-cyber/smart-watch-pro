@@ -69,17 +69,23 @@ const AnnouncementBar = ({
       if (now < start) {
         setTimerLabel('অফার শুরু হতে বাকি:');
         setTime(toTimeParts(Math.floor((start - now) / 1000)));
+        setExpired(false);
       } else if (now <= end) {
         setTimerLabel('অফার শেষ হতে বাকি:');
         setTime(toTimeParts(Math.floor((end - now) / 1000)));
+        setExpired(false);
       } else {
-        setTimerLabel('অফার শেষ');
-        setTime({ d: 0, h: 0, m: 0, s: 0 });
+        setExpired(true);
       }
     } else {
-      setTimerLabel('অফার শেষ হতে বাকি:');
       const remaining = Math.max(0, Math.floor((fallbackTarget.current - now) / 1000));
-      setTime(toTimeParts(remaining));
+      if (remaining <= 0) {
+        setExpired(true);
+      } else {
+        setTimerLabel('অফার শেষ হতে বাকি:');
+        setTime(toTimeParts(remaining));
+        setExpired(false);
+      }
     }
   }, [offerStartAt, offerEndAt]);
 
