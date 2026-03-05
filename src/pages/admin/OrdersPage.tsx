@@ -1,13 +1,16 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useOrders, useUpdateOrderStatus, useSettings } from '@/hooks/useSupabaseData';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
-import { Search, Filter, ChevronLeft, ChevronRight, Truck, FileText } from 'lucide-react';
+import { Search, Filter, ChevronLeft, ChevronRight, Truck, FileText, CheckCircle2, Package } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Checkbox } from '@/components/ui/checkbox';
 import jsPDF from 'jspdf';
 import {
   Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
 } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
 import type { Database } from '@/integrations/supabase/types';
 
 type OrderStatus = Database['public']['Enums']['order_status'];
@@ -29,25 +32,54 @@ const OrdersPage = () => {
   const [filter, setFilter] = useState<OrderStatus | undefined>();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(0);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const pageSize = 15;
   const { data: orders, isLoading } = useOrders(filter);
   const { data: settings } = useSettings();
   const updateStatus = useUpdateOrderStatus();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  const bookCourier = useCallback((orderId: string, customerName: string) => {
+  const bookCourier = useCallback(async (orderId: string, customerName: string) => {
     const mockTrackingId = `TRK-${Date.now().toString(36).toUpperCase()}`;
+    const { error } = await supabase.from('orders').update({ courier_booked: true } as any).eq('id', orderId);
+    if (error) {
+      toast({ title: 'ত্রুটি!', description: 'কুরিয়ার বুক করতে সমস্যা হয়েছে', variant: 'destructive' });
+      return;
+    }
+    queryClient.invalidateQueries({ queryKey: ['orders'] });
     toast({
-      title: 'কুরিয়ার বুক হয়েছে!',
+      title: '✅ কুরিয়ার বুক সফল!',
       description: `${customerName} — ট্র্যাকিং: ${mockTrackingId}`,
     });
-  }, [toast]);
+  }, [toast, queryClient]);
+
+  const bulkBookCourier = useCallback(async (ids: string[]) => {
+    const unbookedIds = ids.filter(id => {
+      const order = orders?.find(o => o.id === id);
+      return order && !(order as any).courier_booked;
+    });
+    if (!unbookedIds.length) {
+      toast({ title: '⚠️ কোনো নতুন অর্ডার নেই', description: 'সিলেক্ট করা সব অর্ডার ইতিমধ্যে কুরিয়ারে বুক হয়েছে' });
+      return;
+    }
+    const { error } = await supabase.from('orders').update({ courier_booked: true } as any).in('id', unbookedIds);
+    if (error) {
+      toast({ title: 'ত্রুটি!', description: 'বাল্ক কুরিয়ার বুক করতে সমস্যা হয়েছে', variant: 'destructive' });
+      return;
+    }
+    queryClient.invalidateQueries({ queryKey: ['orders'] });
+    setSelectedIds(new Set());
+    toast({
+      title: '✅ বাল্ক কুরিয়ার বুক সফল!',
+      description: `${toBengaliNum(unbookedIds.length)} টি অর্ডার কুরিয়ারে যুক্ত হয়েছে`,
+    });
+  }, [orders, toast, queryClient]);
 
   const downloadInvoice = useCallback((order: any) => {
     const brandName = settings?.brand_name || 'Kronos Premium Watch';
     const doc = new jsPDF({ unit: 'mm', format: 'a4' });
     
-    // Header
     doc.setFillColor(10, 10, 10);
     doc.rect(0, 0, 210, 40, 'F');
     doc.setTextColor(255, 255, 255);
@@ -56,14 +88,12 @@ const OrdersPage = () => {
     doc.setFontSize(10);
     doc.text('INVOICE', 15, 32);
     
-    // Invoice details
     doc.setTextColor(60, 60, 60);
     doc.setFontSize(10);
     const orderId = order.id.slice(0, 8).toUpperCase();
     doc.text(`Invoice #: INV-${orderId}`, 140, 22);
     doc.text(`Date: ${new Date(order.created_at).toLocaleDateString('en-GB')}`, 140, 28);
     
-    // Customer info
     let y = 55;
     doc.setFontSize(12);
     doc.setTextColor(30, 30, 30);
@@ -79,7 +109,6 @@ const OrdersPage = () => {
     y += 6;
     doc.text(`Area: ${order.delivery_location === 'dhaka' ? 'Dhaka' : 'Outside Dhaka'}`, 15, y);
     
-    // Table header
     y += 15;
     doc.setFillColor(245, 245, 245);
     doc.rect(15, y - 5, 180, 10, 'F');
@@ -90,7 +119,6 @@ const OrdersPage = () => {
     doc.text('Price', 135, y + 1);
     doc.text('Total', 165, y + 1);
     
-    // Table row
     y += 12;
     doc.setTextColor(60, 60, 60);
     doc.text(order.watch_model, 18, y);
@@ -99,7 +127,6 @@ const OrdersPage = () => {
     doc.text(`Tk ${unitPrice.toLocaleString()}`, 135, y);
     doc.text(`Tk ${(order.total_price - order.delivery_charge).toLocaleString()}`, 165, y);
     
-    // Summary
     y += 15;
     doc.setDrawColor(220, 220, 220);
     doc.line(110, y, 195, y);
@@ -123,14 +150,13 @@ const OrdersPage = () => {
     doc.text('Grand Total:', 110, y);
     doc.text(`Tk ${order.total_price.toLocaleString()}`, 165, y);
     
-    // Footer
     doc.setFontSize(8);
     doc.setTextColor(150, 150, 150);
     doc.text('Thank you for your purchase!', 105, 280, { align: 'center' });
     doc.text(`${brandName} | Generated on ${new Date().toLocaleDateString('en-GB')}`, 105, 285, { align: 'center' });
     
     doc.save(`invoice-${orderId}.pdf`);
-    toast({ title: 'PDF ইনভয়েস ডাউনলোড হয়েছে' });
+    toast({ title: '📄 PDF ইনভয়েস ডাউনলোড হয়েছে' });
   }, [toast, settings]);
 
   const filtered = useMemo(() => {
@@ -147,6 +173,28 @@ const OrdersPage = () => {
 
   const paged = filtered.slice(page * pageSize, (page + 1) * pageSize);
   const totalPages = Math.ceil(filtered.length / pageSize);
+
+  const allPageSelected = paged.length > 0 && paged.every(o => selectedIds.has(o.id));
+  const someSelected = selectedIds.size > 0;
+
+  const toggleSelectAll = () => {
+    if (allPageSelected) {
+      const newSet = new Set(selectedIds);
+      paged.forEach(o => newSet.delete(o.id));
+      setSelectedIds(newSet);
+    } else {
+      const newSet = new Set(selectedIds);
+      paged.forEach(o => newSet.add(o.id));
+      setSelectedIds(newSet);
+    }
+  };
+
+  const toggleSelect = (id: string) => {
+    const newSet = new Set(selectedIds);
+    if (newSet.has(id)) newSet.delete(id);
+    else newSet.add(id);
+    setSelectedIds(newSet);
+  };
 
   return (
     <div className="space-y-5 max-w-[1400px]">
@@ -165,6 +213,30 @@ const OrdersPage = () => {
           />
         </div>
       </div>
+
+      {/* Bulk Actions Bar */}
+      {someSelected && (
+        <div className="flex items-center gap-3 glass-card rounded-xl px-4 py-3 border-l-4 border-l-accent">
+          <span className="text-sm font-medium text-foreground">
+            {toBengaliNum(selectedIds.size)} টি সিলেক্ট করা হয়েছে
+          </span>
+          <div className="flex items-center gap-2 ml-auto">
+            <button
+              onClick={() => bulkBookCourier(Array.from(selectedIds))}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold bg-accent text-accent-foreground hover:bg-accent/90 transition-colors shadow-sm"
+            >
+              <Package className="h-3.5 w-3.5" />
+              সব কুরিয়ারে যুক্ত করুন
+            </button>
+            <button
+              onClick={() => setSelectedIds(new Set())}
+              className="px-3 py-2 rounded-lg text-xs font-medium text-muted-foreground hover:bg-muted transition-colors"
+            >
+              বাতিল
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Filters */}
       <div className="flex items-center gap-2 flex-wrap">
@@ -199,6 +271,14 @@ const OrdersPage = () => {
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/40 hover:bg-muted/40 border-b border-border/60">
+                  <TableHead className="w-[40px]">
+                    <Checkbox
+                      checked={allPageSelected}
+                      onCheckedChange={toggleSelectAll}
+                      className="border-muted-foreground/40"
+                    />
+                  </TableHead>
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground w-[50px]">#</TableHead>
                   <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">কাস্টমার</TableHead>
                   <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">ফোন</TableHead>
                   <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">মডেল</TableHead>
@@ -212,66 +292,86 @@ const OrdersPage = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {paged.map((o) => (
-                  <TableRow key={o.id} className="group hover:bg-muted/30 transition-colors duration-200 border-b border-border/40">
-                    <TableCell>
-                      <div>
-                        <p className="font-medium text-sm text-foreground">{o.customer_name}</p>
-                        <p className="text-[11px] text-muted-foreground truncate max-w-[200px]">{o.address}</p>
-                      </div>
-                    </TableCell>
-                    <TableCell className="font-inter text-sm tabular-nums text-foreground">{o.phone}</TableCell>
-                    <TableCell className="text-sm text-foreground">{o.watch_model}</TableCell>
-                    <TableCell className="text-center font-inter text-sm text-foreground">{toBengaliNum(o.quantity)}</TableCell>
-                    <TableCell className="font-semibold text-accent font-inter text-sm">
-                      ৳{formatBengaliPrice(o.total_price)}
-                    </TableCell>
-                    <TableCell>
-                      {o.trx_id ? (
-                        <span className="bg-accent/10 text-accent px-2 py-1 rounded-lg text-[11px] font-mono font-semibold">
-                          {o.trx_id}
-                        </span>
-                      ) : (
-                        <span className="text-muted-foreground text-[11px]">COD</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-[11px] text-foreground">
-                      {o.delivery_location === 'dhaka' ? 'ঢাকা' : 'ঢাকার বাইরে'}
-                    </TableCell>
-                    <TableCell className="text-[11px] text-muted-foreground font-inter tabular-nums">
-                      {new Date(o.created_at).toLocaleDateString('bn-BD')}
-                    </TableCell>
-                    <TableCell>
-                      <select
-                        value={o.status}
-                        onChange={(e) => updateStatus.mutate({ id: o.id, status: e.target.value as OrderStatus })}
-                        className={`text-[11px] font-medium px-3 py-1.5 rounded-full border cursor-pointer appearance-none transition-colors ${statusStyles[o.status]}`}
-                      >
-                        {Object.entries(statusLabels).map(([k, v]) => (
-                          <option key={k} value={k}>{v}</option>
-                        ))}
-                      </select>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center justify-end gap-1.5">
-                        <button
-                          onClick={() => bookCourier(o.id, o.customer_name)}
-                          className="p-1.5 rounded-lg text-info/70 hover:text-info hover:bg-info/10 transition-all"
-                          title="কুরিয়ার বুক"
+                {paged.map((o, index) => {
+                  const serial = page * pageSize + index + 1;
+                  const courierBooked = (o as any).courier_booked === true;
+                  return (
+                    <TableRow key={o.id} className={`group hover:bg-muted/30 transition-colors duration-200 border-b border-border/40 ${selectedIds.has(o.id) ? 'bg-accent/5' : ''}`}>
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedIds.has(o.id)}
+                          onCheckedChange={() => toggleSelect(o.id)}
+                          className="border-muted-foreground/40"
+                        />
+                      </TableCell>
+                      <TableCell className="font-inter text-xs font-semibold text-muted-foreground tabular-nums">
+                        {toBengaliNum(serial)}
+                      </TableCell>
+                      <TableCell>
+                        <div>
+                          <p className="font-medium text-sm text-foreground">{o.customer_name}</p>
+                          <p className="text-[11px] text-muted-foreground truncate max-w-[200px]">{o.address}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell className="font-inter text-sm tabular-nums text-foreground">{o.phone}</TableCell>
+                      <TableCell className="text-sm text-foreground">{o.watch_model}</TableCell>
+                      <TableCell className="text-center font-inter text-sm text-foreground">{toBengaliNum(o.quantity)}</TableCell>
+                      <TableCell className="font-semibold text-accent font-inter text-sm">
+                        ৳{formatBengaliPrice(o.total_price)}
+                      </TableCell>
+                      <TableCell>
+                        {o.trx_id ? (
+                          <span className="bg-accent/10 text-accent px-2 py-1 rounded-lg text-[11px] font-mono font-semibold">
+                            {o.trx_id}
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground text-[11px]">COD</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-[11px] text-foreground">
+                        {o.delivery_location === 'dhaka' ? 'ঢাকা' : 'ঢাকার বাইরে'}
+                      </TableCell>
+                      <TableCell className="text-[11px] text-muted-foreground font-inter tabular-nums">
+                        {new Date(o.created_at).toLocaleDateString('bn-BD')}
+                      </TableCell>
+                      <TableCell>
+                        <select
+                          value={o.status}
+                          onChange={(e) => updateStatus.mutate({ id: o.id, status: e.target.value as OrderStatus })}
+                          className={`text-[11px] font-medium px-3 py-1.5 rounded-full border cursor-pointer appearance-none transition-colors ${statusStyles[o.status]}`}
                         >
-                          <Truck className="h-4 w-4" />
-                        </button>
-                        <button
-                          onClick={() => downloadInvoice(o)}
-                          className="p-1.5 rounded-lg text-accent/70 hover:text-accent hover:bg-accent/10 transition-all"
-                          title="ইনভয়েস ডাউনলোড"
-                        >
-                          <FileText className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                          {Object.entries(statusLabels).map(([k, v]) => (
+                            <option key={k} value={k}>{v}</option>
+                          ))}
+                        </select>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center justify-end gap-1.5">
+                          {courierBooked ? (
+                            <span className="p-1.5 rounded-lg text-success" title="কুরিয়ার বুক হয়েছে">
+                              <CheckCircle2 className="h-4 w-4" />
+                            </span>
+                          ) : (
+                            <button
+                              onClick={() => bookCourier(o.id, o.customer_name)}
+                              className="p-1.5 rounded-lg text-info/70 hover:text-info hover:bg-info/10 transition-all"
+                              title="কুরিয়ার বুক"
+                            >
+                              <Truck className="h-4 w-4" />
+                            </button>
+                          )}
+                          <button
+                            onClick={() => downloadInvoice(o)}
+                            className="p-1.5 rounded-lg text-accent/70 hover:text-accent hover:bg-accent/10 transition-all"
+                            title="ইনভয়েস ডাউনলোড"
+                          >
+                            <FileText className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </div>

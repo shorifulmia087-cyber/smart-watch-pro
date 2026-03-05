@@ -1,0 +1,1 @@
+ALTER TABLE public.orders ADD COLUMN courier_booked boolean NOT NULL DEFAULT false;
