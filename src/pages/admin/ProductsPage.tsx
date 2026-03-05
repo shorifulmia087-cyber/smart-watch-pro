@@ -314,7 +314,7 @@ const ProductsPage = () => {
             </div>
           </div>
 
-          <div className="px-6 py-6 space-y-6 bg-gradient-to-b from-muted/10 via-background to-muted/5">
+          <div className="px-6 py-6 space-y-6">
             {/* Basic Info Card */}
             <SectionCard icon={<Package className="w-4 h-4" />} title="মৌলিক তথ্য" color="accent">
               <PremiumField label="নাম *" value={form.name} onChange={v => setForm({ ...form, name: v })} />
