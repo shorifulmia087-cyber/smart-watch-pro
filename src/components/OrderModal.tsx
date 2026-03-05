@@ -296,10 +296,10 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
               <div className="border-t border-border/60 pt-3">
                 <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium mb-2">ডেলিভারি এলাকা</p>
                 <div className="flex gap-2">
-                  <button onClick={() => setLocation('dhaka')} className={`flex-1 py-2.5 rounded-lg border text-sm font-medium transition-all ${location === 'dhaka' ? 'border-gold bg-gold/10 text-gold shadow-sm' : 'border-border/80 bg-surface text-muted-foreground hover:border-border'}`}>
+                  <button onClick={() => setLocation('dhaka')} className={`flex-1 py-2.5 rounded-sm border text-sm font-medium transition-all ${location === 'dhaka' ? 'border-gold bg-gold/10 text-gold shadow-sm' : 'border-border/60 bg-surface text-muted-foreground hover:border-border'}`}>
                     ঢাকার ভেতরে
                   </button>
-                  <button onClick={() => setLocation('outside')} className={`flex-1 py-2.5 rounded-lg border text-sm font-medium transition-all ${location === 'outside' ? 'border-gold bg-gold/10 text-gold shadow-sm' : 'border-border/80 bg-surface text-muted-foreground hover:border-border'}`}>
+                  <button onClick={() => setLocation('outside')} className={`flex-1 py-2.5 rounded-sm border text-sm font-medium transition-all ${location === 'outside' ? 'border-gold bg-gold/10 text-gold shadow-sm' : 'border-border/60 bg-surface text-muted-foreground hover:border-border'}`}>
                     ঢাকার বাইরে
                   </button>
                 </div>
