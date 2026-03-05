@@ -270,7 +270,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
           <div className="p-5 pt-0 space-y-5">
             {/* Price & Quantity Card */}
             <div
-              className="rounded-xl p-4 space-y-3 border border-border/60"
+              className="rounded-sm p-4 space-y-3 border border-border/30"
               style={{
                 backgroundImage: `linear-gradient(hsl(var(--border) / 0.12) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--border) / 0.12) 1px, transparent 1px)`,
                 backgroundSize: '24px 24px',
