@@ -14,18 +14,38 @@ interface HeroSliderProps {
 
 const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিমিয়াম ক্রাফটসম্যানশিপ, অতুলনীয় ডিজাইন।', price = 0, discountPercent = 0 }: HeroSliderProps) => {
   const [current, setCurrent] = useState(0);
+  const [direction, setDirection] = useState(1); // 1 = right-to-left, -1 = left-to-right
+  const autoSlideRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const originalPrice = discountPercent > 0 ? Math.round(price / (1 - discountPercent / 100)) : price;
 
-  const next = useCallback(() => setCurrent((c) => (c + 1) % images.length), [images.length]);
-  const prev = useCallback(() => setCurrent((c) => (c - 1 + images.length) % images.length), [images.length]);
+  const resetAutoSlide = useCallback(() => {
+    if (autoSlideRef.current) clearInterval(autoSlideRef.current);
+    if (images.length > 1) {
+      autoSlideRef.current = setInterval(() => {
+        setDirection(1);
+        setCurrent((c) => (c + 1) % images.length);
+      }, 3000);
+    }
+  }, [images.length]);
 
-  // Auto-slide every 4 seconds when multiple images
+  const next = useCallback(() => {
+    setDirection(1);
+    setCurrent((c) => (c + 1) % images.length);
+    resetAutoSlide();
+  }, [images.length, resetAutoSlide]);
+
+  const prev = useCallback(() => {
+    setDirection(-1);
+    setCurrent((c) => (c - 1 + images.length) % images.length);
+    resetAutoSlide();
+  }, [images.length, resetAutoSlide]);
+
+  // Start auto-slide
   useEffect(() => {
-    if (images.length <= 1) return;
-    const interval = setInterval(next, 3000);
-    return () => clearInterval(interval);
-  }, [images.length, next]);
+    resetAutoSlide();
+    return () => { if (autoSlideRef.current) clearInterval(autoSlideRef.current); };
+  }, [resetAutoSlide]);
 
   return (
     <section className="bg-surface">
