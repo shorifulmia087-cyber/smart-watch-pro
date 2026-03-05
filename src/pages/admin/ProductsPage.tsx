@@ -39,7 +39,7 @@ const ProductsPage = () => {
     discount_percent: 0, product_type: 'watch', is_featured: false,
     image_urls: [] as string[], description_list: [] as string[],
     features: [] as { icon: string; title: string; desc: string }[],
-    sourcing_cost: 0,
+    sourcing_cost: 0, meta_title: '', meta_description: '',
   });
 
   const [newDesc, setNewDesc] = useState('');
@@ -51,7 +51,7 @@ const ProductsPage = () => {
       name: '', price: 0, subtitle: '', video_url: '', stock_status: 'in_stock',
       discount_percent: 0, product_type: 'watch', is_featured: false,
       image_urls: [], description_list: [],
-      features: [], sourcing_cost: 0,
+      features: [], sourcing_cost: 0, meta_title: '', meta_description: '',
     });
     setNewDesc('');
     setNewFeature({ icon: '', title: '', desc: '' });
@@ -71,6 +71,7 @@ const ProductsPage = () => {
       image_urls: p.image_urls || [],
       description_list: p.description_list || [],
       features, sourcing_cost: (p as any).sourcing_cost || 0,
+      meta_title: (p as any).meta_title || '', meta_description: (p as any).meta_description || '',
     });
     setNewDesc('');
     setNewFeature({ icon: '', title: '', desc: '' });
@@ -130,6 +131,8 @@ const ProductsPage = () => {
       thumbnail_url: form.image_urls[0] || null,
       features: form.features as any,
       sourcing_cost: form.sourcing_cost,
+      meta_title: form.meta_title || null,
+      meta_description: form.meta_description || null,
       ...(editingId ? { id: editingId } : {}),
     } as any, {
       onSuccess: () => {
@@ -333,6 +336,24 @@ const ProductsPage = () => {
                   <p className="text-[11px] text-muted-foreground">ওয়েবসাইটে প্রধান প্রোডাক্ট হিসেবে দেখাবে</p>
                 </div>
               </label>
+            </div>
+
+            {/* SEO Card */}
+            <div className="rounded-2xl border border-border/50 bg-background p-5 space-y-4 shadow-sm">
+              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-warning" /> SEO সেটিংস
+              </h3>
+              <FormField label="Meta Title" value={form.meta_title} onChange={v => setForm({ ...form, meta_title: v })} />
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Meta Description</label>
+                <textarea
+                  value={form.meta_description}
+                  onChange={e => setForm({ ...form, meta_description: e.target.value })}
+                  rows={2}
+                  placeholder="সার্চ ইঞ্জিনে দেখানো বিবরণ..."
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all resize-none"
+                />
+              </div>
             </div>
 
             {/* Image Upload Card */}

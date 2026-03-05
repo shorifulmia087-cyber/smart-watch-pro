@@ -74,6 +74,8 @@ export type Database = {
           id: string
           image_urls: string[]
           is_featured: boolean
+          meta_description: string | null
+          meta_title: string | null
           name: string
           price: number
           product_type: string
@@ -93,6 +95,8 @@ export type Database = {
           id?: string
           image_urls?: string[]
           is_featured?: boolean
+          meta_description?: string | null
+          meta_title?: string | null
           name: string
           price: number
           product_type?: string
@@ -112,6 +116,8 @@ export type Database = {
           id?: string
           image_urls?: string[]
           is_featured?: boolean
+          meta_description?: string | null
+          meta_title?: string | null
           name?: string
           price?: number
           product_type?: string
@@ -263,6 +269,7 @@ export type Database = {
         | "shipped"
         | "completed"
         | "cancelled"
+        | "returned"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -397,6 +404,7 @@ export const Constants = {
         "shipped",
         "completed",
         "cancelled",
+        "returned",
       ],
     },
   },

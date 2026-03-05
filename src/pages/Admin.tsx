@@ -12,6 +12,8 @@ import PaymentSettingsPage from './admin/PaymentSettingsPage';
 import ProfileSettingsPage from './admin/ProfileSettingsPage';
 import CourierSettingsPage from './admin/CourierSettingsPage';
 import FacebookPixelPage from './admin/FacebookPixelPage';
+import SmsSettingsPage from './admin/SmsSettingsPage';
+import TeamPage from './admin/TeamPage';
 import { Loader2 } from 'lucide-react';
 import { Routes, Route } from 'react-router-dom';
 
@@ -47,8 +49,10 @@ const Admin = () => {
         <Route path="products" element={<ProductsPage />} />
         <Route path="customers" element={<CustomersPage />} />
         <Route path="reviews" element={<ReviewsPage />} />
+        <Route path="team" element={<TeamPage />} />
         <Route path="payment" element={<PaymentSettingsPage />} />
         <Route path="courier" element={<CourierSettingsPage />} />
+        <Route path="sms" element={<SmsSettingsPage />} />
         <Route path="analytics" element={<AnalyticsPage />} />
         <Route path="pixel" element={<FacebookPixelPage />} />
         <Route path="settings" element={<SiteControlPage />} />

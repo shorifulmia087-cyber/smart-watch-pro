@@ -18,7 +18,7 @@ const FloatingNotification = () => {
       setIndex((i) => (i + 1) % notifications.length);
       setShow(true);
       setTimeout(() => setShow(false), 4000);
-    }, 30000);
+    }, 45000);
 
     // Show first one after 5 seconds
     const initial = setTimeout(() => {
