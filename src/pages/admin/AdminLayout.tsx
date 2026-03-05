@@ -21,9 +21,16 @@ const AdminLayoutInner = () => {
     const checkSandboxMode = async () => {
       const { data } = await supabase.from('courier_settings' as any).select('is_sandbox, is_active');
       if (data && (data as any[]).length > 0) {
-        // If ANY provider is in sandbox mode, show the warning
-        const anySandbox = (data as any[]).some((row: any) => row.is_sandbox === true);
-        setSandboxMode(anySandbox);
+        const activeProviders = (data as any[]).filter((row: any) => row.is_active);
+        if (activeProviders.length > 0) {
+          const anySandbox = activeProviders.some((row: any) => row.is_sandbox === true);
+          const allProduction = activeProviders.every((row: any) => row.is_sandbox === false);
+          setSandboxMode(allProduction ? false : anySandbox ? true : null);
+        } else {
+          // Check all providers if none active
+          const anySandbox = (data as any[]).some((row: any) => row.is_sandbox === true);
+          setSandboxMode(anySandbox);
+        }
       }
     };
     checkSandboxMode();
