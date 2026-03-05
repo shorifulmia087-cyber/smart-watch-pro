@@ -382,7 +382,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
                 )}
               </div>
               {tab === 'cod' && (
-                <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="mt-3 p-3 rounded-lg bg-success/5 border border-success/10">
+                <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="mt-3 p-3 rounded-sm bg-success/5 border border-success/10">
                   <p className="text-sm text-foreground font-medium">✅ পণ্য হাতে পেয়ে টাকা দিন</p>
                   <p className="text-xs text-muted-foreground mt-0.5">কোনো অগ্রিম পেমেন্ট প্রয়োজন নেই।</p>
                 </motion.div>
