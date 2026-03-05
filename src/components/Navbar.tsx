@@ -98,7 +98,7 @@ const Navbar = () => {
         </div>
 
         {/* Center: Logo/Brand */}
-        <Link to="/" className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1.5 group">
+        <Link to="/" className="absolute left-1/2 -translate-x-1/2 flex items-center gap-0.5 group">
           {logoUrl ? (
             <>
               <motion.img

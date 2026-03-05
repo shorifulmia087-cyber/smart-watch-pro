@@ -91,7 +91,7 @@ const AnnouncementBar = ({
             <span className="text-gold/90 tabular-nums font-bold tracking-wide text-lg md:text-xl">
               {pad(time.h)}:{pad(time.m)}:{pad(time.s)}
             </span>
-            <span className="hidden sm:inline text-gold/70 font-medium">{timerLabel}</span>
+            <span className="text-gold/70 font-medium">{timerLabel}</span>
           </>
         )}
       </div>
