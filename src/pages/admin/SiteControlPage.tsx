@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useSettings, useUpdateSettings } from '@/hooks/useSupabaseData';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
-  Globe, Megaphone, Type, FileText, Save, Loader2, CheckCircle2, MessageCircle,
+  Globe, Megaphone, Type, FileText, Save, Loader2, CheckCircle2, MessageCircle, Upload, X, Image,
 } from 'lucide-react';
 import type { Database } from '@/integrations/supabase/types';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 type SettingsRow = Database['public']['Tables']['site_settings']['Row'];
 
