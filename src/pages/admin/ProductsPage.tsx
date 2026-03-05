@@ -327,8 +327,8 @@ const ProductsPage = () => {
               <PremiumField label="ভিডিও URL (YouTube ID)" value={form.video_url} onChange={v => setForm({ ...form, video_url: v })} />
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[11px] font-semibold text-muted-foreground/80 mb-1.5 block uppercase tracking-wider">টাইপ</label>
-                  <select value={form.product_type} onChange={e => setForm({ ...form, product_type: e.target.value })} className="w-full bg-muted/50 border border-border/50 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all hover:border-border">
+                  <label className="text-[11px] font-semibold text-muted-foreground mb-1.5 block uppercase tracking-wider">টাইপ</label>
+                  <select value={form.product_type} onChange={e => setForm({ ...form, product_type: e.target.value })} className="w-full bg-background border border-border/60 rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all hover:border-border">
                     <option value="watch">ঘড়ি</option>
                     <option value="clothing">পোশাক</option>
                     <option value="electronics">ইলেকট্রনিক্স</option>
