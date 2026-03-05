@@ -166,26 +166,6 @@ const DashboardPage = () => {
                 <h4 className="text-sm font-semibold text-foreground">তারিখ নির্বাচন করুন</h4>
                 <p className="text-[11px] text-muted-foreground mt-0.5">শুরু ও শেষ তারিখ সিলেক্ট করুন</p>
               </div>
-              <div className="flex gap-2 p-3 pb-1 flex-wrap">
-                {[
-                  { label: 'গত ৭ দিন', days: 7 },
-                  { label: 'গত ১৫ দিন', days: 15 },
-                  { label: 'গত ৩০ দিন', days: 30 },
-                  { label: 'গত ৬০ দিন', days: 60 },
-                ].map((q) => (
-                  <button
-                    key={q.days}
-                    onClick={() => {
-                      setDateRange({ from: subDays(new Date(), q.days), to: new Date() });
-                      setActivePreset(-1);
-                      setCalendarOpen(false);
-                    }}
-                    className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-border/50 text-muted-foreground hover:bg-muted hover:text-foreground transition-all duration-150"
-                  >
-                    {q.label}
-                  </button>
-                ))}
-              </div>
               <Calendar
                 mode="range"
                 selected={{ from: dateRange.from, to: dateRange.to }}
