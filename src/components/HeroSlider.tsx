@@ -49,7 +49,7 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
 
   return (
     <section className="bg-surface relative" style={{
-      backgroundImage: `linear-gradient(hsl(var(--border) / 0.4) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--border) / 0.4) 1px, transparent 1px)`,
+      backgroundImage: `linear-gradient(hsl(var(--border) / 0.18) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--border) / 0.18) 1px, transparent 1px)`,
       backgroundSize: '32px 32px',
     }}>
       <div className="text-center pt-10 pb-6 px-4">
