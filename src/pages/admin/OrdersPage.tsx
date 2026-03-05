@@ -398,8 +398,9 @@ const OrdersPage = () => {
                 {paged.map((o, index) => {
                   const serial = page * pageSize + index + 1;
                   const courierBooked = (o as any).courier_booked === true;
-                  return (
-                    <TableRow key={o.id} className={`group hover:bg-muted/30 transition-colors duration-200 border-b border-border/40 ${selectedIds.has(o.id) ? 'bg-accent/5' : ''}`}>
+                    return (
+                    <React.Fragment key={o.id}>
+                    <TableRow className={`group hover:bg-muted/30 transition-colors duration-200 border-b border-border/40 ${selectedIds.has(o.id) ? 'bg-accent/5' : ''}`}>
                       <TableCell>
                         <Checkbox
                           checked={selectedIds.has(o.id)}
