@@ -445,6 +445,28 @@ const OrdersPage = () => {
                           <span className="text-muted-foreground text-[11px]">—</span>
                         )}
                       </TableCell>
+                      {/* Tracking Status Badge */}
+                      <TableCell>
+                        {courierBooked ? (
+                          <button
+                            onClick={() => setExpandedOrderId(expandedOrderId === o.id ? null : o.id)}
+                            className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-semibold border transition-colors cursor-pointer ${
+                              o.status === 'completed'
+                                ? 'bg-success/10 text-success border-success/20'
+                                : o.status === 'shipped'
+                                ? 'bg-info/10 text-info border-info/20'
+                                : o.status === 'returned'
+                                ? 'bg-destructive/10 text-destructive border-destructive/20'
+                                : 'bg-warning/10 text-warning border-warning/20'
+                            }`}
+                          >
+                            <Eye className="h-2.5 w-2.5" />
+                            {o.status === 'completed' ? 'ডেলিভারড' : o.status === 'shipped' ? 'ট্রানজিট' : o.status === 'returned' ? 'রিটার্ন' : 'পেন্ডিং'}
+                          </button>
+                        ) : (
+                          <span className="text-muted-foreground text-[10px]">—</span>
+                        )}
+                      </TableCell>
                       <TableCell className="text-[11px] text-foreground">
                         {o.delivery_location === 'dhaka' ? 'ঢাকা' : 'ঢাকার বাইরে'}
                       </TableCell>
@@ -476,7 +498,7 @@ const OrdersPage = () => {
                               onClick={() => bookCourier(o.id, o.customer_name)}
                               disabled={bookingInProgress === o.id || bookingInProgress === 'bulk'}
                               className="p-1.5 rounded-lg text-info/70 hover:text-info hover:bg-info/10 transition-all disabled:opacity-50"
-                              title="RedX কুরিয়ার বুক"
+                              title="কুরিয়ার বুক"
                             >
                               {bookingInProgress === o.id ? (
                                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -495,7 +517,28 @@ const OrdersPage = () => {
                         </div>
                       </TableCell>
                     </TableRow>
-                  );
+                    {/* Expandable Live Tracking Row */}
+                    {expandedOrderId === o.id && (
+                      <TableRow className="bg-muted/20 hover:bg-muted/20">
+                        <TableCell colSpan={14} className="py-4 px-6">
+                          <div className="flex items-start justify-between">
+                            <LiveTracking
+                              orderId={o.id}
+                              trackingId={(o as any).tracking_id}
+                              courierProvider={(o as any).courier_provider}
+                            />
+                            <button
+                              onClick={() => setExpandedOrderId(null)}
+                              className="p-1 rounded-lg hover:bg-muted text-muted-foreground"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </>
+                );
                 })}
               </TableBody>
             </Table>
