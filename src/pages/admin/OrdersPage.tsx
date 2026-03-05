@@ -85,9 +85,18 @@ const OrdersPage = () => {
 
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       const modeLabel = result.mode === 'sandbox' ? ' (🧪 TEST)' : '';
+      // Show the raw API response message from the courier
+      const apiMessage = result?.redx_response?.message 
+        || result?.pathao_response?.message 
+        || result?.steadfast_response?.message 
+        || result?.api_response?.message
+        || null;
+      const description = apiMessage 
+        ? `${apiMessage} — ট্র্যাকিং: ${result.tracking_id}${result.mode === 'sandbox' ? ' (টেস্ট)' : ''}`
+        : `${customerName} — ট্র্যাকিং আইডি: ${result.tracking_id}${result.mode === 'sandbox' ? ' (টেস্ট অর্ডার)' : ''}`;
       toast({
         title: `✅ ${providerNames[courierProvider]} কুরিয়ার বুক সফল!${modeLabel}`,
-        description: `${customerName} — ট্র্যাকিং আইডি: ${result.tracking_id}${result.mode === 'sandbox' ? ' (টেস্ট অর্ডার)' : ''}`,
+        description,
         duration: 8000,
       });
     } catch (err: any) {
