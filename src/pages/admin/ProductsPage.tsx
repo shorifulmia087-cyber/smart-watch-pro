@@ -285,7 +285,7 @@ const ProductsPage = () => {
       )}
 
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-        <SheetContent className="w-full sm:max-w-2xl overflow-y-auto p-0 border-l-0 shadow-2xl">
+        <SheetContent className="w-full sm:max-w-2xl overflow-y-auto p-0 border-l border-border/30 shadow-2xl bg-background">
           {/* Premium Header */}
           <div className="sticky top-0 z-10 border-b border-border/30">
             <div className="absolute inset-0 bg-background/90 backdrop-blur-2xl" />
