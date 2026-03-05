@@ -10,7 +10,7 @@ const ReviewGallery = () => {
   if (isLoading || !images?.length) return null;
 
   return (
-    <section className="bg-surface py-20 px-4">
+    <section className="bg-surface py-12 px-4">
       <div className="max-w-6xl mx-auto">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
