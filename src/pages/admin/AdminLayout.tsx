@@ -19,7 +19,7 @@ const AdminLayoutInner = () => {
 
   useEffect(() => {
     const checkSandboxMode = async () => {
-      const { data } = await supabase.from('courier_settings' as any).select('is_sandbox').limit(1);
+      const { data } = await supabase.from('courier_settings' as any).select('is_sandbox, is_active');
       if (data && (data as any[]).length > 0) {
         // If ANY provider is in sandbox mode, show the warning
         const anySandbox = (data as any[]).some((row: any) => row.is_sandbox === true);
