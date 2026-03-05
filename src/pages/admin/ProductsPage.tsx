@@ -523,7 +523,7 @@ const ProductsPage = () => {
                     value={newFeature.title}
                     onChange={e => setNewFeature({ ...newFeature, title: e.target.value })}
                     placeholder="ফিচার শিরোনাম"
-                    className="bg-muted/50 border border-border/50 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all hover:border-border"
+                    className="bg-background border border-border/60 rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all hover:border-border placeholder:text-muted-foreground"
                   />
                 </div>
                 <div className="flex gap-2">
