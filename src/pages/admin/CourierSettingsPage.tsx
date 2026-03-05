@@ -14,9 +14,9 @@ interface CourierConfig {
 }
 
 const providers = [
-  { id: 'redx' as CourierProvider, name: 'RedX', desc: 'দ্রুত ডেলিভারি সার্ভিস', url: 'https://redx.com.bd' },
-  { id: 'pathao' as CourierProvider, name: 'Pathao Courier', desc: 'পাঠাও কুরিয়ার সার্ভিস', url: 'https://pathao.com' },
-  { id: 'steadfast' as CourierProvider, name: 'Steadfast Courier', desc: 'স্টেডফাস্ট কুরিয়ার সার্ভিস', url: 'https://steadfast.com.bd' },
+  { id: 'redx' as CourierProvider, name: 'RedX', desc: 'দ্রুত ডেলিভারি সার্ভিস', url: 'https://redx.com.bd', keyLabel: 'Access Token', secretLabel: 'Secret (ঐচ্ছিক)', keyPlaceholder: 'RedX Access Token দিন...', secretPlaceholder: 'RedX Secret (প্রয়োজন হলে)...' },
+  { id: 'pathao' as CourierProvider, name: 'Pathao Courier', desc: 'পাঠাও কুরিয়ার সার্ভিস', url: 'https://merchant.pathao.com', keyLabel: 'Store ID', secretLabel: 'Access Token (Bearer)', keyPlaceholder: 'Pathao Store ID দিন...', secretPlaceholder: 'Pathao Access Token দিন...' },
+  { id: 'steadfast' as CourierProvider, name: 'Steadfast Courier', desc: 'স্টেডফাস্ট কুরিয়ার সার্ভিস', url: 'https://steadfast.com.bd', keyLabel: 'API Key', secretLabel: 'Secret Key', keyPlaceholder: 'Steadfast API Key দিন...', secretPlaceholder: 'Steadfast Secret Key দিন...' },
 ];
 
 const CourierSettingsPage = () => {
@@ -47,6 +47,7 @@ const CourierSettingsPage = () => {
   }, []);
 
   const currentConfig = configs[selectedProvider];
+  const currentProvider = providers.find(p => p.id === selectedProvider);
 
   const updateLocalConfig = (field: 'api_key' | 'api_secret', value: string) => {
     setConfigs(prev => ({
@@ -152,30 +153,30 @@ const CourierSettingsPage = () => {
       <div className="glass-card rounded-2xl p-5 md:p-6 space-y-4">
         <h3 className="font-semibold text-sm flex items-center gap-2">
           <div className="w-1.5 h-1.5 rounded-full bg-info" />
-          {providers.find(p => p.id === selectedProvider)?.name} — API ক্রেডেনশিয়াল
+          {currentProvider?.name} — API ক্রেডেনশিয়াল
         </h3>
         <p className="text-[11px] text-muted-foreground">
-          {providers.find(p => p.id === selectedProvider)?.name} ড্যাশবোর্ড থেকে API Key ও Secret সংগ্রহ করে এখানে দিন। সংরক্ষণ করলে ডাটাবেসে নিরাপদে সেভ হবে।
+          {currentProvider?.name} ড্যাশবোর্ড থেকে নিচের তথ্যগুলো সংগ্রহ করে এখানে দিন। সংরক্ষণ করলে ডাটাবেসে নিরাপদে সেভ হবে।
         </p>
         <div className="space-y-3">
           <div>
-            <label className="text-[11px] font-medium text-muted-foreground mb-1.5 block">API Key</label>
+            <label className="text-[11px] font-medium text-muted-foreground mb-1.5 block">{currentProvider?.keyLabel}</label>
             <input
               type="text"
               value={currentConfig?.api_key || ''}
               onChange={e => updateLocalConfig('api_key', e.target.value)}
-              placeholder="আপনার API Key দিন..."
+              placeholder={currentProvider?.keyPlaceholder}
               className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all font-mono"
             />
           </div>
           <div>
-            <label className="text-[11px] font-medium text-muted-foreground mb-1.5 block">API Secret</label>
+            <label className="text-[11px] font-medium text-muted-foreground mb-1.5 block">{currentProvider?.secretLabel}</label>
             <div className="relative">
               <input
                 type={showSecrets[selectedProvider] ? 'text' : 'password'}
                 value={currentConfig?.api_secret || ''}
                 onChange={e => updateLocalConfig('api_secret', e.target.value)}
-                placeholder="আপনার API Secret দিন..."
+                placeholder={currentProvider?.secretPlaceholder}
                 className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all font-mono pr-10"
               />
               <button

@@ -43,16 +43,9 @@ const OrdersPage = () => {
   const [courierProvider, setCourierProvider] = useState<'redx' | 'pathao' | 'steadfast'>('redx');
   const [bookingInProgress, setBookingInProgress] = useState<string | null>(null);
 
-  const bookCourier = useCallback(async (orderId: string, customerName: string) => {
-    if (courierProvider !== 'redx') {
-      toast({
-        title: '⚠️ শুধুমাত্র RedX সমর্থিত',
-        description: 'বর্তমানে শুধুমাত্র RedX কুরিয়ার API ইন্টিগ্রেটেড। Pathao ও Steadfast শীঘ্রই আসছে।',
-        variant: 'destructive',
-      });
-      return;
-    }
+  const providerNames: Record<string, string> = { redx: 'RedX', pathao: 'Pathao', steadfast: 'Steadfast' };
 
+  const bookCourier = useCallback(async (orderId: string, customerName: string) => {
     setBookingInProgress(orderId);
 
     try {
@@ -64,8 +57,9 @@ const OrdersPage = () => {
       }
 
       const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+      const functionName = `book-${courierProvider}-courier`;
       const res = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/book-redx-courier`,
+        `https://${projectId}.supabase.co/functions/v1/${functionName}`,
         {
           method: 'POST',
           headers: {
@@ -79,9 +73,9 @@ const OrdersPage = () => {
       const result = await res.json();
 
       if (!res.ok) {
-        const errorMsg = result?.details?.message || result?.error || 'কুরিয়ার বুক করতে সমস্যা হয়েছে';
+        const errorMsg = result?.details?.message || result?.details || result?.error || 'কুরিয়ার বুক করতে সমস্যা হয়েছে';
         toast({
-          title: '❌ RedX API ত্রুটি!',
+          title: `❌ ${providerNames[courierProvider]} API ত্রুটি!`,
           description: typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg),
           variant: 'destructive',
           duration: 8000,
@@ -91,14 +85,14 @@ const OrdersPage = () => {
 
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       toast({
-        title: '✅ RedX কুরিয়ার বুক সফল!',
+        title: `✅ ${providerNames[courierProvider]} কুরিয়ার বুক সফল!`,
         description: `${customerName} — ট্র্যাকিং আইডি: ${result.tracking_id}`,
         duration: 8000,
       });
     } catch (err: any) {
       toast({
         title: '❌ নেটওয়ার্ক ত্রুটি!',
-        description: err?.message || 'RedX সার্ভারে সংযোগ করা যায়নি',
+        description: err?.message || `${providerNames[courierProvider]} সার্ভারে সংযোগ করা যায়নি`,
         variant: 'destructive',
       });
     } finally {
@@ -107,10 +101,6 @@ const OrdersPage = () => {
   }, [toast, queryClient, courierProvider]);
 
   const bulkBookCourier = useCallback(async (ids: string[]) => {
-    if (courierProvider !== 'redx') {
-      toast({ title: '⚠️ শুধুমাত্র RedX সমর্থিত', description: 'বর্তমানে শুধুমাত্র RedX ইন্টিগ্রেটেড।', variant: 'destructive' });
-      return;
-    }
     const unbookedIds = ids.filter(id => {
       const order = orders?.find(o => o.id === id);
       return order && !(order as any).courier_booked;
@@ -135,8 +125,9 @@ const OrdersPage = () => {
 
     for (const id of unbookedIds) {
       try {
+        const functionName = `book-${courierProvider}-courier`;
         const res = await fetch(
-          `https://${projectId}.supabase.co/functions/v1/book-redx-courier`,
+          `https://${projectId}.supabase.co/functions/v1/${functionName}`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
