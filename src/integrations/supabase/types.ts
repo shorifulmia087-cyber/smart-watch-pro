@@ -225,6 +225,8 @@ export type Database = {
           id: string
           logo_url: string | null
           nagad_number: string
+          offer_end_at: string | null
+          offer_start_at: string | null
           online_payment_enabled: boolean
           primary_color: string
           product_type: string
@@ -252,6 +254,8 @@ export type Database = {
           id?: string
           logo_url?: string | null
           nagad_number?: string
+          offer_end_at?: string | null
+          offer_start_at?: string | null
           online_payment_enabled?: boolean
           primary_color?: string
           product_type?: string
@@ -279,6 +283,8 @@ export type Database = {
           id?: string
           logo_url?: string | null
           nagad_number?: string
+          offer_end_at?: string | null
+          offer_start_at?: string | null
           online_payment_enabled?: boolean
           primary_color?: string
           product_type?: string
