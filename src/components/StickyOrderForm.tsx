@@ -20,7 +20,7 @@ const StickyOrderForm = () => {
   const { data: product } = useFeaturedProduct();
   const createOrder = useCreateOrder();
   const { toast } = useToast();
-  const { checkLimit } = useRateLimit({ maxAttempts: 3, windowMs: 60_000 });
+  const { checkLimit } = useRateLimit({ maxAttempts: 10, windowMs: 60_000 });
 
   const deliveryCharge = location === 'dhaka'
     ? (settings?.delivery_charge_inside ?? 70)
