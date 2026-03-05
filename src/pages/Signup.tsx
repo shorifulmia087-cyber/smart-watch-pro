@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { UserPlus, Eye, EyeOff } from 'lucide-react';
+import { UserPlus, Eye, EyeOff, ArrowLeft, Shield, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useToast } from '@/hooks/use-toast';
 
@@ -35,69 +35,133 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="w-full max-w-sm"
-      >
-        <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-accent flex items-center justify-center mx-auto mb-4">
-            <UserPlus className="h-6 w-6 text-accent-foreground" />
-          </div>
-          <h1 className="text-2xl font-bold text-foreground">অ্যাকাউন্ট করুন</h1>
-          <p className="text-muted-foreground text-sm mt-1">নতুন অ্যাকাউন্ট তৈরি করুন</p>
-        </div>
+    <div className="min-h-screen bg-background flex items-center justify-center px-4 relative overflow-hidden">
+      {/* Grid pattern background */}
+      <div
+        className="absolute inset-0 opacity-[0.03]"
+        style={{
+          backgroundImage: `linear-gradient(hsl(var(--border)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--border)) 1px, transparent 1px)`,
+          backgroundSize: '32px 32px',
+        }}
+      />
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1.5">ইমেইল</label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-border bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 transition-shadow"
-              placeholder="example@mail.com"
-            />
+      {/* Gold glow orb */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-[hsl(var(--gold))] opacity-[0.04] blur-[120px] pointer-events-none" />
+
+      <motion.div
+        initial={{ opacity: 0, y: 24, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        className="w-full max-w-[400px] relative z-10"
+      >
+        {/* Back button */}
+        <motion.div
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8 group"
+          >
+            <ArrowLeft className="h-4 w-4 group-hover:-translate-x-0.5 transition-transform" />
+            হোমে ফিরে যান
+          </Link>
+        </motion.div>
+
+        {/* Card */}
+        <div className="bg-card/80 backdrop-blur-xl border border-border/60 rounded-2xl p-8 shadow-[0_8px_40px_-12px_hsl(var(--gold)/0.08)]">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[hsl(var(--gold))] to-[hsl(var(--gold-light))] flex items-center justify-center mx-auto mb-5 shadow-[0_4px_20px_-4px_hsl(var(--gold)/0.35)]">
+              <UserPlus className="h-6 w-6 text-white" />
+            </div>
+            <h1 className="text-2xl font-bold text-foreground tracking-tight">অ্যাকাউন্ট করুন</h1>
+            <p className="text-muted-foreground text-sm mt-1.5">নতুন অ্যাকাউন্ট তৈরি করুন</p>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1.5">পাসওয়ার্ড</label>
-            <div className="relative">
+
+          {/* Divider */}
+          <div className="flex items-center gap-3 mb-6">
+            <div className="h-px flex-1 bg-border/60" />
+            <span className="text-[11px] text-muted-foreground/60 uppercase tracking-widest font-medium">details</span>
+            <div className="h-px flex-1 bg-border/60" />
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label className="block text-xs font-semibold text-foreground/80 uppercase tracking-wider mb-2">ইমেইল</label>
               <input
-                type={showPw ? 'text' : 'password'}
+                type="email"
                 required
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-border bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 transition-shadow pr-10"
-                placeholder="কমপক্ষে ৬ অক্ষর"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl border border-border/60 bg-muted/30 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-[hsl(var(--gold)/0.4)] focus:border-[hsl(var(--gold)/0.5)] transition-all placeholder:text-muted-foreground/50"
+                placeholder="example@mail.com"
               />
-              <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
-                {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </button>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-foreground/80 uppercase tracking-wider mb-2">পাসওয়ার্ড</label>
+              <div className="relative">
+                <input
+                  type={showPw ? 'text' : 'password'}
+                  required
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border border-border/60 bg-muted/30 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-[hsl(var(--gold)/0.4)] focus:border-[hsl(var(--gold)/0.5)] transition-all placeholder:text-muted-foreground/50 pr-11"
+                  placeholder="কমপক্ষে ৬ অক্ষর"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPw(!showPw)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/60 hover:text-foreground transition-colors"
+                >
+                  {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+            </div>
+
+            <motion.button
+              type="submit"
+              disabled={loading}
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[hsl(var(--gold))] to-[hsl(var(--gold-light))] text-white font-semibold text-sm shadow-[0_4px_16px_-4px_hsl(var(--gold)/0.4)] hover:shadow-[0_6px_24px_-4px_hsl(var(--gold)/0.5)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  তৈরি হচ্ছে...
+                </span>
+              ) : 'অ্যাকাউন্ট তৈরি করুন'}
+            </motion.button>
+          </form>
+
+          {/* Trust badges */}
+          <div className="flex items-center justify-center gap-4 mt-6 pt-5 border-t border-border/40">
+            <div className="flex items-center gap-1.5 text-muted-foreground/60">
+              <Shield className="h-3.5 w-3.5" />
+              <span className="text-[11px]">নিরাপদ</span>
+            </div>
+            <div className="w-1 h-1 rounded-full bg-border" />
+            <div className="flex items-center gap-1.5 text-muted-foreground/60">
+              <Zap className="h-3.5 w-3.5" />
+              <span className="text-[11px]">এনক্রিপ্টেড</span>
             </div>
           </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 rounded-xl bg-accent text-accent-foreground font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
-          >
-            {loading ? 'তৈরি হচ্ছে...' : 'অ্যাকাউন্ট তৈরি করুন'}
-          </button>
-        </form>
+        </div>
 
-        <p className="text-center text-sm text-muted-foreground mt-6">
+        {/* Bottom link */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="text-center text-sm text-muted-foreground mt-6"
+        >
           ইতোমধ্যে অ্যাকাউন্ট আছে?{' '}
-          <Link to="/login" className="text-accent font-medium hover:underline">
+          <Link to="/login" className="text-[hsl(var(--gold))] font-semibold hover:underline underline-offset-4">
             লগইন করুন
           </Link>
-        </p>
-        <p className="text-center mt-4">
-          <Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-            ← হোমে ফিরে যান
-          </Link>
-        </p>
+        </motion.p>
       </motion.div>
     </div>
   );
