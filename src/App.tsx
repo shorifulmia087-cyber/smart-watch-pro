@@ -9,6 +9,7 @@ import Admin from "./pages/Admin";
 import TrackOrder from "./pages/TrackOrder";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import MyOrders from "./pages/MyOrders";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
             <Route path="/track" element={<TrackOrder />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/my-orders" element={<MyOrders />} />
             <Route path="/admin/*" element={<Admin />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
