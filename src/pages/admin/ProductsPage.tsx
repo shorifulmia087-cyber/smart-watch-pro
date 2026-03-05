@@ -76,9 +76,11 @@ const ProductsPage = () => {
       description_list: p.description_list || [],
       features, sourcing_cost: (p as any).sourcing_cost || 0,
       meta_title: (p as any).meta_title || '', meta_description: (p as any).meta_description || '',
+      available_colors: (p as any).available_colors || [],
     });
     setNewDesc('');
     setNewFeature({ icon: '', title: '', desc: '' });
+    setNewColor('');
     setSheetOpen(true);
   };
 
