@@ -21,7 +21,7 @@ const ThemeToggle = () => {
             exit={{ rotate: 90, opacity: 0, scale: 0.5 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
           >
-            <Sun className="h-[18px] w-[18px] text-accent" />
+            <Sun className="h-5 w-5 text-accent" />
           </motion.div>
         ) : (
           <motion.div
@@ -31,7 +31,7 @@ const ThemeToggle = () => {
             exit={{ rotate: -90, opacity: 0, scale: 0.5 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
           >
-            <Moon className="h-[18px] w-[18px] text-muted-foreground" />
+            <Moon className="h-5 w-5 text-muted-foreground" />
           </motion.div>
         )}
       </AnimatePresence>
