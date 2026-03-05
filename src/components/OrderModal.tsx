@@ -435,7 +435,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
                             onChange={(e) => setTxnId(e.target.value.replace(/[^a-zA-Z0-9]/g, ''))}
                             placeholder={`ট্রানজেকশন আইডি (${label} অক্ষর) *`}
                             maxLength={requiredLen}
-                            className={`w-full bg-muted/40 border rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/40 transition-all font-mono ${touched && errors.txnId ? 'border-destructive/60 bg-destructive/5' : 'border-border/60'}`}
+                            className={`w-full bg-transparent border rounded-sm px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/20 focus:border-gold/40 transition-all font-mono ${touched && errors.txnId ? 'border-destructive/60 bg-destructive/5' : 'border-border/60'}`}
                           />
                           <ErrorMessage error={errors.txnId} />
                         </>
