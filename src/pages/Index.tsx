@@ -130,12 +130,17 @@ const Index = () => {
           <p className="text-surface/60 mb-8">
             {settings?.footer_cta_subtitle || 'সীমিত সময়ের অফার। স্টক শেষ হওয়ার আগেই অর্ডার করুন।'}
           </p>
-          <button
+          <motion.button
             onClick={() => setOrderOpen(true)}
             className="gradient-gold text-surface font-semibold px-10 py-4 rounded-xl text-lg hover:opacity-90 transition-opacity"
+            animate={{ 
+              scale: [1, 1.08, 1.08, 1],
+              rotateZ: [0, -2, 2, -2, 2, 0],
+            }}
+            transition={{ duration: 1.2, ease: 'easeInOut', repeat: Infinity, repeatDelay: 1.8 }}
           >
             এখনই অর্ডার করুন — ৳{formatBengaliPrice(currentProduct.price)}
-          </button>
+          </motion.button>
         </motion.div>
       </section>
 
