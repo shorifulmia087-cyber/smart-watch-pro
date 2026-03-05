@@ -21,7 +21,7 @@ interface OrderModalProps {
   rocketNumber?: string;
 }
 
-const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInside = 70, deliveryChargeOutside = 150, onlinePaymentEnabled = true }: OrderModalProps) => {
+const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInside = 70, deliveryChargeOutside = 150, onlinePaymentEnabled = true, bkashNumber = '', nagadNumber = '', rocketNumber = '' }: OrderModalProps) => {
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState<'cod' | 'online'>('cod');
   const [name, setName] = useState('');
