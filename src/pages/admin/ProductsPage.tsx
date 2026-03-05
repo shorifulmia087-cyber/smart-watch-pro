@@ -180,20 +180,20 @@ const ProductsPage = () => {
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/40 hover:bg-muted/40 border-b border-border/60">
-                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground w-[50px]">ছবি</TableHead>
-                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">নাম</TableHead>
-                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">টাইপ</TableHead>
-                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">মূল্য</TableHead>
-                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground text-center">ছাড়</TableHead>
-                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground text-center">স্টক</TableHead>
-                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground text-center">ফিচার্ড</TableHead>
-                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground text-right">অ্যাকশন</TableHead>
+                  <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 w-[50px]">ছবি</TableHead>
+                  <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">নাম</TableHead>
+                  <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">টাইপ</TableHead>
+                  <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">মূল্য</TableHead>
+                  <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 text-center w-[60px]">ছাড়</TableHead>
+                  <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 text-center w-[70px]">স্টক</TableHead>
+                  <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 text-center w-[70px]">ফিচার্ড</TableHead>
+                  <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 text-right w-[100px]">অ্যাকশন</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filtered.map((p) => (
-                  <TableRow key={p.id} className="group hover:bg-muted/30 transition-colors cursor-pointer border-b border-border/40" onClick={() => openEdit(p)}>
-                    <TableCell>
+                  <TableRow key={p.id} className="group hover:bg-muted/20 transition-colors cursor-pointer border-b border-border/30" onClick={() => openEdit(p)}>
+                    <TableCell className="py-4">
                       {p.thumbnail_url ? (
                         <img src={p.thumbnail_url} alt={p.name} className="w-10 h-10 rounded-lg object-cover bg-muted" />
                       ) : (
@@ -202,67 +202,62 @@ const ProductsPage = () => {
                         </div>
                       )}
                     </TableCell>
-                    <TableCell className="max-w-[180px]">
+                    <TableCell className="py-4 max-w-[200px]">
                       <div className="flex items-center gap-2 min-w-0">
                         <span className="font-medium text-sm truncate">{p.name}</span>
                         {p.is_featured && <Star className="h-3.5 w-3.5 text-accent fill-accent shrink-0" />}
                       </div>
                       {p.subtitle && <p className="text-[11px] text-muted-foreground truncate">{p.subtitle}</p>}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="py-4">
                       <span className="text-[11px] bg-muted px-2.5 py-1 rounded-full">{p.product_type}</span>
                     </TableCell>
-                    <TableCell className="font-inter font-semibold text-sm text-accent">
+                    <TableCell className="py-4 font-inter font-semibold text-sm text-accent">
                       ৳{formatBengaliPrice(p.price)}
                     </TableCell>
-                    <TableCell className="text-center font-inter text-sm">
+                    <TableCell className="py-4 text-center font-inter text-sm">
                       {p.discount_percent > 0 ? (
                         <span className="text-accent font-medium">{toBengaliNum(p.discount_percent)}%</span>
                       ) : '-'}
                     </TableCell>
-                    <TableCell className="text-center" onClick={e => e.stopPropagation()}>
-                      <div className="flex flex-col items-center gap-1">
-                        <button
-                          onClick={() => toggleStock.mutate({ id: p.id, stock_status: p.stock_status === 'in_stock' ? 'out_of_stock' : 'in_stock' })}
-                          className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${
-                            p.stock_status === 'in_stock' ? 'bg-success' : 'bg-muted-foreground/25'
-                          }`}
-                        >
-                          <span
-                            className={`inline-block h-6 w-6 transform rounded-full bg-background shadow-lg transition-transform duration-300 ${
-                              p.stock_status === 'in_stock' ? 'translate-x-7' : 'translate-x-1'
-                            }`}
-                          />
-                        </button>
-                        <span className={`text-[10px] font-medium ${p.stock_status === 'in_stock' ? 'text-success' : 'text-muted-foreground'}`}>
-                          {p.stock_status === 'in_stock' ? 'ইন স্টক' : 'স্টক আউট'}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-center" onClick={e => e.stopPropagation()}>
+                    <TableCell className="py-4 text-center" onClick={e => e.stopPropagation()}>
                       <button
-                        onClick={() => toggleFeatured.mutate({ id: p.id, is_featured: !p.is_featured })}
-                        className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors duration-300 focus:outline-none shadow-inner ${
-                          p.is_featured ? 'bg-accent' : 'bg-muted-foreground/25'
+                        onClick={() => toggleStock.mutate({ id: p.id, stock_status: p.stock_status === 'in_stock' ? 'out_of_stock' : 'in_stock' })}
+                        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-300 focus:outline-none ${
+                          p.stock_status === 'in_stock' ? 'bg-success' : 'bg-muted-foreground/25'
                         }`}
                       >
                         <span
-                          className={`inline-block h-6 w-6 transform rounded-full bg-background shadow-lg transition-transform duration-300 ${
-                            p.is_featured ? 'translate-x-7' : 'translate-x-1'
+                          className={`inline-block h-3.5 w-3.5 transform rounded-full bg-background shadow transition-transform duration-300 ${
+                            p.stock_status === 'in_stock' ? 'translate-x-4.5' : 'translate-x-0.5'
                           }`}
                         />
                       </button>
                     </TableCell>
-                    <TableCell className="text-right" onClick={e => e.stopPropagation()}>
-                      <div className="flex items-center justify-end gap-1">
-                        <button onClick={() => openEdit(p)} className="p-2 rounded-lg hover:bg-muted transition-colors">
-                          <Pencil className="h-4 w-4 text-muted-foreground" />
+                    <TableCell className="py-4 text-center" onClick={e => e.stopPropagation()}>
+                      <button
+                        onClick={() => toggleFeatured.mutate({ id: p.id, is_featured: !p.is_featured })}
+                        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-300 focus:outline-none ${
+                          p.is_featured ? 'bg-accent' : 'bg-muted-foreground/25'
+                        }`}
+                      >
+                        <span
+                          className={`inline-block h-3.5 w-3.5 transform rounded-full bg-background shadow transition-transform duration-300 ${
+                            p.is_featured ? 'translate-x-4.5' : 'translate-x-0.5'
+                          }`}
+                        />
+                      </button>
+                    </TableCell>
+                    <TableCell className="py-4 text-right" onClick={e => e.stopPropagation()}>
+                      <div className="flex items-center justify-end gap-2">
+                        <button onClick={() => openEdit(p)} className="p-2 rounded-full text-info/70 hover:text-info hover:bg-info/10 transition-all">
+                          <Pencil className="h-3.5 w-3.5" />
                         </button>
                         <button
                           onClick={() => setDeleteTarget({ id: p.id, name: p.name })}
-                          className="p-2 rounded-lg text-destructive hover:bg-destructive/10 transition-colors"
+                          className="p-2 rounded-full text-destructive/60 hover:text-destructive hover:bg-destructive/10 transition-all"
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-3.5 w-3.5" />
                         </button>
                       </div>
                     </TableCell>
