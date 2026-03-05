@@ -24,7 +24,7 @@ const CollectionGrid = ({ currentProductId, onSelectProduct, sectionTitle = 'আ
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-2xl md:text-3xl font-bold text-center mb-12"
+          className="text-2xl md:text-3xl font-bold text-center mb-12 text-gold drop-shadow-[0_0_10px_hsl(var(--gold)/0.25)]"
         >
           {sectionTitle}
         </motion.h2>

@@ -28,11 +28,11 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.77, 0, 0.18, 1] }}
-          className="text-xl md:text-2xl text-muted-foreground font-semibold leading-relaxed max-w-2xl mx-auto"
+          className="text-xl md:text-2xl text-foreground font-semibold leading-relaxed max-w-2xl mx-auto"
         >
-          {subtitle}
+          <span className="text-gold drop-shadow-[0_0_8px_hsl(var(--gold)/0.3)]">{subtitle}</span>
           <br />
-          <span className="text-foreground font-normal">{tagline}</span>
+          <span className="text-muted-foreground font-normal">{tagline}</span>
         </motion.p>
       </div>
 
