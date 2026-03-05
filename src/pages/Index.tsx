@@ -133,10 +133,10 @@ const Index = () => {
           viewport={{ once: true }}
           className="max-w-2xl mx-auto text-center"
         >
-          <h2 className="text-2xl md:text-3xl font-bold text-surface mb-3">
+          <h2 className="text-2xl md:text-3xl font-bold text-gold drop-shadow-[0_0_12px_hsl(var(--gold)/0.4)] mb-3">
             {settings?.footer_cta_title || `আজই আপনার ${currentProduct.name} অর্ডার করুন`}
           </h2>
-          <p className="text-surface/60 mb-8">
+          <p className="text-surface/70 mb-8 text-lg">
             {settings?.footer_cta_subtitle || 'সীমিত সময়ের অফার। স্টক শেষ হওয়ার আগেই অর্ডার করুন।'}
           </p>
           <motion.button
