@@ -52,6 +52,17 @@ const OrdersPage = () => {
   };
 
   const bookCourier = useCallback(async (orderId: string, customerName: string) => {
+    // Check if courier API is configured
+    const { data: courierCfg } = await supabase.from('courier_settings' as any).select('*').eq('provider', courierProvider).single();
+    if (!courierCfg || !(courierCfg as any).is_active) {
+      toast({ 
+        title: '⚠️ কুরিয়ার API সেট করা হয়নি!', 
+        description: `প্রথমে কুরিয়ার সেটিংস থেকে ${courierProvider === 'redx' ? 'RedX' : courierProvider === 'pathao' ? 'Pathao' : 'Steadfast'} এর API কনফিগার করুন।`,
+        variant: 'destructive',
+      });
+      return;
+    }
+
     const trackingId = generateMockTrackingId(courierProvider);
     const { error } = await supabase.from('orders').update({ 
       courier_booked: true, 
@@ -65,7 +76,8 @@ const OrdersPage = () => {
     queryClient.invalidateQueries({ queryKey: ['orders'] });
     toast({
       title: '✅ কুরিয়ার বুক সফল!',
-      description: `${customerName} — ${courierProvider === 'redx' ? 'RedX' : courierProvider === 'pathao' ? 'Pathao' : 'Steadfast'} ট্র্যাকিং: ${trackingId}`,
+      description: `${customerName} — ${courierProvider === 'redx' ? 'RedX' : courierProvider === 'pathao' ? 'Pathao' : 'Steadfast'} ট্র্যাকিং আইডি: ${trackingId}`,
+      duration: 6000,
     });
   }, [toast, queryClient, courierProvider]);
 
@@ -402,7 +414,10 @@ const OrdersPage = () => {
                       <TableCell>
                         <div className="flex items-center justify-end gap-1.5">
                           {courierBooked ? (
-                            <span className="p-1.5 rounded-lg text-success" title="কুরিয়ার বুক হয়েছে">
+                            <span 
+                              className="p-1.5 rounded-lg text-success cursor-help" 
+                              title={`✅ কুরিয়ার: ${(o as any).courier_provider || 'N/A'} | ট্র্যাকিং: ${(o as any).tracking_id || 'N/A'}`}
+                            >
                               <CheckCircle2 className="h-4 w-4" />
                             </span>
                           ) : (
