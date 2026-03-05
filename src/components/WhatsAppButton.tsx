@@ -1,4 +1,3 @@
-import { MessageCircle } from 'lucide-react';
 import { useSettings } from '@/hooks/useSupabaseData';
 
 const normalizeBangladeshPhone = (value: string) => {
