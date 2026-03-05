@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useSettings, useUpdateSettings } from '@/hooks/useSupabaseData';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
-  Globe, Megaphone, Type, FileText, Save, Loader2, CheckCircle2, MessageCircle,
+  Globe, Megaphone, Type, FileText, Save, Loader2, CheckCircle2, MessageCircle, Upload, X, Image,
 } from 'lucide-react';
 import type { Database } from '@/integrations/supabase/types';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 type SettingsRow = Database['public']['Tables']['site_settings']['Row'];
 
@@ -63,12 +65,11 @@ const SiteControlPage = () => {
             <Field label="ব্র্যান্ড নাম" value={form.brand_name || ''} onChange={v => setForm({ ...form, brand_name: v })} />
             <Field label="ট্যাগলাইন" value={form.brand_tagline || ''} onChange={v => setForm({ ...form, brand_tagline: v })} />
             <div className="sm:col-span-2">
-              <Field label="লোগো URL (ছবির লিংক দিন)" value={(form as any).logo_url || ''} onChange={v => setForm({ ...form, logo_url: v } as any)} />
-              {(form as any).logo_url && (
-                <div className="mt-2 p-3 bg-muted rounded-xl inline-block">
-                  <img src={(form as any).logo_url} alt="Logo preview" className="h-10 w-auto object-contain" />
-                </div>
-              )}
+              <LogoUpload
+                currentUrl={(form as any).logo_url || ''}
+                onUploaded={(url) => setForm({ ...form, logo_url: url } as any)}
+                onRemove={() => setForm({ ...form, logo_url: '' } as any)}
+              />
             </div>
             <div>
               <label className="text-[11px] font-medium text-muted-foreground mb-1.5 block">টাইপ</label>
@@ -122,6 +123,65 @@ const SiteControlPage = () => {
           />
         </Section>
       </div>
+    </div>
+  );
+};
+
+const LogoUpload = ({ currentUrl, onUploaded, onRemove }: { currentUrl: string; onUploaded: (url: string) => void; onRemove: () => void }) => {
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      toast.error('শুধুমাত্র ইমেজ ফাইল আপলোড করুন');
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('ফাইল সাইজ ২MB এর বেশি হতে পারবে না');
+      return;
+    }
+
+    setUploading(true);
+    const ext = file.name.split('.').pop();
+    const path = `logo-${Date.now()}.${ext}`;
+
+    const { error } = await supabase.storage.from('brand-assets').upload(path, file, { upsert: true });
+    if (error) {
+      toast.error('আপলোড ব্যর্থ হয়েছে');
+      setUploading(false);
+      return;
+    }
+
+    const { data: urlData } = supabase.storage.from('brand-assets').getPublicUrl(path);
+    onUploaded(urlData.publicUrl);
+    toast.success('লোগো আপলোড সফল!');
+    setUploading(false);
+  };
+
+  return (
+    <div>
+      <label className="text-[11px] font-medium text-muted-foreground mb-1.5 block">ব্র্যান্ড লোগো</label>
+      {currentUrl ? (
+        <div className="flex items-center gap-3 p-3 bg-muted rounded-xl">
+          <img src={currentUrl} alt="Logo" className="h-10 w-auto object-contain rounded" />
+          <span className="text-xs text-muted-foreground flex-1 truncate">{currentUrl.split('/').pop()}</span>
+          <button onClick={onRemove} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      ) : (
+        <button
+          onClick={() => fileRef.current?.click()}
+          disabled={uploading}
+          className="w-full flex items-center justify-center gap-2 p-4 border-2 border-dashed border-border rounded-xl text-sm text-muted-foreground hover:border-accent hover:text-accent transition-colors cursor-pointer"
+        >
+          {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+          {uploading ? 'আপলোড হচ্ছে...' : 'লোগো আপলোড করুন'}
+        </button>
+      )}
+      <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleUpload} />
     </div>
   );
 };
