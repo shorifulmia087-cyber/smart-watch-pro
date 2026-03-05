@@ -268,16 +268,24 @@ const ProductsPage = () => {
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
         <SheetContent className="w-full sm:max-w-2xl overflow-y-auto bg-gradient-to-b from-background to-muted/20 p-0">
           <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-xl border-b border-border/40 px-6 py-5">
-            <SheetHeader className="space-y-1">
-              <SheetTitle className="text-xl font-bold flex items-center gap-2.5">
-                {editingId ? (
-                  <><Pencil className="h-5 w-5 text-accent" /> প্রোডাক্ট এডিট</>
-                ) : (
-                  <><Plus className="h-5 w-5 text-accent" /> নতুন প্রোডাক্ট</>
-                )}
-              </SheetTitle>
-              <SheetDescription className="text-xs">প্রোডাক্টের সমস্ত তথ্য পূরণ করুন</SheetDescription>
-            </SheetHeader>
+            <div className="flex items-start justify-between gap-4">
+              <SheetHeader className="space-y-1">
+                <SheetTitle className="text-xl font-bold flex items-center gap-2.5">
+                  {editingId ? (
+                    <><Pencil className="h-5 w-5 text-accent" /> প্রোডাক্ট এডিট</>
+                  ) : (
+                    <><Plus className="h-5 w-5 text-accent" /> নতুন প্রোডাক্ট</>
+                  )}
+                </SheetTitle>
+                <SheetDescription className="text-xs">প্রোডাক্টের সমস্ত তথ্য পূরণ করুন</SheetDescription>
+              </SheetHeader>
+              <button
+                onClick={() => setSheetOpen(false)}
+                className="p-2 rounded-xl hover:bg-muted transition-colors text-muted-foreground hover:text-foreground shrink-0"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
           </div>
 
           <div className="px-6 py-6 space-y-7">
