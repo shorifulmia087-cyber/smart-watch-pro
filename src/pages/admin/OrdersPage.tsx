@@ -40,9 +40,25 @@ const OrdersPage = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Mock courier provider selection — defaults to 'redx'
+  const [courierProvider, setCourierProvider] = useState<'redx' | 'pathao'>('redx');
+
+  const generateMockTrackingId = (provider: 'redx' | 'pathao') => {
+    const ts = Date.now().toString().slice(-8);
+    const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
+    if (provider === 'redx') {
+      return `RDX${ts}${rand}`; // RedX style: RDX + 12 chars
+    }
+    return `PT-${ts}-${rand}`; // Pathao style: PT-XXXXXXXX-XXXX
+  };
+
   const bookCourier = useCallback(async (orderId: string, customerName: string) => {
-    const mockTrackingId = `TRK-${Date.now().toString(36).toUpperCase()}`;
-    const { error } = await supabase.from('orders').update({ courier_booked: true } as any).eq('id', orderId);
+    const trackingId = generateMockTrackingId(courierProvider);
+    const { error } = await supabase.from('orders').update({ 
+      courier_booked: true, 
+      tracking_id: trackingId, 
+      courier_provider: courierProvider 
+    } as any).eq('id', orderId);
     if (error) {
       toast({ title: 'ত্রুটি!', description: 'কুরিয়ার বুক করতে সমস্যা হয়েছে', variant: 'destructive' });
       return;
@@ -50,9 +66,9 @@ const OrdersPage = () => {
     queryClient.invalidateQueries({ queryKey: ['orders'] });
     toast({
       title: '✅ কুরিয়ার বুক সফল!',
-      description: `${customerName} — ট্র্যাকিং: ${mockTrackingId}`,
+      description: `${customerName} — ${courierProvider === 'redx' ? 'RedX' : 'Pathao'} ট্র্যাকিং: ${trackingId}`,
     });
-  }, [toast, queryClient]);
+  }, [toast, queryClient, courierProvider]);
 
   const bulkBookCourier = useCallback(async (ids: string[]) => {
     const unbookedIds = ids.filter(id => {
@@ -63,8 +79,18 @@ const OrdersPage = () => {
       toast({ title: '⚠️ কোনো নতুন অর্ডার নেই', description: 'সিলেক্ট করা সব অর্ডার ইতিমধ্যে কুরিয়ারে বুক হয়েছে' });
       return;
     }
-    const { error } = await supabase.from('orders').update({ courier_booked: true } as any).in('id', unbookedIds);
-    if (error) {
+    // Generate tracking IDs for each order
+    const updates = unbookedIds.map(id => {
+      const trackingId = generateMockTrackingId(courierProvider);
+      return supabase.from('orders').update({ 
+        courier_booked: true, 
+        tracking_id: trackingId, 
+        courier_provider: courierProvider 
+      } as any).eq('id', id);
+    });
+    const results = await Promise.all(updates);
+    const hasError = results.some(r => r.error);
+    if (hasError) {
       toast({ title: 'ত্রুটি!', description: 'বাল্ক কুরিয়ার বুক করতে সমস্যা হয়েছে', variant: 'destructive' });
       return;
     }
@@ -72,9 +98,9 @@ const OrdersPage = () => {
     setSelectedIds(new Set());
     toast({
       title: '✅ বাল্ক কুরিয়ার বুক সফল!',
-      description: `${toBengaliNum(unbookedIds.length)} টি অর্ডার কুরিয়ারে যুক্ত হয়েছে`,
+      description: `${toBengaliNum(unbookedIds.length)} টি অর্ডার ${courierProvider === 'redx' ? 'RedX' : 'Pathao'} কুরিয়ারে যুক্ত হয়েছে`,
     });
-  }, [orders, toast, queryClient]);
+  }, [orders, toast, queryClient, courierProvider]);
 
   const downloadInvoice = useCallback((order: any) => {
     const brandName = settings?.brand_name || 'Kronos Premium Watch';
@@ -204,13 +230,26 @@ const OrdersPage = () => {
           <h2 className="text-lg font-semibold text-foreground">সকল অর্ডার</h2>
           <p className="text-[11px] text-muted-foreground">মোট {toBengaliNum(filtered.length)} টি অর্ডার</p>
         </div>
-        <div className="flex items-center gap-2 glass-card rounded-xl px-3 py-2 min-w-[240px]">
-          <Search className="h-4 w-4 text-muted-foreground shrink-0" />
-          <input
-            type="text" value={search} onChange={e => { setSearch(e.target.value); setPage(0); }}
-            placeholder="নাম, ফোন বা TrxID দিয়ে খুঁজুন..."
-            className="bg-transparent border-none outline-none w-full text-sm text-foreground placeholder:text-muted-foreground"
-          />
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 glass-card rounded-xl px-3 py-2">
+            <Truck className="h-4 w-4 text-muted-foreground" />
+            <select
+              value={courierProvider}
+              onChange={e => setCourierProvider(e.target.value as 'redx' | 'pathao')}
+              className="bg-transparent border-none outline-none text-sm font-medium text-foreground cursor-pointer"
+            >
+              <option value="redx">RedX</option>
+              <option value="pathao">Pathao</option>
+            </select>
+          </div>
+          <div className="flex items-center gap-2 glass-card rounded-xl px-3 py-2 min-w-[240px]">
+            <Search className="h-4 w-4 text-muted-foreground shrink-0" />
+            <input
+              type="text" value={search} onChange={e => { setSearch(e.target.value); setPage(0); }}
+              placeholder="নাম, ফোন বা TrxID দিয়ে খুঁজুন..."
+              className="bg-transparent border-none outline-none w-full text-sm text-foreground placeholder:text-muted-foreground"
+            />
+          </div>
         </div>
       </div>
 
@@ -285,6 +324,7 @@ const OrdersPage = () => {
                   <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground text-center">পরিমাণ</TableHead>
                   <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">মোট</TableHead>
                   <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">TrxID</TableHead>
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">ট্র্যাকিং</TableHead>
                   <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">এলাকা</TableHead>
                   <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">তারিখ</TableHead>
                   <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">স্ট্যাটাস</TableHead>
@@ -326,6 +366,20 @@ const OrdersPage = () => {
                           </span>
                         ) : (
                           <span className="text-muted-foreground text-[11px]">COD</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {(o as any).tracking_id ? (
+                          <div className="flex flex-col gap-0.5">
+                            <span className="bg-success/10 text-success px-2 py-1 rounded-lg text-[11px] font-mono font-semibold">
+                              {(o as any).tracking_id}
+                            </span>
+                            <span className="text-[10px] text-muted-foreground">
+                              {(o as any).courier_provider === 'pathao' ? 'Pathao' : 'RedX'}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground text-[11px]">—</span>
                         )}
                       </TableCell>
                       <TableCell className="text-[11px] text-foreground">

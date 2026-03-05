@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           address: string
           courier_booked: boolean
+          courier_provider: string | null
           created_at: string
           customer_email: string | null
           customer_name: string
@@ -29,12 +30,14 @@ export type Database = {
           quantity: number
           status: Database["public"]["Enums"]["order_status"]
           total_price: number
+          tracking_id: string | null
           trx_id: string | null
           watch_model: string
         }
         Insert: {
           address: string
           courier_booked?: boolean
+          courier_provider?: string | null
           created_at?: string
           customer_email?: string | null
           customer_name: string
@@ -46,12 +49,14 @@ export type Database = {
           quantity?: number
           status?: Database["public"]["Enums"]["order_status"]
           total_price: number
+          tracking_id?: string | null
           trx_id?: string | null
           watch_model: string
         }
         Update: {
           address?: string
           courier_booked?: boolean
+          courier_provider?: string | null
           created_at?: string
           customer_email?: string | null
           customer_name?: string
@@ -63,6 +68,7 @@ export type Database = {
           quantity?: number
           status?: Database["public"]["Enums"]["order_status"]
           total_price?: number
+          tracking_id?: string | null
           trx_id?: string | null
           watch_model?: string
         }
