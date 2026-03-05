@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { formatBengaliPrice } from '@/lib/bengali';
@@ -14,12 +14,6 @@ interface HeroSliderProps {
 
 const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিমিয়াম ক্রাফটসম্যানশিপ, অতুলনীয় ডিজাইন।', price = 0, discountPercent = 0 }: HeroSliderProps) => {
   const [current, setCurrent] = useState(0);
-  const [flipKey, setFlipKey] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => setFlipKey(k => k + 1), 3000);
-    return () => clearInterval(interval);
-  }, []);
 
   const originalPrice = discountPercent > 0 ? Math.round(price / (1 - discountPercent / 100)) : price;
 
@@ -97,19 +91,18 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
 
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pb-16 px-4">
         <div className="relative w-full sm:w-auto">
-          <AnimatePresence mode="wait">
             <motion.button
-              key={flipKey}
               onClick={onOrderClick}
               className="gradient-gold text-surface font-semibold px-8 py-3.5 rounded-xl text-base hover:opacity-90 transition-opacity w-full sm:w-auto"
-              initial={{ y: -15, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 15, opacity: 0 }}
-              transition={{ duration: 0.35, ease: 'easeOut' }}
+              initial={{ scale: 1, rotateZ: 0 }}
+              animate={{ 
+                scale: [1, 1.08, 1.08, 1],
+                rotateZ: [0, -2, 2, -2, 2, 0],
+              }}
+              transition={{ duration: 1.2, ease: 'easeInOut', repeat: Infinity, repeatDelay: 1.8 }}
             >
               এখনই কিনুন — ৳{formatBengaliPrice(price)}
             </motion.button>
-          </AnimatePresence>
         </div>
         <div className="flex flex-col items-center gap-1 px-6 py-3 rounded-xl bg-muted w-full sm:w-auto">
           {discountPercent > 0 ? (
