@@ -482,7 +482,7 @@ const ProductsPage = () => {
                   onChange={e => setNewDesc(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && addDescription()}
                   placeholder="নতুন বিবরণ লিখুন..."
-                  className="flex-1 bg-muted/50 border border-border/50 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all hover:border-border"
+                  className="flex-1 bg-background border border-border/60 rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all hover:border-border placeholder:text-muted-foreground"
                 />
                 <button onClick={addDescription} className="px-4 py-2.5 rounded-xl bg-accent/10 text-accent text-sm font-semibold hover:bg-accent/20 transition-all border border-accent/20 hover:border-accent/30">
                   <Plus className="w-4 h-4" />
