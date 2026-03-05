@@ -45,6 +45,7 @@ const ProductsPage = () => {
 
   const [newDesc, setNewDesc] = useState('');
   const [newFeature, setNewFeature] = useState({ icon: '', title: '', desc: '' });
+  const [newColor, setNewColor] = useState('');
 
   const openNew = () => {
     setEditingId(null);
