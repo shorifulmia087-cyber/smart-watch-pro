@@ -96,30 +96,32 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
       </div>
 
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pb-16 px-4">
-        <div className="relative w-full sm:w-auto" style={{ perspective: '600px' }}>
+        <div className="relative w-full sm:w-auto">
           <AnimatePresence mode="wait">
             <motion.button
               key={flipKey}
               onClick={onOrderClick}
               className="gradient-gold text-surface font-semibold px-8 py-3.5 rounded-xl text-base hover:opacity-90 transition-opacity w-full sm:w-auto"
-              initial={{ rotateX: 90, opacity: 0 }}
-              animate={{ rotateX: 0, opacity: 1 }}
-              exit={{ rotateX: -90, opacity: 0 }}
-              transition={{ duration: 0.4, ease: 'easeOut' }}
+              initial={{ y: -15, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 15, opacity: 0 }}
+              transition={{ duration: 0.35, ease: 'easeOut' }}
             >
               এখনই কিনুন — ৳{formatBengaliPrice(price)}
             </motion.button>
           </AnimatePresence>
         </div>
-        <div className="flex items-center gap-2 px-6 py-3.5 rounded-xl bg-muted w-full sm:w-auto justify-center">
+        <div className="flex flex-col items-center gap-1 px-6 py-3 rounded-xl bg-muted w-full sm:w-auto">
           {discountPercent > 0 ? (
             <>
-              <span className="line-through text-muted-foreground text-sm">৳{formatBengaliPrice(originalPrice)}</span>
-              <span className="text-foreground font-bold text-base">৳{formatBengaliPrice(price)}</span>
-              <span className="bg-destructive/10 text-destructive text-xs font-semibold px-2 py-0.5 rounded-md">-{discountPercent}%</span>
+              <span className="line-through text-muted-foreground text-sm">মূল্য: ৳{formatBengaliPrice(originalPrice)}</span>
+              <div className="flex items-center gap-2">
+                <span className="text-foreground font-bold text-base">অফার মূল্য: ৳{formatBengaliPrice(price)}</span>
+                <span className="bg-destructive/10 text-destructive text-xs font-semibold px-2 py-0.5 rounded-md">-{discountPercent}%</span>
+              </div>
             </>
           ) : (
-            <span className="text-foreground font-bold text-base">৳{formatBengaliPrice(price)}</span>
+            <span className="text-foreground font-bold text-base">মূল্য: ৳{formatBengaliPrice(price)}</span>
           )}
         </div>
       </div>
