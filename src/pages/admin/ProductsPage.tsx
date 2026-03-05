@@ -345,7 +345,49 @@ const ProductsPage = () => {
               </label>
             </div>
 
-            {/* SEO Card */}
+            {/* Available Colors Card */}
+            <div className="rounded-2xl border border-border/50 bg-background p-5 space-y-4 shadow-sm">
+              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-pink-500" /> এভেইলেবল কালার
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {form.available_colors.map((color, i) => (
+                  <span key={i} className="inline-flex items-center gap-1.5 bg-muted/60 rounded-full px-3 py-1.5 text-sm group hover:bg-muted transition-colors">
+                    <span className="w-3 h-3 rounded-full border border-border/60 shrink-0" style={{ backgroundColor: color }} />
+                    <span>{color}</span>
+                    <button onClick={() => setForm(prev => ({ ...prev, available_colors: prev.available_colors.filter((_, idx) => idx !== i) }))} className="text-destructive/60 hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity ml-1">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <input
+                  value={newColor}
+                  onChange={e => setNewColor(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' && newColor.trim()) {
+                      setForm(prev => ({ ...prev, available_colors: [...prev.available_colors, newColor.trim()] }));
+                      setNewColor('');
+                    }
+                  }}
+                  placeholder="কালার নাম লিখুন (যেমন: কালো, সিলভার, গোল্ড)"
+                  className="flex-1 bg-muted border border-border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all"
+                />
+                <button
+                  onClick={() => {
+                    if (newColor.trim()) {
+                      setForm(prev => ({ ...prev, available_colors: [...prev.available_colors, newColor.trim()] }));
+                      setNewColor('');
+                    }
+                  }}
+                  className="px-4 py-2.5 rounded-xl bg-accent/10 text-accent text-sm font-semibold hover:bg-accent/20 transition-colors"
+                >
+                  যোগ
+                </button>
+              </div>
+            </div>
+
             <div className="rounded-2xl border border-border/50 bg-background p-5 space-y-4 shadow-sm">
               <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-warning" /> SEO সেটিংস

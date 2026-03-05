@@ -97,7 +97,8 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
       delivery_location: location,
       delivery_charge: deliveryCharge,
       total_price: grandTotal,
-    };
+      selected_color: selectedColor || null,
+    } as any;
 
     try {
       await createOrder.mutateAsync(orderData);
