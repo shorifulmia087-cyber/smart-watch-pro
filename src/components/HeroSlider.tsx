@@ -3,6 +3,60 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Truck, ShieldCheck, Star, Award, Clock } from 'lucide-react';
 import { formatBengaliPrice } from '@/lib/bengali';
 
+const BentoGridBackground = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [mousePos, setMousePos] = useState({ x: -200, y: -200 });
+
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+  }, []);
+
+  return (
+    <div
+      ref={containerRef}
+      onMouseMove={handleMouseMove}
+      className="absolute inset-0 overflow-hidden pointer-events-auto"
+      style={{ zIndex: 0 }}
+    >
+      {/* Base grid pattern with thin lines */}
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage: `
+            linear-gradient(to right, hsla(215, 20%, 25%, 0.15) 1px, transparent 1px),
+            linear-gradient(to bottom, hsla(215, 20%, 25%, 0.15) 1px, transparent 1px)
+          `,
+          backgroundSize: '32px 32px',
+        }}
+      />
+      {/* Slightly larger overlay grid */}
+      <div
+        className="absolute inset-0 hidden md:block"
+        style={{
+          backgroundImage: `
+            linear-gradient(to right, hsla(215, 20%, 30%, 0.08) 1px, transparent 1px),
+            linear-gradient(to bottom, hsla(215, 20%, 30%, 0.08) 1px, transparent 1px)
+          `,
+          backgroundSize: '128px 128px',
+        }}
+      />
+      {/* Mouse-following spotlight */}
+      <div
+        className="absolute pointer-events-none transition-opacity duration-300"
+        style={{
+          left: mousePos.x - 150,
+          top: mousePos.y - 150,
+          width: 300,
+          height: 300,
+          background: `radial-gradient(circle, hsla(41, 52%, 48%, 0.06) 0%, transparent 70%)`,
+          borderRadius: '50%',
+        }}
+      />
+    </div>
+  );
+};
 interface HeroSliderProps {
   onOrderClick: () => void;
   images: { src: string; label: string }[];
