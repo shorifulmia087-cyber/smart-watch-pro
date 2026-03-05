@@ -1,6 +1,6 @@
 import { useOrders, useProducts } from '@/hooks/useSupabaseData';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
-import { TrendingUp, ShoppingCart, Clock, DollarSign, Package, ArrowUpRight, CalendarIcon, Box, Truck, CheckCircle2, XCircle } from 'lucide-react';
+import { TrendingUp, ShoppingCart, Clock, DollarSign, Package, ArrowUpRight, CalendarIcon, Box, Truck, CheckCircle2, XCircle, AlertTriangle } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useMemo, useState } from 'react';
 import { format, subDays, startOfDay, endOfDay, isWithinInterval } from 'date-fns';
@@ -115,9 +115,24 @@ const DashboardPage = () => {
 
   const isLoading = ordersLoading || productsLoading;
 
+  const outOfStockProducts = useMemo(() => {
+    return products?.filter(p => p.stock_status !== 'in_stock') || [];
+  }, [products]);
+
   return (
     <div className="space-y-6 max-w-[1400px]">
-      {/* Date Filter */}
+      {/* Inventory Alert */}
+      {outOfStockProducts.length > 0 && (
+        <div className="flex items-start gap-3 p-4 rounded-2xl bg-destructive/10 border border-destructive/20">
+          <AlertTriangle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-semibold text-destructive">ইনভেন্টরি এলার্ট!</p>
+            <p className="text-xs text-destructive/80 mt-0.5">
+              {outOfStockProducts.map(p => p.name).join(', ')} — স্টক শেষ হয়ে গেছে। অনুগ্রহ করে স্টক আপডেট করুন।
+            </p>
+          </div>
+        </div>
+      )}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-lg font-semibold text-foreground">ড্যাশবোর্ড</h2>
