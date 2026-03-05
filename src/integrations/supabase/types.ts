@@ -21,7 +21,12 @@ export type Database = {
           created_at: string
           id: string
           is_active: boolean
+          is_sandbox: boolean
+          production_api_key: string | null
+          production_api_secret: string | null
           provider: string
+          sandbox_api_key: string | null
+          sandbox_api_secret: string | null
           updated_at: string
         }
         Insert: {
@@ -30,7 +35,12 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean
+          is_sandbox?: boolean
+          production_api_key?: string | null
+          production_api_secret?: string | null
           provider: string
+          sandbox_api_key?: string | null
+          sandbox_api_secret?: string | null
           updated_at?: string
         }
         Update: {
@@ -39,7 +49,12 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean
+          is_sandbox?: boolean
+          production_api_key?: string | null
+          production_api_secret?: string | null
           provider?: string
+          sandbox_api_key?: string | null
+          sandbox_api_secret?: string | null
           updated_at?: string
         }
         Relationships: []

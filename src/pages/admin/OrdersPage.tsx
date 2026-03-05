@@ -84,9 +84,10 @@ const OrdersPage = () => {
       }
 
       queryClient.invalidateQueries({ queryKey: ['orders'] });
+      const modeLabel = result.mode === 'sandbox' ? ' (🧪 TEST)' : '';
       toast({
-        title: `✅ ${providerNames[courierProvider]} কুরিয়ার বুক সফল!`,
-        description: `${customerName} — ট্র্যাকিং আইডি: ${result.tracking_id}`,
+        title: `✅ ${providerNames[courierProvider]} কুরিয়ার বুক সফল!${modeLabel}`,
+        description: `${customerName} — ট্র্যাকিং আইডি: ${result.tracking_id}${result.mode === 'sandbox' ? ' (টেস্ট অর্ডার)' : ''}`,
         duration: 8000,
       });
     } catch (err: any) {
