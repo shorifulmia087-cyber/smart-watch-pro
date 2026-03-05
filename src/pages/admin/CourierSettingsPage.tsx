@@ -60,6 +60,24 @@ const CourierSettingsPage = () => {
     }));
   };
 
+  // Auto-save sandbox toggle immediately to DB
+  const toggleSandboxMode = async (newSandboxValue: boolean) => {
+    updateField('is_sandbox', newSandboxValue);
+    if (!currentConfig?.id) return;
+    const { error } = await supabase.from('courier_settings' as any).update({
+      is_sandbox: newSandboxValue,
+      api_key: newSandboxValue ? (currentConfig.sandbox_api_key || '') : (currentConfig.production_api_key || ''),
+      api_secret: newSandboxValue ? (currentConfig.sandbox_api_secret || '') : (currentConfig.production_api_secret || ''),
+      updated_at: new Date().toISOString(),
+    } as any).eq('id', currentConfig.id);
+    if (error) {
+      toast({ title: 'ত্রুটি!', description: 'মোড পরিবর্তন সেভ হয়নি', variant: 'destructive' });
+      updateField('is_sandbox', !newSandboxValue); // revert
+    } else {
+      toast({ title: newSandboxValue ? '🧪 টেস্ট মোড সক্রিয়' : '🚀 প্রোডাকশন মোড সক্রিয়', description: `${currentProvider?.name} এর মোড পরিবর্তন সেভ হয়েছে` });
+    }
+  };
+
   const handleSave = async () => {
     if (!currentConfig) return;
     setSaving(true);
@@ -194,7 +212,7 @@ const CourierSettingsPage = () => {
             <span className={`text-[11px] font-medium ${isSandbox ? 'text-warning' : 'text-muted-foreground'}`}>Test</span>
             <Switch
               checked={!isSandbox}
-              onCheckedChange={(checked) => updateField('is_sandbox', !checked)}
+              onCheckedChange={(checked) => toggleSandboxMode(!checked)}
             />
             <span className={`text-[11px] font-medium ${!isSandbox ? 'text-success' : 'text-muted-foreground'}`}>Live</span>
           </div>
