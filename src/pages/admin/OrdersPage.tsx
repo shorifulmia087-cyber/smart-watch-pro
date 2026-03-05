@@ -538,7 +538,7 @@ const OrdersPage = () => {
                         </TableCell>
                       </TableRow>
                     )}
-                  </>
+                  </React.Fragment>
                 );
                 })}
               </TableBody>
