@@ -21,16 +21,15 @@ const AdminLayoutInner = () => {
     const checkSandboxMode = async () => {
       const { data } = await supabase.from('courier_settings' as any).select('is_sandbox, is_active');
       if (data && (data as any[]).length > 0) {
-        const activeProviders = (data as any[]).filter((row: any) => row.is_active);
-        if (activeProviders.length > 0) {
-          const anySandbox = activeProviders.some((row: any) => row.is_sandbox === true);
-          const allProduction = activeProviders.every((row: any) => row.is_sandbox === false);
-          setSandboxMode(allProduction ? false : anySandbox ? true : null);
-        } else {
-          // Check all providers if none active
-          const anySandbox = (data as any[]).some((row: any) => row.is_sandbox === true);
-          setSandboxMode(anySandbox);
-        }
+        const rows = data as any[];
+        const activeRows = rows.filter((row: any) => row.is_active);
+        const targetRows = activeRows.length > 0 ? activeRows : rows;
+
+        const hasProduction = targetRows.some((row: any) => row.is_sandbox === false);
+        const hasSandbox = targetRows.some((row: any) => row.is_sandbox === true);
+
+        // If at least one active provider is in production, show production status.
+        setSandboxMode(hasProduction ? false : hasSandbox ? true : null);
       }
     };
     checkSandboxMode();
