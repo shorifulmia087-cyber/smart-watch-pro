@@ -65,16 +65,16 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
 
       <div className="relative max-w-6xl mx-auto px-4 pb-6">
         <div className="relative aspect-[4/3] md:aspect-[16/9] rounded-2xl overflow-hidden bg-muted">
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="wait" initial={false}>
             <motion.img
               key={`${images[current]?.src}-${current}`}
               src={images[current]?.src}
               alt={images[current]?.label}
               className="absolute inset-0 w-full h-full object-cover"
-              initial={{ opacity: 0, scale: 1.05 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
+              initial={{ opacity: 0, x: direction > 0 ? '30%' : '-30%' }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: direction > 0 ? '-15%' : '15%' }}
+              transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
             />
           </AnimatePresence>
 
