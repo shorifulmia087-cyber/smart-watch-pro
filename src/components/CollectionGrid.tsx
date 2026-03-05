@@ -18,45 +18,90 @@ const CollectionGrid = ({ currentProductId, onSelectProduct, sectionTitle = 'আ
   if (!otherProducts.length) return null;
 
   return (
-    <section className="bg-ash py-12 px-4">
-      <div className="max-w-6xl mx-auto">
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-2xl md:text-3xl font-bold text-center mb-12 text-gold drop-shadow-[0_0_10px_hsl(var(--gold)/0.25)]"
-        >
-          {sectionTitle}
-        </motion.h2>
+    <section
+      className="py-16 px-4 relative overflow-hidden"
+      style={{
+        backgroundImage: `linear-gradient(hsl(var(--border) / 0.18) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--border) / 0.18) 1px, transparent 1px)`,
+        backgroundSize: '32px 32px',
+        backgroundColor: 'hsl(var(--surface))',
+      }}
+    >
+      {/* Decorative gold accent */}
+      <div
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[250px] rounded-full opacity-[0.05] pointer-events-none"
+        style={{ background: 'radial-gradient(ellipse, hsl(var(--gold)), transparent 70%)' }}
+      />
+
+      <div className="max-w-6xl mx-auto relative">
+        <div className="text-center mb-12">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-2xl md:text-3xl font-bold text-gold drop-shadow-[0_0_10px_hsl(var(--gold)/0.25)]"
+          >
+            {sectionTitle}
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="text-muted-foreground text-sm mt-2"
+          >
+            আপনার পছন্দের স্টাইল খুঁজে নিন
+          </motion.p>
+        </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {otherProducts.map((product, i) => (
             <motion.button
               key={product.id}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
+              transition={{ delay: i * 0.08, duration: 0.4 }}
+              whileHover={{ y: -6 }}
               onClick={() => onSelectProduct(product)}
-              className="group bg-surface rounded-2xl overflow-hidden border border-border hover:border-gold/40 transition-all duration-300 text-left"
+              className="group text-left rounded-xl overflow-hidden bg-surface"
+              style={{
+                boxShadow: '0 4px 20px -4px hsl(var(--ink) / 0.08), 0 0 0 1px hsl(var(--border) / 0.5)',
+              }}
             >
-              <div className="aspect-square overflow-hidden bg-muted">
+              <div className="aspect-square overflow-hidden bg-muted relative">
                 {product.thumbnail_url ? (
                   <img
                     src={product.thumbnail_url}
                     alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm">
                     ছবি নেই
                   </div>
                 )}
+                {/* Hover overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-ink/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                {/* Discount badge */}
+                {product.discount_percent > 0 && (
+                  <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-bold gradient-gold text-surface shadow-sm">
+                    -{product.discount_percent}%
+                  </div>
+                )}
+                {/* Gold border glow on hover */}
+                <div className="absolute inset-0 ring-0 group-hover:ring-1 ring-gold/20 transition-all duration-300 rounded-none" />
               </div>
               <div className="p-5">
-                <h3 className="font-bold text-foreground text-lg">{product.name}</h3>
-                <p className="text-muted-foreground text-sm mt-1 line-clamp-2">{product.subtitle}</p>
-                <p className="text-gold font-bold text-xl mt-3">৳{formatBengaliPrice(product.price)}</p>
+                <h3 className="font-bold text-foreground text-lg group-hover:text-gold transition-colors duration-200">{product.name}</h3>
+                <p className="text-muted-foreground text-sm mt-1 line-clamp-2 leading-relaxed">{product.subtitle}</p>
+                <div className="flex items-center gap-2 mt-3">
+                  <span className="text-gold font-bold text-xl">৳{formatBengaliPrice(product.price)}</span>
+                  {product.discount_percent > 0 && (
+                    <span className="text-muted-foreground text-sm line-through">
+                      ৳{formatBengaliPrice(Math.round(product.price / (1 - product.discount_percent / 100)))}
+                    </span>
+                  )}
+                </div>
               </div>
             </motion.button>
           ))}
