@@ -119,9 +119,7 @@ const Index = () => {
         />
       </motion.div>
 
-      <StickyOrderForm />
       <ReviewGallery />
-      <DeliveryChecker />
       <CollectionGrid
         currentProductId={currentProduct.id}
         onSelectProduct={handleSelectProduct}
