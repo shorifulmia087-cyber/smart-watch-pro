@@ -277,6 +277,28 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
               <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="মোবাইল নম্বর" className="w-full bg-muted/40 border border-border/60 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/40 transition-all" maxLength={15} />
               <textarea value={address} onChange={(e) => setAddress(e.target.value)} placeholder="সম্পূর্ণ ঠিকানা" rows={2} className="w-full bg-muted/40 border border-border/60 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/40 transition-all resize-none" maxLength={500} />
               
+              {/* Color Selection */}
+              {availableColors.length > 0 && (
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium mb-2">কালার সিলেক্ট করুন *</p>
+                  <div className="flex flex-wrap gap-2">
+                    {availableColors.map((color) => (
+                      <button
+                        key={color}
+                        type="button"
+                        onClick={() => setSelectedColor(color)}
+                        className={`px-3.5 py-2 rounded-lg border text-sm font-medium transition-all ${
+                          selectedColor === color
+                            ? 'border-gold bg-gold/10 text-gold shadow-sm ring-1 ring-gold/30'
+                            : 'border-border/60 bg-surface text-muted-foreground hover:border-border'
+                        }`}
+                      >
+                        {color}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
               {/* Honeypot fields */}
               <div className="absolute left-[-9999px] top-[-9999px]" aria-hidden="true" tabIndex={-1}>
                 <input type="text" name="website_url" value={honeypot} onChange={(e) => setHoneypot(e.target.value)} tabIndex={-1} autoComplete="off" />

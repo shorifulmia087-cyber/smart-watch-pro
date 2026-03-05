@@ -172,6 +172,7 @@ const Index = () => {
         bkashNumber={settings?.bkash_number}
         nagadNumber={settings?.nagad_number}
         rocketNumber={settings?.rocket_number}
+        availableColors={(currentProduct as any).available_colors || []}
       />
       <FloatingNotification />
       <WhatsAppButton />
