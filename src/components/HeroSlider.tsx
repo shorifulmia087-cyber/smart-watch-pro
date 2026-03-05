@@ -114,7 +114,7 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
             <div className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs font-bold px-3 py-1 rounded-bl-xl rounded-tr-xl shadow-md">
               -{discountPercent}% ছাড়
             </div>
-            <span className="line-through text-muted-foreground text-sm">মূল্য: ৳{formatBengaliPrice(originalPrice)}</span>
+            <span className="line-through text-muted-foreground text-base sm:text-lg">মূল্য: ৳{formatBengaliPrice(originalPrice)}</span>
             <span className="text-foreground font-extrabold text-xl tracking-tight">
               অফার মূল্য: <span className="text-gold">৳{formatBengaliPrice(price)}</span>
             </span>
