@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import {
   useProducts, useUpsertProduct, useDeleteProduct, useToggleStock, useToggleFeatured,
 } from '@/hooks/useSupabaseData';
@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/table';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import DeleteProductDialog from '@/components/admin/DeleteProductDialog';
 
 const BUCKET = 'product-images';
 
@@ -31,6 +32,7 @@ const ProductsPage = () => {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
 
   const [form, setForm] = useState({
     name: '', price: 0, subtitle: '', video_url: '', stock_status: 'in_stock',
@@ -248,7 +250,7 @@ const ProductsPage = () => {
                           <Pencil className="h-4 w-4 text-muted-foreground" />
                         </button>
                         <button
-                          onClick={() => { if (confirm('এই প্রোডাক্ট মুছে ফেলবেন?')) deleteProduct.mutate(p.id); }}
+                          onClick={() => setDeleteTarget({ id: p.id, name: p.name })}
                           className="p-2 rounded-lg text-destructive hover:bg-destructive/10 transition-colors"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -461,6 +463,23 @@ const ProductsPage = () => {
           </div>
         </SheetContent>
       </Sheet>
+
+      <DeleteProductDialog
+        open={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={() => {
+          if (deleteTarget) {
+            deleteProduct.mutate(deleteTarget.id, {
+              onSuccess: () => {
+                setDeleteTarget(null);
+                toast({ title: 'প্রোডাক্ট মুছে ফেলা হয়েছে' });
+              },
+            });
+          }
+        }}
+        productName={deleteTarget?.name || ''}
+        isDeleting={deleteProduct.isPending}
+      />
     </div>
   );
 };
