@@ -39,7 +39,7 @@ const Navbar = () => {
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      className="sticky top-0 z-40 bg-card/90 backdrop-blur-2xl border-b border-border/40 shadow-sm"
+      className="sticky top-0 z-40 bg-white backdrop-blur-2xl border-b border-border/40 shadow-sm"
     >
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
         {/* Left: Menu toggle (mobile) + Nav links (desktop) */}
