@@ -606,14 +606,14 @@ const SectionCard = ({ icon, title, color, badge, children }: {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="rounded-2xl border border-border/40 bg-white dark:bg-slate-900 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+      className="rounded-2xl border border-border/40 bg-card overflow-hidden shadow-sm hover:shadow-md transition-shadow"
     >
-      <div className="px-5 py-3.5 border-b border-border/30 bg-white dark:bg-slate-900 flex items-center gap-3">
+      <div className="px-5 py-3.5 border-b border-border/20 bg-muted/30 flex items-center gap-3">
         <div className={`w-7 h-7 rounded-lg ${colorMap[color] || colorMap.accent} flex items-center justify-center border`}>
           {icon}
         </div>
         <h3 className="text-xs font-bold text-foreground/80 uppercase tracking-wider">{title}</h3>
-        {badge && <span className="text-[10px] font-normal text-muted-foreground/60 ml-auto bg-muted/60 px-2 py-0.5 rounded-full">{badge}</span>}
+        {badge && <span className="text-[10px] font-normal text-muted-foreground/60 ml-auto bg-muted/50 px-2 py-0.5 rounded-full">{badge}</span>}
       </div>
       <div className="p-5 space-y-4">{children}</div>
     </motion.div>
