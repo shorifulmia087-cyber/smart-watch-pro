@@ -35,7 +35,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
   const [honeypot2, setHoneypot2] = useState('');
   const createOrder = useCreateOrder();
   const { toast } = useToast();
-  const { checkLimit } = useRateLimit({ maxAttempts: 3, windowMs: 60_000 });
+  const { checkLimit } = useRateLimit({ maxAttempts: 10, windowMs: 60_000 });
 
   useEffect(() => {
     if (!isOpen) {
