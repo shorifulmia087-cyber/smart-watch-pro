@@ -11,6 +11,7 @@ import CollectionGrid from '@/components/CollectionGrid';
 import LoadingOverlay from '@/components/LoadingOverlay';
 import StickyOrderForm from '@/components/StickyOrderForm';
 import WhatsAppButton from '@/components/WhatsAppButton';
+import Navbar from '@/components/Navbar';
 import { formatBengaliPrice } from '@/lib/bengali';
 import { useSettings, useFeaturedProduct, useProducts } from '@/hooks/useSupabaseData';
 import { motion } from 'framer-motion';
