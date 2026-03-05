@@ -27,7 +27,7 @@ const Navbar = () => {
   const handleMyOrders = () => {
     setMenuOpen(false);
     if (user) {
-      navigate('/track');
+      navigate('/my-orders');
     } else {
       navigate('/login');
     }
