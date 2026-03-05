@@ -53,7 +53,7 @@ const FlipDigit = ({ value }: FlipDigitProps) => {
           className="absolute top-0 left-0 right-0 h-1/2 overflow-hidden rounded-t-[4px] bg-[#2c2c30] z-[3]"
           style={{
             transformOrigin: 'bottom center',
-            animation: 'flipTopDown 0.3s ease-in forwards',
+            animation: 'flipTopDown 0.2s cubic-bezier(0.32, 0, 0.67, 0) forwards',
             backfaceVisibility: 'hidden',
           }}
         >
