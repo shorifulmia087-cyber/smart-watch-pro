@@ -329,7 +329,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
                 <input value={name} onChange={(e) => setName(e.target.value)} placeholder="আপনার নাম *" className={`w-full bg-transparent border rounded-sm px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/20 focus:border-gold/40 transition-all ${touched && errors.name ? 'border-destructive/60 bg-destructive/5' : 'border-border/60'}`} maxLength={100} />
                 <ErrorMessage error={errors.name} />
               </div>
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ইমেইল (ঐচ্ছিক)" className="w-full bg-muted/40 border border-border/60 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/40 transition-all" maxLength={255} />
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ইমেইল (ঐচ্ছিক)" className="w-full bg-transparent border border-border/60 rounded-sm px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/20 focus:border-gold/40 transition-all" maxLength={255} />
               <div>
                 <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="মোবাইল নম্বর *" className={`w-full bg-muted/40 border rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/40 transition-all ${touched && errors.phone ? 'border-destructive/60 bg-destructive/5' : 'border-border/60'}`} maxLength={15} />
                 <ErrorMessage error={errors.phone} />
