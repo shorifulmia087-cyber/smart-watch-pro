@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Package, Search, Truck, CheckCircle2, Clock, MapPin, ArrowLeft, Box, XCircle } from 'lucide-react';
+import { Package, Search, Truck, CheckCircle2, Clock, MapPin, ArrowLeft, Box, XCircle, Loader2, ExternalLink } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import Navbar from '@/components/Navbar';
 
 type OrderStatus = 'pending' | 'processing' | 'shipped' | 'completed' | 'cancelled' | 'returned';
 
@@ -15,6 +16,22 @@ interface OrderInfo {
   courier_provider: string | null;
   created_at: string;
   delivery_location: string;
+}
+
+interface TrackingEvent {
+  status: string;
+  timestamp: string;
+  location?: string;
+  details?: string;
+}
+
+interface LiveTrackingData {
+  current_status: string;
+  last_updated: string;
+  current_location?: string;
+  events: TrackingEvent[];
+  provider: string;
+  tracking_id: string;
 }
 
 const statusSteps: { key: OrderStatus; label: string; icon: any }[] = [
@@ -33,6 +50,8 @@ const TrackOrder = () => {
   const [order, setOrder] = useState<OrderInfo | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [liveTracking, setLiveTracking] = useState<LiveTrackingData | null>(null);
+  const [trackingLoading, setTrackingLoading] = useState(false);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,12 +59,11 @@ const TrackOrder = () => {
     setLoading(true);
     setError('');
     setOrder(null);
+    setLiveTracking(null);
 
-    // Search by phone or tracking_id
     const cleanQuery = query.trim();
     let result: any = null;
 
-    // Try by phone
     const { data: byPhone } = await supabase
       .from('orders')
       .select('id, customer_name, watch_model, status, tracking_id, courier_provider, created_at, delivery_location')
@@ -56,7 +74,6 @@ const TrackOrder = () => {
     if (byPhone && byPhone.length > 0) {
       result = byPhone[0];
     } else {
-      // Try by tracking_id
       const { data: byTracking } = await supabase
         .from('orders')
         .select('id, customer_name, watch_model, status, tracking_id, courier_provider, created_at, delivery_location')
@@ -66,7 +83,6 @@ const TrackOrder = () => {
       if (byTracking && byTracking.length > 0) {
         result = byTracking[0];
       } else {
-        // Try by order id prefix
         const { data: byId } = await supabase
           .from('orders')
           .select('id, customer_name, watch_model, status, tracking_id, courier_provider, created_at, delivery_location')
@@ -82,8 +98,32 @@ const TrackOrder = () => {
     setLoading(false);
     if (result) {
       setOrder(result as OrderInfo);
+      // Auto-fetch live tracking if courier is booked
+      if (result.tracking_id && result.courier_provider) {
+        fetchLiveTracking(result.tracking_id, result.courier_provider);
+      }
     } else {
       setError('এই তথ্য দিয়ে কোনো অর্ডার পাওয়া যায়নি।');
+    }
+  };
+
+  const fetchLiveTracking = async (trackingId: string, provider: string) => {
+    setTrackingLoading(true);
+    try {
+      const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+      const res = await fetch(`https://${projectId}.supabase.co/functions/v1/track-courier`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tracking_id: trackingId, courier_provider: provider }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setLiveTracking(data);
+      }
+    } catch {
+      // Silently fail - we still show the basic status
+    } finally {
+      setTrackingLoading(false);
     }
   };
 
@@ -91,32 +131,19 @@ const TrackOrder = () => {
   const isCancelled = order?.status === 'cancelled';
   const isReturned = order?.status === 'returned';
 
-  const getTrackingUrl = (provider: string | null, trackingId: string | null) => {
-    if (!trackingId || !provider) return null;
-    switch (provider) {
-      case 'redx': return `https://redx.com.bd/track-parcel/?trackingId=${trackingId}`;
-      case 'steadfast': return `https://steadfast.com.bd/t/${trackingId}`;
-      case 'pathao': return `https://merchant.pathao.com/tracking?consignment_id=${trackingId}`;
-      default: return null;
-    }
-  };
+  const providerNames: Record<string, string> = { redx: 'RedX', pathao: 'Pathao', steadfast: 'Steadfast' };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/30">
-      {/* Header */}
-      <div className="bg-card border-b border-border">
-        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center gap-3">
-          <Link to="/" className="p-2 rounded-lg hover:bg-muted transition-colors">
-            <ArrowLeft className="h-5 w-5" />
-          </Link>
-          <div>
-            <h1 className="text-lg font-bold text-foreground">অর্ডার ট্র্যাকিং</h1>
-            <p className="text-xs text-muted-foreground">আপনার অর্ডারের বর্তমান অবস্থা দেখুন</p>
-          </div>
-        </div>
-      </div>
+      <Navbar />
 
       <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
+        {/* Page Header */}
+        <div className="text-center space-y-2">
+          <h1 className="text-xl font-bold text-foreground">অর্ডার ট্র্যাকিং</h1>
+          <p className="text-sm text-muted-foreground">আপনার অর্ডারের রিয়েল-টাইম অবস্থা দেখুন</p>
+        </div>
+
         {/* Search Form */}
         <form onSubmit={handleSearch} className="relative">
           <div className="flex gap-2">
@@ -133,9 +160,9 @@ const TrackOrder = () => {
             <button
               type="submit"
               disabled={loading}
-              className="gradient-gold text-white px-6 py-3 rounded-xl font-medium text-sm hover:opacity-90 transition-opacity"
+              className="gradient-gold text-white px-6 py-3 rounded-xl font-medium text-sm hover:opacity-90 transition-opacity flex items-center gap-2"
             >
-              {loading ? '...' : 'খুঁজুন'}
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'খুঁজুন'}
             </button>
           </div>
         </form>
@@ -151,7 +178,7 @@ const TrackOrder = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="space-y-6"
+            className="space-y-5"
           >
             {/* Order Info Card */}
             <div className="bg-card rounded-2xl border border-border p-5 space-y-3">
@@ -179,18 +206,11 @@ const TrackOrder = () => {
                 <div className="border-t border-border pt-3 flex items-center justify-between">
                   <div>
                     <p className="text-xs text-muted-foreground">ট্র্যাকিং আইডি</p>
-                    <p className="font-mono text-sm font-bold text-primary">{order.tracking_id}</p>
+                    <p className="font-mono text-sm font-bold text-accent">{order.tracking_id}</p>
+                    {order.courier_provider && (
+                      <p className="text-[10px] text-muted-foreground mt-0.5">{providerNames[order.courier_provider] || order.courier_provider}</p>
+                    )}
                   </div>
-                  {getTrackingUrl(order.courier_provider, order.tracking_id) && (
-                    <a
-                      href={getTrackingUrl(order.courier_provider, order.tracking_id)!}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs text-primary underline hover:opacity-80"
-                    >
-                      কুরিয়ারে ট্র্যাক করুন →
-                    </a>
-                  )}
                 </div>
               )}
             </div>
@@ -216,13 +236,13 @@ const TrackOrder = () => {
                         <div className="flex flex-col items-center">
                           <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all ${
                             isCompleted
-                              ? 'bg-primary border-primary text-primary-foreground'
+                              ? 'bg-accent border-accent text-accent-foreground'
                               : 'border-border bg-muted text-muted-foreground'
-                          } ${isCurrent ? 'ring-4 ring-primary/20' : ''}`}>
+                          } ${isCurrent ? 'ring-4 ring-accent/20' : ''}`}>
                             <Icon className="h-4 w-4" />
                           </div>
                           {i < statusSteps.length - 1 && (
-                            <div className={`w-0.5 h-12 ${isCompleted ? 'bg-primary' : 'bg-border'}`} />
+                            <div className={`w-0.5 h-12 ${isCompleted ? 'bg-accent' : 'bg-border'}`} />
                           )}
                         </div>
                         <div className="pt-2">
@@ -230,7 +250,7 @@ const TrackOrder = () => {
                             {step.label}
                           </p>
                           {isCurrent && (
-                            <p className="text-xs text-primary font-medium mt-0.5">বর্তমান অবস্থা</p>
+                            <p className="text-xs text-accent font-medium mt-0.5">বর্তমান অবস্থা</p>
                           )}
                         </div>
                       </div>
@@ -239,16 +259,102 @@ const TrackOrder = () => {
                 </div>
               </div>
             )}
+
+            {/* Live Courier Tracking */}
+            {order.tracking_id && order.courier_provider && (
+              <div className="bg-card rounded-2xl border border-border p-5 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                    <Truck className="h-4 w-4 text-accent" />
+                    কুরিয়ার লাইভ ট্র্যাকিং
+                  </h3>
+                  {trackingLoading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+                </div>
+
+                {liveTracking ? (
+                  <div className="space-y-4">
+                    {/* Current Status */}
+                    <div className="bg-muted/30 rounded-xl p-4 flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-bold text-foreground">{liveTracking.current_status}</p>
+                        {liveTracking.current_location && (
+                          <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                            <MapPin className="h-3 w-3" /> {liveTracking.current_location}
+                          </p>
+                        )}
+                      </div>
+                      <div className="text-right">
+                        <p className="text-[10px] text-muted-foreground">সর্বশেষ আপডেট</p>
+                        <p className="text-xs font-medium">{new Date(liveTracking.last_updated).toLocaleString('bn-BD')}</p>
+                      </div>
+                    </div>
+
+                    {/* Live Events Timeline */}
+                    {liveTracking.events.length > 0 && (
+                      <div className="space-y-0 pl-1">
+                        {liveTracking.events.map((event, i) => {
+                          const isLast = i === liveTracking.events.length - 1;
+                          return (
+                            <div key={i} className="flex gap-3">
+                              <div className="flex flex-col items-center">
+                                <div className={`w-6 h-6 rounded-full flex items-center justify-center border-2 ${
+                                  isLast ? 'bg-accent border-accent text-accent-foreground' : 'border-border bg-card text-muted-foreground'
+                                }`}>
+                                  <CheckCircle2 className="h-3 w-3" />
+                                </div>
+                                {i < liveTracking.events.length - 1 && (
+                                  <div className="w-px h-8 bg-border" />
+                                )}
+                              </div>
+                              <div className="pb-3">
+                                <p className={`text-xs font-medium ${isLast ? 'text-foreground' : 'text-muted-foreground'}`}>
+                                  {event.status}
+                                </p>
+                                {event.details && (
+                                  <p className="text-[10px] text-muted-foreground">{event.details}</p>
+                                )}
+                                <div className="flex items-center gap-2 mt-0.5">
+                                  <p className="text-[10px] text-muted-foreground/70">
+                                    {new Date(event.timestamp).toLocaleString('bn-BD')}
+                                  </p>
+                                  {event.location && (
+                                    <span className="text-[10px] text-accent flex items-center gap-0.5">
+                                      <MapPin className="h-2.5 w-2.5" /> {event.location}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* Refresh */}
+                    <button
+                      onClick={() => fetchLiveTracking(order.tracking_id!, order.courier_provider!)}
+                      disabled={trackingLoading}
+                      className="text-xs text-accent hover:underline flex items-center gap-1"
+                    >
+                      <Loader2 className={`h-3 w-3 ${trackingLoading ? 'animate-spin' : ''}`} />
+                      রিফ্রেশ করুন
+                    </button>
+                  </div>
+                ) : !trackingLoading ? (
+                  <p className="text-xs text-muted-foreground">ট্র্যাকিং ডেটা লোড হয়নি</p>
+                ) : null}
+              </div>
+            )}
           </motion.div>
         )}
 
-        {/* Info when no search yet */}
+        {/* Empty State */}
         {!order && !error && !loading && (
           <div className="text-center py-16 space-y-4">
             <Package className="h-16 w-16 text-muted-foreground/30 mx-auto" />
             <div>
               <p className="text-sm text-muted-foreground">আপনার ফোন নম্বর বা ট্র্যাকিং আইডি দিয়ে</p>
-              <p className="text-sm text-muted-foreground">অর্ডারের বর্তমান অবস্থা জানুন</p>
+              <p className="text-sm text-muted-foreground">অর্ডারের রিয়েল-টাইম অবস্থা জানুন</p>
             </div>
           </div>
         )}
