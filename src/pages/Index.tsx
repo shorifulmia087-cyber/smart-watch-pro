@@ -85,6 +85,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-surface">
       <LoadingOverlay visible={swapLoading} />
+      <Navbar />
       <AnnouncementBar
         discountPercent={settings?.discount_percent}
         countdownHours={settings?.countdown_hours}
