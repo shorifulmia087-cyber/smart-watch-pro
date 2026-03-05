@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import FlipDigit from './FlipDigit';
 
 interface AnnouncementBarProps {
@@ -10,7 +10,9 @@ interface AnnouncementBarProps {
   offerEndAt?: string | null;
 }
 
-const toTimeParts = (totalSeconds: number) => {
+interface TimeParts { d: number; h: number; m: number; s: number }
+
+const toTimeParts = (totalSeconds: number): TimeParts => {
   if (totalSeconds <= 0) return { d: 0, h: 0, m: 0, s: 0 };
   return {
     d: Math.floor(totalSeconds / 86400),
@@ -22,6 +24,19 @@ const toTimeParts = (totalSeconds: number) => {
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
+const FlipUnit = memo(({ value, label }: { value: string; label: string }) => (
+  <div className="flex flex-col items-center gap-1">
+    <div className="flex gap-[3px] sm:gap-1">
+      <FlipDigit value={value[0]} />
+      <FlipDigit value={value[1]} />
+    </div>
+    <span className="text-[#D4AF37] text-[8px] sm:text-[10px] md:text-xs font-semibold uppercase tracking-wider">
+      {label}
+    </span>
+  </div>
+));
+FlipUnit.displayName = 'FlipUnit';
+
 const AnnouncementBar = ({
   discountPercent = 30,
   countdownHours = 2,
@@ -30,52 +45,73 @@ const AnnouncementBar = ({
   offerStartAt,
   offerEndAt,
 }: AnnouncementBarProps) => {
-  const [time, setTime] = useState({ d: 0, h: countdownHours, m: 0, s: 0 });
+  // For non-scheduled mode, store the absolute target time
+  const fallbackTarget = useRef(Date.now() + countdownHours * 3600_000);
+  const [time, setTime] = useState<TimeParts>({ d: 0, h: countdownHours, m: 0, s: 0 });
   const [timerLabel, setTimerLabel] = useState('অফার শেষ হতে বাকি:');
+  const rafId = useRef(0);
 
+  // Reset fallback target when countdownHours changes and no schedule
   useEffect(() => {
     if (!offerStartAt || !offerEndAt) {
-      setTime({ d: 0, h: countdownHours, m: 0, s: 0 });
-      setTimerLabel('অফার শেষ হতে বাকি:');
+      fallbackTarget.current = Date.now() + countdownHours * 3600_000;
     }
   }, [countdownHours, offerStartAt, offerEndAt]);
+
+  const tick = useCallback(() => {
+    const start = offerStartAt ? new Date(offerStartAt).getTime() : NaN;
+    const end = offerEndAt ? new Date(offerEndAt).getTime() : NaN;
+    const hasSchedule = Number.isFinite(start) && Number.isFinite(end) && end > start;
+    const now = Date.now();
+
+    if (hasSchedule) {
+      if (now < start) {
+        setTimerLabel('অফার শুরু হতে বাকি:');
+        setTime(toTimeParts(Math.floor((start - now) / 1000)));
+      } else if (now <= end) {
+        setTimerLabel('অফার শেষ হতে বাকি:');
+        setTime(toTimeParts(Math.floor((end - now) / 1000)));
+      } else {
+        setTimerLabel('অফার শেষ');
+        setTime({ d: 0, h: 0, m: 0, s: 0 });
+      }
+    } else {
+      setTimerLabel('অফার শেষ হতে বাকি:');
+      const remaining = Math.max(0, Math.floor((fallbackTarget.current - now) / 1000));
+      setTime(toTimeParts(remaining));
+    }
+  }, [offerStartAt, offerEndAt]);
 
   useEffect(() => {
     if (!timerEnabled) return;
 
-    const start = offerStartAt ? new Date(offerStartAt).getTime() : NaN;
-    const end = offerEndAt ? new Date(offerEndAt).getTime() : NaN;
-    const hasSchedule = Number.isFinite(start) && Number.isFinite(end) && end > start;
+    let lastSecond = -1;
 
-    const tick = () => {
-      if (hasSchedule) {
-        const now = Date.now();
-        if (now < start) {
-          setTimerLabel('অফার শুরু হতে বাকি:');
-          setTime(toTimeParts(Math.floor((start - now) / 1000)));
-          return;
-        }
-        if (now <= end) {
-          setTimerLabel('অফার শেষ হতে বাকি:');
-          setTime(toTimeParts(Math.floor((end - now) / 1000)));
-          return;
-        }
-        setTimerLabel('অফার শেষ');
-        setTime({ d: 0, h: 0, m: 0, s: 0 });
-        return;
+    const loop = () => {
+      const nowSecond = Math.floor(Date.now() / 1000);
+      if (nowSecond !== lastSecond) {
+        lastSecond = nowSecond;
+        tick();
       }
-
-      setTimerLabel('অফার শেষ হতে বাকি:');
-      setTime((prev) => {
-        const totalSeconds = prev.d * 86400 + prev.h * 3600 + prev.m * 60 + prev.s - 1;
-        return toTimeParts(totalSeconds);
-      });
+      rafId.current = requestAnimationFrame(loop);
     };
 
+    // Re-sync on visibility change (background tab)
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        lastSecond = -1; // force immediate update
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+
     tick();
-    const timer = setInterval(tick, 1000);
-    return () => clearInterval(timer);
-  }, [timerEnabled, offerStartAt, offerEndAt]);
+    rafId.current = requestAnimationFrame(loop);
+
+    return () => {
+      cancelAnimationFrame(rafId.current);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, [timerEnabled, tick]);
 
   const units = [
     { value: pad(time.d), label: 'দিন' },
@@ -87,20 +123,14 @@ const AnnouncementBar = ({
   return (
     <div className="sticky top-0 z-50 bg-[#0a0a0f] py-2.5 sm:py-3 px-3 sm:px-4 shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
       <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6">
-        {/* Left text */}
         <div className="flex items-center gap-2 text-center sm:text-left">
           {announcementText ? (
-            <span className="text-[#D4AF37] font-bold text-sm sm:text-base md:text-lg">
-              {announcementText}
-            </span>
+            <span className="text-[#D4AF37] font-bold text-sm sm:text-base md:text-lg">{announcementText}</span>
           ) : (
-            <span className="text-[#D4AF37] font-bold text-sm sm:text-base md:text-lg">
-              🔥 {timerLabel}
-            </span>
+            <span className="text-[#D4AF37] font-bold text-sm sm:text-base md:text-lg">🔥 {timerLabel}</span>
           )}
         </div>
 
-        {/* Flip timer */}
         {timerEnabled && (
           <div className="flex items-end gap-1.5 sm:gap-2.5 md:gap-3">
             {units.map((unit, i) => (
@@ -108,15 +138,7 @@ const AnnouncementBar = ({
                 {i > 0 && (
                   <span className="text-[#D4AF37] font-bold text-lg sm:text-xl md:text-2xl pb-5 sm:pb-6">:</span>
                 )}
-                <div className="flex flex-col items-center gap-1">
-                  <div className="flex gap-[3px] sm:gap-1">
-                    <FlipDigit value={unit.value[0]} />
-                    <FlipDigit value={unit.value[1]} />
-                  </div>
-                  <span className="text-[#D4AF37] text-[8px] sm:text-[10px] md:text-xs font-semibold uppercase tracking-wider">
-                    {unit.label}
-                  </span>
-                </div>
+                <FlipUnit value={unit.value} label={unit.label} />
               </div>
             ))}
           </div>
