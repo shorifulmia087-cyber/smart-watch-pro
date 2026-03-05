@@ -23,7 +23,7 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
   // Auto-slide every 4 seconds when multiple images
   useEffect(() => {
     if (images.length <= 1) return;
-    const interval = setInterval(next, 4000);
+    const interval = setInterval(next, 3000);
     return () => clearInterval(interval);
   }, [images.length, next]);
 
