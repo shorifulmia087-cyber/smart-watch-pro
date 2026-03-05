@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useSettings } from '@/hooks/useSupabaseData';
 import {
   LayoutDashboard, ShoppingCart, Package, BarChart3, Settings2,
-  LogOut, ChevronRight, X, Star, CreditCard, UserCog,
+  LogOut, ChevronRight, X, Star, CreditCard, UserCog, Users, Truck, Activity,
 } from 'lucide-react';
 import {
   Sidebar, SidebarContent, SidebarFooter, SidebarGroup,
@@ -16,9 +16,12 @@ const navItems = [
   { title: 'ড্যাশবোর্ড', url: '/admin', icon: LayoutDashboard },
   { title: 'অর্ডার', url: '/admin/orders', icon: ShoppingCart },
   { title: 'প্রোডাক্ট', url: '/admin/products', icon: Package },
+  { title: 'কাস্টমার', url: '/admin/customers', icon: Users },
   { title: 'রিভিউ', url: '/admin/reviews', icon: Star },
   { title: 'পেমেন্ট', url: '/admin/payment', icon: CreditCard },
+  { title: 'কুরিয়ার', url: '/admin/courier', icon: Truck },
   { title: 'অ্যানালিটিক্স', url: '/admin/analytics', icon: BarChart3 },
+  { title: 'FB Pixel', url: '/admin/pixel', icon: Activity },
   { title: 'সাইট কন্ট্রোল', url: '/admin/settings', icon: Settings2 },
   { title: 'প্রোফাইল', url: '/admin/profile', icon: UserCog },
 ];

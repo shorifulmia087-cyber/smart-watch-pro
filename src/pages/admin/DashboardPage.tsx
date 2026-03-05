@@ -62,7 +62,16 @@ const DashboardPage = () => {
     const cancelled = filteredOrders.filter(o => o.status === 'cancelled').length;
     const totalProducts = products?.length ?? 0;
     const inStockProducts = products?.filter(p => p.stock_status === 'in_stock').length ?? 0;
-    return { total: filteredOrders.length, pending, shipped, completed, cancelled, todayRevenue, totalRevenue, todayOrders: todayOrders.length, totalProducts, inStockProducts };
+    // Gross Profit: sum(total_price) - sum(sourcing_cost * quantity) from completed orders
+    const totalSourcingCost = filteredOrders
+      .filter(o => o.status !== 'cancelled')
+      .reduce((s, o) => {
+        const product = products?.find(p => p.name === o.watch_model);
+        const cost = (product as any)?.sourcing_cost || 0;
+        return s + (cost * o.quantity);
+      }, 0);
+    const grossProfit = totalRevenue - totalSourcingCost;
+    return { total: filteredOrders.length, pending, shipped, completed, cancelled, todayRevenue, totalRevenue, todayOrders: todayOrders.length, totalProducts, inStockProducts, grossProfit };
   }, [filteredOrders, products]);
 
   const dayCount = useMemo(() => {
@@ -209,7 +218,7 @@ const DashboardPage = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-9 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-10 gap-4">
         {isLoading ? (
           Array.from({ length: 9 }).map((_, i) => (
             <Skeleton key={i} className="h-[130px] rounded-2xl" />
@@ -273,10 +282,17 @@ const DashboardPage = () => {
               sparkData={[]}
             />
             <StatCard
+              icon={TrendingUp} label="গ্রস প্রফিট"
+              value={`৳${formatBengaliPrice(stats.grossProfit)}`}
+              sub="আয় - সোর্সিং"
+              variant="success"
+              sparkData={[]}
+            />
+            <StatCard
               icon={Package} label="স্টকে আছে"
               value={toBengaliNum(stats.inStockProducts)}
               sub={`${toBengaliNum(stats.totalProducts - stats.inStockProducts)} আউট`}
-              variant="success"
+              variant={stats.inStockProducts < stats.totalProducts ? 'warning' : 'success'}
               sparkData={[]}
             />
           </>

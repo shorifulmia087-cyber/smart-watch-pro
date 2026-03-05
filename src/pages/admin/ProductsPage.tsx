@@ -39,6 +39,7 @@ const ProductsPage = () => {
     discount_percent: 0, product_type: 'watch', is_featured: false,
     image_urls: [] as string[], description_list: [] as string[],
     features: [] as { icon: string; title: string; desc: string }[],
+    sourcing_cost: 0,
   });
 
   const [newDesc, setNewDesc] = useState('');
@@ -50,7 +51,7 @@ const ProductsPage = () => {
       name: '', price: 0, subtitle: '', video_url: '', stock_status: 'in_stock',
       discount_percent: 0, product_type: 'watch', is_featured: false,
       image_urls: [], description_list: [],
-      features: [],
+      features: [], sourcing_cost: 0,
     });
     setNewDesc('');
     setNewFeature({ icon: '', title: '', desc: '' });
@@ -69,7 +70,7 @@ const ProductsPage = () => {
       is_featured: p.is_featured,
       image_urls: p.image_urls || [],
       description_list: p.description_list || [],
-      features,
+      features, sourcing_cost: (p as any).sourcing_cost || 0,
     });
     setNewDesc('');
     setNewFeature({ icon: '', title: '', desc: '' });
@@ -128,6 +129,7 @@ const ProductsPage = () => {
       description_list: form.description_list,
       thumbnail_url: form.image_urls[0] || null,
       features: form.features as any,
+      sourcing_cost: form.sourcing_cost,
       ...(editingId ? { id: editingId } : {}),
     } as any, {
       onSuccess: () => {
@@ -299,8 +301,9 @@ const ProductsPage = () => {
                 <div className="w-1.5 h-1.5 rounded-full bg-accent" /> মৌলিক তথ্য
               </h3>
               <FormField label="নাম *" value={form.name} onChange={v => setForm({ ...form, name: v })} />
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <FormField label="মূল্য (৳) *" type="number" value={String(form.price)} onChange={v => setForm({ ...form, price: Number(v) })} />
+                <FormField label="সোর্সিং কস্ট (৳)" type="number" value={String(form.sourcing_cost)} onChange={v => setForm({ ...form, sourcing_cost: Number(v) })} />
                 <FormField label="ছাড় %" type="number" value={String(form.discount_percent)} onChange={v => setForm({ ...form, discount_percent: Number(v) })} />
               </div>
               <FormField label="সাবটাইটেল" value={form.subtitle} onChange={v => setForm({ ...form, subtitle: v })} />

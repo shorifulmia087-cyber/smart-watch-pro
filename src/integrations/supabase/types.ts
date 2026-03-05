@@ -78,6 +78,7 @@ export type Database = {
           price: number
           product_type: string
           sort_order: number
+          sourcing_cost: number
           stock_status: string
           subtitle: string | null
           thumbnail_url: string | null
@@ -96,6 +97,7 @@ export type Database = {
           price: number
           product_type?: string
           sort_order?: number
+          sourcing_cost?: number
           stock_status?: string
           subtitle?: string | null
           thumbnail_url?: string | null
@@ -114,6 +116,7 @@ export type Database = {
           price?: number
           product_type?: string
           sort_order?: number
+          sourcing_cost?: number
           stock_status?: string
           subtitle?: string | null
           thumbnail_url?: string | null
