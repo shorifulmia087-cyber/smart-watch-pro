@@ -29,9 +29,13 @@ export const useCreateOrder = () => {
   return useMutation({
     mutationFn: async (order: OrderInsert) => {
       const { data, error } = await supabase.from('orders').insert(order).select().single();
-      if (error) throw error;
+      if (error) {
+        console.error('Order creation error:', error.message, error.details, error.hint);
+        throw new Error('অর্ডার তৈরিতে সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।');
+      }
       return data;
     },
+    retry: 1,
   });
 };
 
