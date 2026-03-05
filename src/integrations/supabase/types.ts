@@ -223,6 +223,7 @@ export type Database = {
           footer_text: string
           hero_subtitle: string
           id: string
+          logo_url: string | null
           nagad_number: string
           online_payment_enabled: boolean
           primary_color: string
@@ -249,6 +250,7 @@ export type Database = {
           footer_text?: string
           hero_subtitle?: string
           id?: string
+          logo_url?: string | null
           nagad_number?: string
           online_payment_enabled?: boolean
           primary_color?: string
@@ -275,6 +277,7 @@ export type Database = {
           footer_text?: string
           hero_subtitle?: string
           id?: string
+          logo_url?: string | null
           nagad_number?: string
           online_payment_enabled?: boolean
           primary_color?: string
