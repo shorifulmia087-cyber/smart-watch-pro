@@ -256,7 +256,7 @@ const OrdersPage = () => {
       {/* Bulk Actions Bar */}
       {someSelected && (
         <div className="flex items-center gap-3 glass-card rounded-xl px-4 py-3 border-l-4 border-l-accent">
-          <span className="text-sm font-medium text-foreground">
+          <span className="text-sm font-semibold text-foreground" style={{ fontFamily: "'Hind Siliguri', sans-serif", fontSize: '14px', letterSpacing: '0.02em' }}>
             {toBengaliNum(selectedIds.size)} টি সিলেক্ট করা হয়েছে
           </span>
           <div className="flex items-center gap-2 ml-auto">
