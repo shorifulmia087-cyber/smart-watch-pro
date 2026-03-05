@@ -283,11 +283,11 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
                   <p className="text-2xl font-bold text-gold mt-0.5">৳{formatBengaliPrice(subtotal)}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => setQty(Math.max(1, qty - 1))} className="w-9 h-9 rounded-lg border border-border/80 bg-surface flex items-center justify-center hover:border-gold/40 transition-colors">
+                  <button onClick={() => setQty(Math.max(1, qty - 1))} className="w-9 h-9 rounded-sm border border-border/60 bg-surface flex items-center justify-center hover:border-gold/40 transition-colors">
                     <Minus className="w-4 h-4 text-foreground" />
                   </button>
                   <span className="text-lg font-bold w-8 text-center tabular-nums text-foreground">{toBengaliNum(qty)}</span>
-                  <button onClick={() => setQty(qty + 1)} className="w-9 h-9 rounded-lg border border-border/80 bg-surface flex items-center justify-center hover:border-gold/40 transition-colors">
+                  <button onClick={() => setQty(qty + 1)} className="w-9 h-9 rounded-sm border border-border/60 bg-surface flex items-center justify-center hover:border-gold/40 transition-colors">
                     <Plus className="w-4 h-4 text-foreground" />
                   </button>
                 </div>
