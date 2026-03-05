@@ -223,13 +223,13 @@ const ProductsPage = () => {
                     <TableCell className="py-4 text-center" onClick={e => e.stopPropagation()}>
                       <button
                         onClick={() => toggleStock.mutate({ id: p.id, stock_status: p.stock_status === 'in_stock' ? 'out_of_stock' : 'in_stock' })}
-                        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-300 focus:outline-none ${
+                        className={`relative inline-flex h-[22px] w-[40px] items-center rounded-full transition-colors duration-300 focus:outline-none ${
                           p.stock_status === 'in_stock' ? 'bg-success' : 'bg-muted-foreground/25'
                         }`}
                       >
                         <span
-                          className={`inline-block h-3.5 w-3.5 transform rounded-full bg-background shadow transition-transform duration-300 ${
-                            p.stock_status === 'in_stock' ? 'translate-x-4.5' : 'translate-x-0.5'
+                          className={`inline-block h-[16px] w-[16px] rounded-full bg-background shadow transition-transform duration-300 ${
+                            p.stock_status === 'in_stock' ? 'translate-x-[20px]' : 'translate-x-[3px]'
                           }`}
                         />
                       </button>
@@ -237,27 +237,27 @@ const ProductsPage = () => {
                     <TableCell className="py-4 text-center" onClick={e => e.stopPropagation()}>
                       <button
                         onClick={() => toggleFeatured.mutate({ id: p.id, is_featured: !p.is_featured })}
-                        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-300 focus:outline-none ${
+                        className={`relative inline-flex h-[22px] w-[40px] items-center rounded-full transition-colors duration-300 focus:outline-none ${
                           p.is_featured ? 'bg-accent' : 'bg-muted-foreground/25'
                         }`}
                       >
                         <span
-                          className={`inline-block h-3.5 w-3.5 transform rounded-full bg-background shadow transition-transform duration-300 ${
-                            p.is_featured ? 'translate-x-4.5' : 'translate-x-0.5'
+                          className={`inline-block h-[16px] w-[16px] rounded-full bg-background shadow transition-transform duration-300 ${
+                            p.is_featured ? 'translate-x-[20px]' : 'translate-x-[3px]'
                           }`}
                         />
                       </button>
                     </TableCell>
                     <TableCell className="py-4 text-right" onClick={e => e.stopPropagation()}>
-                      <div className="flex items-center justify-end gap-2">
+                      <div className="flex items-center justify-end gap-2.5">
                         <button onClick={() => openEdit(p)} className="p-2 rounded-full text-info/70 hover:text-info hover:bg-info/10 transition-all">
-                          <Pencil className="h-3.5 w-3.5" />
+                          <Pencil className="h-4 w-4" />
                         </button>
                         <button
                           onClick={() => setDeleteTarget({ id: p.id, name: p.name })}
                           className="p-2 rounded-full text-destructive/60 hover:text-destructive hover:bg-destructive/10 transition-all"
                         >
-                          <Trash2 className="h-3.5 w-3.5" />
+                          <Trash2 className="h-4 w-4" />
                         </button>
                       </div>
                     </TableCell>
