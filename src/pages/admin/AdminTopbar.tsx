@@ -33,7 +33,7 @@ const AdminTopbar = () => {
   return (
     <header className="h-14 border-b border-border/50 bg-card sticky top-0 z-40 flex items-center justify-between px-4 md:px-6 gap-4">
       <div className="flex items-center gap-3">
-        <SidebarTrigger className="text-muted-foreground hover:text-foreground transition-colors" />
+        <SidebarTrigger className="text-muted-foreground hover:text-foreground transition-colors [&_svg]:!h-[22px] [&_svg]:!w-[22px]" />
         <div className="hidden sm:block">
           <h1 className="text-sm font-semibold text-foreground leading-tight">{title}</h1>
         </div>
@@ -52,7 +52,7 @@ const AdminTopbar = () => {
         <ThemeToggle />
 
         <button className="relative p-2 rounded-xl hover:bg-muted transition-colors">
-          <Bell className="h-[18px] w-[18px] text-muted-foreground" />
+          <Bell className="h-5 w-5 text-muted-foreground" />
           <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-accent rounded-full ring-2 ring-background"></span>
         </button>
 
