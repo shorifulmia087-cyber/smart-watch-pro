@@ -169,119 +169,129 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[100] bg-ink/40 backdrop-blur-sm flex items-end md:items-center justify-center"
+        className="fixed inset-0 z-[100] bg-ink/50 backdrop-blur-md flex items-end md:items-center justify-center"
         onClick={onClose}
       >
         <motion.div
           initial={{ y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
-          transition={{ ease: [0.77, 0, 0.18, 1] }}
+          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           onClick={(e) => e.stopPropagation()}
-          className="bg-surface w-full md:max-w-md md:rounded-2xl rounded-t-2xl max-h-[90vh] overflow-y-auto"
+          className="bg-surface w-full md:max-w-md md:rounded-2xl rounded-t-2xl max-h-[90vh] overflow-y-auto relative"
+          style={{
+            boxShadow: '0 -8px 40px -8px hsl(var(--ink) / 0.15), 0 0 0 1px hsl(var(--border) / 0.4)',
+          }}
         >
-          <div className="flex items-center justify-between p-5 border-b border-border">
-            <div>
-              <h3 className="text-lg font-bold">অর্ডার করুন</h3>
-              <p className="text-xs text-muted-foreground">{watchName}</p>
+          {/* Header with gold accent line */}
+          <div className="relative">
+            <div className="absolute top-0 left-0 right-0 h-[2px] gradient-gold" />
+            <div className="flex items-center justify-between p-5">
+              <div>
+                <h3 className="text-lg font-bold text-foreground">অর্ডার করুন</h3>
+                <p className="text-xs text-muted-foreground mt-0.5">{watchName}</p>
+              </div>
+              <button onClick={onClose} className="w-9 h-9 rounded-full bg-muted/60 backdrop-blur-sm flex items-center justify-center hover:bg-muted transition-colors">
+                <X className="w-4 h-4 text-foreground" />
+              </button>
             </div>
-            <button onClick={onClose} className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-              <X className="w-4 h-4" />
-            </button>
           </div>
 
-          <div className="p-5 space-y-5">
-            <div className="bg-ash rounded-xl p-4 space-y-3">
+          <div className="p-5 pt-0 space-y-5">
+            {/* Price & Quantity Card */}
+            <div
+              className="rounded-xl p-4 space-y-3 border border-border/60"
+              style={{
+                backgroundImage: `linear-gradient(hsl(var(--border) / 0.12) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--border) / 0.12) 1px, transparent 1px)`,
+                backgroundSize: '24px 24px',
+                backgroundColor: 'hsl(var(--ash))',
+              }}
+            >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">পণ্যের মূল্য</p>
-                  <p className="text-xl font-bold text-gold">৳{formatBengaliPrice(subtotal)}</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">পণ্যের মূল্য</p>
+                  <p className="text-2xl font-bold text-gold mt-0.5">৳{formatBengaliPrice(subtotal)}</p>
                 </div>
-                <div className="flex items-center gap-3">
-                  <button onClick={() => setQty(Math.max(1, qty - 1))} className="w-9 h-9 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors">
-                    <Minus className="w-4 h-4" />
+                <div className="flex items-center gap-2">
+                  <button onClick={() => setQty(Math.max(1, qty - 1))} className="w-9 h-9 rounded-lg border border-border/80 bg-surface flex items-center justify-center hover:border-gold/40 transition-colors">
+                    <Minus className="w-4 h-4 text-foreground" />
                   </button>
-                  <span className="text-lg font-bold w-6 text-center tabular-nums">{toBengaliNum(qty)}</span>
-                  <button onClick={() => setQty(qty + 1)} className="w-9 h-9 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors">
-                    <Plus className="w-4 h-4" />
+                  <span className="text-lg font-bold w-8 text-center tabular-nums text-foreground">{toBengaliNum(qty)}</span>
+                  <button onClick={() => setQty(qty + 1)} className="w-9 h-9 rounded-lg border border-border/80 bg-surface flex items-center justify-center hover:border-gold/40 transition-colors">
+                    <Plus className="w-4 h-4 text-foreground" />
                   </button>
                 </div>
               </div>
 
-              <div className="border-t border-border pt-3">
-                <p className="text-sm text-muted-foreground mb-2">ডেলিভারি এলাকা</p>
+              <div className="border-t border-border/60 pt-3">
+                <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium mb-2">ডেলিভারি এলাকা</p>
                 <div className="flex gap-2">
-                  <button onClick={() => setLocation('dhaka')} className={`flex-1 py-2.5 rounded-xl border text-sm font-medium transition-all ${location === 'dhaka' ? 'border-gold bg-gold/10 text-gold' : 'border-border text-muted-foreground'}`}>
+                  <button onClick={() => setLocation('dhaka')} className={`flex-1 py-2.5 rounded-lg border text-sm font-medium transition-all ${location === 'dhaka' ? 'border-gold bg-gold/10 text-gold shadow-sm' : 'border-border/80 bg-surface text-muted-foreground hover:border-border'}`}>
                     ঢাকার ভেতরে
                   </button>
-                  <button onClick={() => setLocation('outside')} className={`flex-1 py-2.5 rounded-xl border text-sm font-medium transition-all ${location === 'outside' ? 'border-gold bg-gold/10 text-gold' : 'border-border text-muted-foreground'}`}>
+                  <button onClick={() => setLocation('outside')} className={`flex-1 py-2.5 rounded-lg border text-sm font-medium transition-all ${location === 'outside' ? 'border-gold bg-gold/10 text-gold shadow-sm' : 'border-border/80 bg-surface text-muted-foreground hover:border-border'}`}>
                     ঢাকার বাইরে
                   </button>
                 </div>
                 {location === 'outside' && (
-                  <motion.p initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="text-xs text-destructive mt-2 leading-relaxed">
+                  <motion.p initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="text-xs text-destructive mt-2 leading-relaxed bg-destructive/5 p-2 rounded-lg border border-destructive/10">
                     ⚠️ ঢাকার বাইরে ডেলিভারির জন্য ২০০ টাকা অগ্রিম প্রদান করতে হবে।
                   </motion.p>
                 )}
               </div>
 
-              <div className="border-t border-border pt-3 flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground">ডেলিভারি চার্জ: ৳{formatBengaliPrice(deliveryCharge)}</p>
-                  <p className="text-sm font-semibold text-foreground mt-0.5">সর্বমোট</p>
+              {/* Total */}
+              <div className="border-t border-border/60 pt-3">
+                <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
+                  <span>ডেলিভারি চার্জ</span>
+                  <span>৳{formatBengaliPrice(deliveryCharge)}</span>
                 </div>
-                <p className="text-2xl font-bold text-gold">৳{formatBengaliPrice(grandTotal)}</p>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-semibold text-foreground">সর্বমোট</span>
+                  <span className="text-2xl font-bold text-gold">৳{formatBengaliPrice(grandTotal)}</span>
+                </div>
               </div>
             </div>
 
+            {/* Form Fields */}
             <div className="space-y-3">
-              <input value={name} onChange={(e) => setName(e.target.value)} placeholder="আপনার নাম" className="w-full bg-ash border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30" maxLength={100} />
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ইমেইল (ঐচ্ছিক)" className="w-full bg-ash border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30" maxLength={255} />
-              <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="মোবাইল নম্বর" className="w-full bg-ash border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30" maxLength={15} />
-              <textarea value={address} onChange={(e) => setAddress(e.target.value)} placeholder="সম্পূর্ণ ঠিকানা" rows={2} className="w-full bg-ash border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 resize-none" maxLength={500} />
+              <div className="relative">
+                <input value={name} onChange={(e) => setName(e.target.value)} placeholder="আপনার নাম" className="w-full bg-muted/40 border border-border/60 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/40 transition-all" maxLength={100} />
+              </div>
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ইমেইল (ঐচ্ছিক)" className="w-full bg-muted/40 border border-border/60 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/40 transition-all" maxLength={255} />
+              <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="মোবাইল নম্বর" className="w-full bg-muted/40 border border-border/60 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/40 transition-all" maxLength={15} />
+              <textarea value={address} onChange={(e) => setAddress(e.target.value)} placeholder="সম্পূর্ণ ঠিকানা" rows={2} className="w-full bg-muted/40 border border-border/60 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/40 transition-all resize-none" maxLength={500} />
               
-              {/* Honeypot fields - invisible to real users */}
+              {/* Honeypot fields */}
               <div className="absolute left-[-9999px] top-[-9999px]" aria-hidden="true" tabIndex={-1}>
-                <input
-                  type="text"
-                  name="website_url"
-                  value={honeypot}
-                  onChange={(e) => setHoneypot(e.target.value)}
-                  tabIndex={-1}
-                  autoComplete="off"
-                />
-                <input
-                  type="text"
-                  name="company_name"
-                  value={honeypot2}
-                  onChange={(e) => setHoneypot2(e.target.value)}
-                  tabIndex={-1}
-                  autoComplete="off"
-                />
+                <input type="text" name="website_url" value={honeypot} onChange={(e) => setHoneypot(e.target.value)} tabIndex={-1} autoComplete="off" />
+                <input type="text" name="company_name" value={honeypot2} onChange={(e) => setHoneypot2(e.target.value)} tabIndex={-1} autoComplete="off" />
               </div>
             </div>
 
+            {/* Payment Tabs */}
             <div>
-              <div className="flex rounded-xl bg-ash p-1 gap-1">
-                <button onClick={() => setTab('cod')} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${tab === 'cod' ? 'bg-surface shadow-sm text-foreground' : 'text-muted-foreground'}`}>
+              <div className="flex rounded-lg bg-muted/50 p-1 gap-1 border border-border/40">
+                <button onClick={() => setTab('cod')} className={`flex-1 py-2.5 rounded-md text-sm font-medium transition-all ${tab === 'cod' ? 'bg-surface shadow-sm text-foreground border border-border/40' : 'text-muted-foreground hover:text-foreground'}`}>
                   ক্যাশ অন ডেলিভারি
                 </button>
                 {onlinePaymentEnabled && (
-                  <button onClick={() => setTab('online')} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${tab === 'online' ? 'bg-surface shadow-sm text-foreground' : 'text-muted-foreground'}`}>
+                  <button onClick={() => setTab('online')} className={`flex-1 py-2.5 rounded-md text-sm font-medium transition-all ${tab === 'online' ? 'bg-surface shadow-sm text-foreground border border-border/40' : 'text-muted-foreground hover:text-foreground'}`}>
                     অনলাইন পেমেন্ট
                   </button>
                 )}
               </div>
               {tab === 'cod' && (
-                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-muted-foreground mt-3 p-3 bg-ash rounded-xl">
-                  ✅ পণ্য হাতে পেয়ে টাকা দিন। কোনো অগ্রিম পেমেন্ট প্রয়োজন নেই।
-                </motion.p>
+                <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="mt-3 p-3 rounded-lg bg-success/5 border border-success/10">
+                  <p className="text-sm text-foreground font-medium">✅ পণ্য হাতে পেয়ে টাকা দিন</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">কোনো অগ্রিম পেমেন্ট প্রয়োজন নেই।</p>
+                </motion.div>
               )}
               {tab === 'online' && onlinePaymentEnabled && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-3 space-y-3">
+                <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="mt-3 space-y-3">
                   <div className="flex gap-2">
                     {['bkash', 'nagad', 'rocket'].map((m) => (
-                      <button key={m} onClick={() => setPayMethod(m)} className={`flex-1 py-2.5 rounded-xl border text-sm font-semibold transition-all ${payMethod === m ? 'border-gold bg-gold/10 text-gold' : 'border-border text-muted-foreground'}`}>
+                      <button key={m} onClick={() => setPayMethod(m)} className={`flex-1 py-2.5 rounded-lg border text-sm font-semibold transition-all ${payMethod === m ? 'border-gold bg-gold/10 text-gold shadow-sm' : 'border-border/60 bg-surface text-muted-foreground hover:border-border'}`}>
                         {m === 'bkash' ? 'বিকাশ' : m === 'nagad' ? 'নগদ' : 'রকেট'}
                       </button>
                     ))}
@@ -297,10 +307,13 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
                             onChange={(e) => setTxnId(e.target.value.replace(/[^a-zA-Z0-9]/g, ''))}
                             placeholder={`ট্রানজেকশন আইডি (${label} অক্ষর)`}
                             maxLength={requiredLen}
-                            className="w-full bg-ash border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 font-mono"
+                            className="w-full bg-muted/40 border border-border/60 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/40 transition-all font-mono"
                           />
                           {txnId && txnId.length !== requiredLen && (
-                            <p className="text-xs text-destructive mt-1">ট্রানজেকশন আইডি ঠিক {label} অক্ষরের হতে হবে।</p>
+                            <p className="text-xs text-destructive mt-1.5 flex items-center gap-1">
+                              <span className="w-1 h-1 rounded-full bg-destructive inline-block" />
+                              ট্রানজেকশন আইডি ঠিক {label} অক্ষরের হতে হবে।
+                            </p>
                           )}
                         </>
                       );
@@ -310,10 +323,16 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
               )}
             </div>
 
-            <button
+            {/* Submit Button */}
+            <motion.button
               onClick={handleSubmit}
               disabled={loading}
-              className="w-full gradient-gold text-surface font-semibold py-3.5 rounded-xl text-base hover:opacity-90 transition-opacity disabled:opacity-70 flex items-center justify-center gap-2"
+              whileHover={{ scale: loading ? 1 : 1.01 }}
+              whileTap={{ scale: loading ? 1 : 0.98 }}
+              className="w-full gradient-gold text-surface font-semibold py-3.5 rounded-xl text-base disabled:opacity-70 flex items-center justify-center gap-2 shadow-lg"
+              style={{
+                boxShadow: '0 4px 16px -4px hsl(var(--gold) / 0.35)',
+              }}
             >
               {loading ? (
                 <>
@@ -323,7 +342,14 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
               ) : (
                 `অর্ডার নিশ্চিত করুন — ৳${formatBengaliPrice(grandTotal)}`
               )}
-            </button>
+            </motion.button>
+
+            {/* Trust badges */}
+            <div className="flex items-center justify-center gap-4 pt-1 pb-2">
+              <span className="text-[10px] text-muted-foreground flex items-center gap-1">🔒 নিরাপদ অর্ডার</span>
+              <span className="text-[10px] text-muted-foreground flex items-center gap-1">🚚 দ্রুত ডেলিভারি</span>
+              <span className="text-[10px] text-muted-foreground flex items-center gap-1">✅ গুণগত মান</span>
+            </div>
           </div>
         </motion.div>
       </motion.div>
