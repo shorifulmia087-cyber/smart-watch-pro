@@ -148,3 +148,38 @@ export const useUpdateSettings = () => {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['settings'] }),
   });
 };
+
+// Review Images
+export const useReviewImages = () => {
+  return useQuery({
+    queryKey: ['review_images'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('review_images' as any).select('*').order('sort_order');
+      if (error) throw error;
+      return data as unknown as { id: string; image_url: string; sort_order: number; created_at: string }[];
+    },
+    staleTime: 60_000,
+  });
+};
+
+export const useAddReviewImage = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ image_url, sort_order }: { image_url: string; sort_order: number }) => {
+      const { error } = await supabase.from('review_images' as any).insert({ image_url, sort_order } as any);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['review_images'] }),
+  });
+};
+
+export const useDeleteReviewImage = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('review_images' as any).delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['review_images'] }),
+  });
+};
