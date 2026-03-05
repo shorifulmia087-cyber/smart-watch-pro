@@ -1,8 +1,8 @@
-import { useState, useRef } from 'react';
-import { useSettings, useUpdateSettings, useReviewImages, useUploadReviewImage, useDeleteReviewImage } from '@/hooks/useSupabaseData';
+import { useState } from 'react';
+import { useSettings, useUpdateSettings } from '@/hooks/useSupabaseData';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
-  Globe, Megaphone, Type, FileText, CreditCard, Truck, Save, Loader2, CheckCircle2, Image, Upload, Trash2,
+  Globe, Megaphone, Type, FileText, Save, Loader2, CheckCircle2,
 } from 'lucide-react';
 import type { Database } from '@/integrations/supabase/types';
 
@@ -15,11 +15,6 @@ const SiteControlPage = () => {
   const [initialized, setInitialized] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  // Review images
-  const { data: reviewImages } = useReviewImages();
-  const uploadReviewImage = useUploadReviewImage();
-  const deleteReviewImage = useDeleteReviewImage();
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (settings && !initialized) {
     setForm({ ...settings });
@@ -35,14 +30,7 @@ const SiteControlPage = () => {
     });
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-    Array.from(files).forEach((file, i) => {
-      uploadReviewImage.mutate({ file, sort_order: (reviewImages?.length || 0) + i });
-    });
-    e.target.value = '';
-  };
+
 
   if (isLoading) {
     return (
@@ -110,76 +98,12 @@ const SiteControlPage = () => {
           </div>
         </Section>
 
-        <Section title="রিভিউ গ্যালারি" icon={<Image className="h-4 w-4 text-accent" />}>
-          <div className="space-y-4">
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleFileUpload}
-              className="hidden"
-            />
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploadReviewImage.isPending}
-              className="w-full border-2 border-dashed border-border rounded-xl py-6 flex flex-col items-center gap-2 text-muted-foreground hover:border-accent/50 hover:text-accent transition-colors cursor-pointer"
-            >
-              {uploadReviewImage.isPending ? (
-                <Loader2 className="h-6 w-6 animate-spin" />
-              ) : (
-                <Upload className="h-6 w-6" />
-              )}
-              <span className="text-sm font-medium">
-                {uploadReviewImage.isPending ? 'আপলোড হচ্ছে...' : 'ছবি আপলোড করুন (একাধিক সিলেক্ট করা যাবে)'}
-              </span>
-            </button>
-            {reviewImages && reviewImages.length > 0 && (
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
-                {reviewImages.map((img) => (
-                  <div key={img.id} className="relative group rounded-xl overflow-hidden aspect-[9/16] bg-muted">
-                    <img src={img.image_url} alt="রিভিউ" className="w-full h-full object-cover" />
-                    <button
-                      onClick={() => deleteReviewImage.mutate(img.id)}
-                      className="absolute top-1.5 right-1.5 w-7 h-7 rounded-full bg-destructive/90 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-            {(!reviewImages || reviewImages.length === 0) && (
-              <p className="text-sm text-muted-foreground text-center py-4">কোনো রিভিউ ছবি নেই। উপরে ক্লিক করে আপলোড করুন।</p>
-            )}
-          </div>
-        </Section>
-
         <Section title="ফুটার ও CTA" icon={<FileText className="h-4 w-4 text-muted-foreground" />}>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="CTA শিরোনাম" value={form.footer_cta_title || ''} onChange={v => setForm({ ...form, footer_cta_title: v })} />
             <Field label="CTA সাবটাইটেল" value={form.footer_cta_subtitle || ''} onChange={v => setForm({ ...form, footer_cta_subtitle: v })} />
           </div>
           <Field label="ফুটার টেক্সট" value={form.footer_text || ''} onChange={v => setForm({ ...form, footer_text: v })} />
-        </Section>
-
-        <Section title="পেমেন্ট কনফিগ" icon={<CreditCard className="h-4 w-4 text-success" />}>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <Field label="বিকাশ নম্বর" value={form.bkash_number || ''} onChange={v => setForm({ ...form, bkash_number: v })} />
-            <Field label="নগদ নম্বর" value={form.nagad_number || ''} onChange={v => setForm({ ...form, nagad_number: v })} />
-            <Field label="রকেট নম্বর" value={form.rocket_number || ''} onChange={v => setForm({ ...form, rocket_number: v })} />
-          </div>
-          <label className="flex items-center gap-2 text-sm cursor-pointer">
-            <input type="checkbox" checked={form.online_payment_enabled ?? true} onChange={e => setForm({ ...form, online_payment_enabled: e.target.checked })} className="rounded accent-accent" />
-            অনলাইন পেমেন্ট চালু
-          </label>
-        </Section>
-
-        <Section title="ডেলিভারি চার্জ" icon={<Truck className="h-4 w-4 text-info" />}>
-          <div className="grid grid-cols-2 gap-4">
-            <Field label="ঢাকার ভেতরে (৳)" type="number" value={String(form.delivery_charge_inside ?? 70)} onChange={v => setForm({ ...form, delivery_charge_inside: Number(v) })} />
-            <Field label="ঢাকার বাইরে (৳)" type="number" value={String(form.delivery_charge_outside ?? 150)} onChange={v => setForm({ ...form, delivery_charge_outside: Number(v) })} />
-          </div>
         </Section>
       </div>
     </div>

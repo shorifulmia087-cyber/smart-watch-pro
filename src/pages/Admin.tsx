@@ -6,6 +6,8 @@ import OrdersPage from './admin/OrdersPage';
 import ProductsPage from './admin/ProductsPage';
 import AnalyticsPage from './admin/AnalyticsPage';
 import SiteControlPage from './admin/SiteControlPage';
+import ReviewsPage from './admin/ReviewsPage';
+import PaymentSettingsPage from './admin/PaymentSettingsPage';
 import { Loader2 } from 'lucide-react';
 import { Routes, Route } from 'react-router-dom';
 
@@ -39,6 +41,8 @@ const Admin = () => {
         <Route index element={<DashboardPage />} />
         <Route path="orders" element={<OrdersPage />} />
         <Route path="products" element={<ProductsPage />} />
+        <Route path="reviews" element={<ReviewsPage />} />
+        <Route path="payment" element={<PaymentSettingsPage />} />
         <Route path="analytics" element={<AnalyticsPage />} />
         <Route path="settings" element={<SiteControlPage />} />
       </Route>
