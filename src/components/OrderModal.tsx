@@ -34,6 +34,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [location, setLocation] = useState<'dhaka' | 'outside'>('dhaka');
+  const [selectedColor, setSelectedColor] = useState('');
   // Honeypot fields - hidden from real users, bots will fill them
   const [honeypot, setHoneypot] = useState('');
   const [honeypot2, setHoneypot2] = useState('');
