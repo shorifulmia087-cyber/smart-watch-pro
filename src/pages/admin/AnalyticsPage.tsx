@@ -46,9 +46,26 @@ const AnalyticsPage = () => {
 
   const locationData = useMemo(() => {
     if (!orders) return [];
-    const dhaka = orders.filter(o => o.delivery_location === 'dhaka').length;
-    const outside = orders.length - dhaka;
-    return [{ name: 'ঢাকা', value: dhaka }, { name: 'ঢাকার বাইরে', value: outside }];
+    const dhaka = orders.filter(o => o.delivery_location === 'dhaka');
+    const outside = orders.filter(o => o.delivery_location !== 'dhaka');
+    return [
+      { city: 'ঢাকা', orders: dhaka.length, revenue: dhaka.reduce((s, o) => s + o.total_price, 0) },
+      { city: 'ঢাকার বাইরে', orders: outside.length, revenue: outside.reduce((s, o) => s + o.total_price, 0) },
+    ];
+  }, [orders]);
+
+  const revenueTrend30 = useMemo(() => {
+    if (!orders) return [];
+    return Array.from({ length: 30 }, (_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() - (29 - i));
+      const dateStr = d.toDateString();
+      const dayOrders = orders.filter(o => new Date(o.created_at).toDateString() === dateStr);
+      return {
+        day: d.toLocaleDateString('bn-BD', { day: 'numeric', month: 'short' }),
+        revenue: dayOrders.reduce((s, o) => s + o.total_price, 0),
+      };
+    });
   }, [orders]);
 
   const avgOrderValue = useMemo(() => {
@@ -114,8 +131,52 @@ const AnalyticsPage = () => {
         )}
       </div>
 
+      {/* Revenue Trend 30 Days */}
+      <div className="glass-card rounded-2xl p-5 md:p-6">
+        <h3 className="font-semibold text-sm text-foreground mb-1">৩০ দিনের রাজস্ব ট্রেন্ড</h3>
+        <p className="text-[11px] text-muted-foreground mb-5">গত ৩০ দিনের আয়ের গতিবিধি</p>
+        {isLoading ? <Skeleton className="h-[280px] rounded-xl" /> : (
+          <ResponsiveContainer width="100%" height={280}>
+            <AreaChart data={revenueTrend30}>
+              <defs>
+                <linearGradient id="color30Rev" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="hsl(var(--success))" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="hsl(var(--success))" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+              <XAxis dataKey="day" tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" axisLine={false} tickLine={false} interval={4} />
+              <YAxis tick={{ fontSize: 11, fontFamily: 'Inter' }} stroke="hsl(var(--muted-foreground))" axisLine={false} tickLine={false} />
+              <Tooltip contentStyle={tooltipStyle} formatter={(value: number) => [`৳${value.toLocaleString()}`, 'আয়']} />
+              <Area type="monotone" dataKey="revenue" stroke="hsl(var(--success))" strokeWidth={2.5} fill="url(#color30Rev)" />
+            </AreaChart>
+          </ResponsiveContainer>
+        )}
+      </div>
+
       {/* Bottom Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Sales Geography */}
+        <div className="glass-card rounded-2xl p-5 md:p-6">
+          <h3 className="font-semibold text-sm text-foreground mb-1">সেলস জিওগ্রাফি</h3>
+          <p className="text-[11px] text-muted-foreground mb-5">শহর অনুযায়ী বিক্রয়</p>
+          {isLoading ? <Skeleton className="h-[250px] rounded-xl" /> : (
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={locationData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                <XAxis dataKey="city" tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fontFamily: 'Inter' }} stroke="hsl(var(--muted-foreground))" axisLine={false} tickLine={false} />
+                <Tooltip contentStyle={tooltipStyle} formatter={(value: number, name: string) => [
+                  name === 'revenue' ? `৳${value.toLocaleString()}` : value,
+                  name === 'revenue' ? 'রাজস্ব' : 'অর্ডার'
+                ]} />
+                <Bar dataKey="orders" fill="hsl(var(--info))" radius={[6, 6, 0, 0]} barSize={40} name="অর্ডার" />
+                <Bar dataKey="revenue" fill="hsl(var(--accent))" radius={[6, 6, 0, 0]} barSize={40} name="রাজস্ব" />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+
         <div className="glass-card rounded-2xl p-5 md:p-6">
           <h3 className="font-semibold text-sm text-foreground mb-1">দৈনিক অর্ডার</h3>
           <p className="text-[11px] text-muted-foreground mb-5">প্রতিদিন কতটি অর্ডার এসেছে</p>
@@ -131,11 +192,11 @@ const AnalyticsPage = () => {
             </ResponsiveContainer>
           )}
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <PieCard title="পেমেন্ট মেথড" data={paymentData} isLoading={isLoading} />
-          <PieCard title="ডেলিভারি অঞ্চল" data={locationData} isLoading={isLoading} />
-        </div>
+      {/* Payment Method Pie */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <PieCard title="পেমেন্ট মেথড" data={paymentData} isLoading={isLoading} />
       </div>
     </div>
   );

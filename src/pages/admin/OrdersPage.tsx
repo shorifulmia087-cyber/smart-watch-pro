@@ -1,11 +1,12 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useOrders, useUpdateOrderStatus } from '@/hooks/useSupabaseData';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
-import { Search, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Filter, ChevronLeft, ChevronRight, Truck, FileText } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
 } from '@/components/ui/table';
+import { useToast } from '@/hooks/use-toast';
 import type { Database } from '@/integrations/supabase/types';
 
 type OrderStatus = Database['public']['Enums']['order_status'];
@@ -29,6 +30,50 @@ const OrdersPage = () => {
   const pageSize = 15;
   const { data: orders, isLoading } = useOrders(filter);
   const updateStatus = useUpdateOrderStatus();
+  const { toast } = useToast();
+
+  const bookCourier = useCallback((orderId: string, customerName: string) => {
+    const mockTrackingId = `TRK-${Date.now().toString(36).toUpperCase()}`;
+    toast({
+      title: 'কুরিয়ার বুক হয়েছে!',
+      description: `${customerName} — ট্র্যাকিং: ${mockTrackingId}`,
+    });
+  }, [toast]);
+
+  const downloadInvoice = useCallback((order: any) => {
+    const invoiceContent = `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         ইনভয়েস / INVOICE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+অর্ডার ID: ${order.id.slice(0, 8).toUpperCase()}
+তারিখ: ${new Date(order.created_at).toLocaleDateString('bn-BD')}
+
+কাস্টমার: ${order.customer_name}
+ফোন: ${order.phone}
+ঠিকানা: ${order.address}
+এলাকা: ${order.delivery_location === 'dhaka' ? 'ঢাকা' : 'ঢাকার বাইরে'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+প্রোডাক্ট: ${order.watch_model}
+পরিমাণ: ${order.quantity}
+মূল্য: ৳${order.total_price.toLocaleString()}
+ডেলিভারি চার্জ: ৳${order.delivery_charge.toLocaleString()}
+পেমেন্ট: ${order.payment_method}
+${order.trx_id ? `TrxID: ${order.trx_id}` : 'ক্যাশ অন ডেলিভারি'}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+মোট: ৳${order.total_price.toLocaleString()}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    `;
+    const blob = new Blob([invoiceContent], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `invoice-${order.id.slice(0, 8)}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast({ title: 'ইনভয়েস ডাউনলোড হয়েছে' });
+  }, [toast]);
 
   const filtered = useMemo(() => {
     if (!orders) return [];
@@ -105,6 +150,7 @@ const OrdersPage = () => {
                   <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">এলাকা</TableHead>
                   <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">তারিখ</TableHead>
                   <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">স্ট্যাটাস</TableHead>
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground text-right">অ্যাকশন</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -147,6 +193,24 @@ const OrdersPage = () => {
                           <option key={k} value={k}>{v}</option>
                         ))}
                       </select>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center justify-end gap-1.5">
+                        <button
+                          onClick={() => bookCourier(o.id, o.customer_name)}
+                          className="p-1.5 rounded-lg text-info/70 hover:text-info hover:bg-info/10 transition-all"
+                          title="কুরিয়ার বুক"
+                        >
+                          <Truck className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => downloadInvoice(o)}
+                          className="p-1.5 rounded-lg text-accent/70 hover:text-accent hover:bg-accent/10 transition-all"
+                          title="ইনভয়েস ডাউনলোড"
+                        >
+                          <FileText className="h-4 w-4" />
+                        </button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

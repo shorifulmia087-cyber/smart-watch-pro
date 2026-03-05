@@ -1,0 +1,1 @@
+ALTER TABLE public.products ADD COLUMN sourcing_cost integer NOT NULL DEFAULT 0;
