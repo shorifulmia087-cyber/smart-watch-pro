@@ -106,3 +106,8 @@
     @apply bg-card border border-border/60 shadow-sm;
   }
 }
+
+@keyframes shimmer {
+  0%, 100% { transform: translateX(-100%); }
+  50% { transform: translateX(100%); }
+}
