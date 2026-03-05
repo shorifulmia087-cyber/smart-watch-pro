@@ -11,6 +11,7 @@ import ReviewsPage from './admin/ReviewsPage';
 import PaymentSettingsPage from './admin/PaymentSettingsPage';
 import ProfileSettingsPage from './admin/ProfileSettingsPage';
 import CourierSettingsPage from './admin/CourierSettingsPage';
+import CourierPaymentsPage from './admin/CourierPaymentsPage';
 import TrackingDashboardPage from './admin/TrackingDashboardPage';
 import FacebookPixelPage from './admin/FacebookPixelPage';
 import SmsSettingsPage from './admin/SmsSettingsPage';
@@ -53,6 +54,7 @@ const Admin = () => {
         <Route path="team" element={<TeamPage />} />
         <Route path="payment" element={<PaymentSettingsPage />} />
         <Route path="courier" element={<CourierSettingsPage />} />
+        <Route path="courier-payments" element={<CourierPaymentsPage />} />
         <Route path="tracking" element={<TrackingDashboardPage />} />
         <Route path="sms" element={<SmsSettingsPage />} />
         <Route path="analytics" element={<AnalyticsPage />} />

@@ -11,3 +11,9 @@ verify_jwt = false
 
 [functions.book-steadfast-courier]
 verify_jwt = false
+
+[functions.courier-webhook]
+verify_jwt = false
+
+[functions.fetch-areas]
+verify_jwt = false
