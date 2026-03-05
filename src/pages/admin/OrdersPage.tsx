@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useOrders, useUpdateOrderStatus, useSettings } from '@/hooks/useSupabaseData';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
-import { Search, Filter, ChevronLeft, ChevronRight, Truck, FileText, CheckCircle2, Package } from 'lucide-react';
+import { Search, Filter, ChevronLeft, ChevronRight, Truck, FileText, CheckCircle2, Package, Loader2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Checkbox } from '@/components/ui/checkbox';
 import jsPDF from 'jspdf';
@@ -40,48 +40,77 @@ const OrdersPage = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Mock courier provider selection — defaults to 'redx'
   const [courierProvider, setCourierProvider] = useState<'redx' | 'pathao' | 'steadfast'>('redx');
-
-  const generateMockTrackingId = (provider: 'redx' | 'pathao' | 'steadfast') => {
-    const ts = Date.now().toString().slice(-8);
-    const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
-    if (provider === 'redx') return `RDX${ts}${rand}`;
-    if (provider === 'pathao') return `PT-${ts}-${rand}`;
-    return `SF-${ts}${rand}`; // Steadfast style
-  };
+  const [bookingInProgress, setBookingInProgress] = useState<string | null>(null);
 
   const bookCourier = useCallback(async (orderId: string, customerName: string) => {
-    // Check if courier API is configured
-    const { data: courierCfg } = await supabase.from('courier_settings' as any).select('*').eq('provider', courierProvider).single();
-    if (!courierCfg || !(courierCfg as any).is_active) {
-      toast({ 
-        title: '⚠️ কুরিয়ার API সেট করা হয়নি!', 
-        description: `প্রথমে কুরিয়ার সেটিংস থেকে ${courierProvider === 'redx' ? 'RedX' : courierProvider === 'pathao' ? 'Pathao' : 'Steadfast'} এর API কনফিগার করুন।`,
+    if (courierProvider !== 'redx') {
+      toast({
+        title: '⚠️ শুধুমাত্র RedX সমর্থিত',
+        description: 'বর্তমানে শুধুমাত্র RedX কুরিয়ার API ইন্টিগ্রেটেড। Pathao ও Steadfast শীঘ্রই আসছে।',
         variant: 'destructive',
       });
       return;
     }
 
-    const trackingId = generateMockTrackingId(courierProvider);
-    const { error } = await supabase.from('orders').update({ 
-      courier_booked: true, 
-      tracking_id: trackingId, 
-      courier_provider: courierProvider 
-    } as any).eq('id', orderId);
-    if (error) {
-      toast({ title: 'ত্রুটি!', description: 'কুরিয়ার বুক করতে সমস্যা হয়েছে', variant: 'destructive' });
-      return;
+    setBookingInProgress(orderId);
+
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData?.session?.access_token;
+      if (!accessToken) {
+        toast({ title: 'ত্রুটি!', description: 'আপনি লগইন করা নেই', variant: 'destructive' });
+        return;
+      }
+
+      const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+      const res = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/book-redx-courier`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({ order_id: orderId }),
+        }
+      );
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        const errorMsg = result?.details?.message || result?.error || 'কুরিয়ার বুক করতে সমস্যা হয়েছে';
+        toast({
+          title: '❌ RedX API ত্রুটি!',
+          description: typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg),
+          variant: 'destructive',
+          duration: 8000,
+        });
+        return;
+      }
+
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      toast({
+        title: '✅ RedX কুরিয়ার বুক সফল!',
+        description: `${customerName} — ট্র্যাকিং আইডি: ${result.tracking_id}`,
+        duration: 8000,
+      });
+    } catch (err: any) {
+      toast({
+        title: '❌ নেটওয়ার্ক ত্রুটি!',
+        description: err?.message || 'RedX সার্ভারে সংযোগ করা যায়নি',
+        variant: 'destructive',
+      });
+    } finally {
+      setBookingInProgress(null);
     }
-    queryClient.invalidateQueries({ queryKey: ['orders'] });
-    toast({
-      title: '✅ কুরিয়ার বুক সফল!',
-      description: `${customerName} — ${courierProvider === 'redx' ? 'RedX' : courierProvider === 'pathao' ? 'Pathao' : 'Steadfast'} ট্র্যাকিং আইডি: ${trackingId}`,
-      duration: 6000,
-    });
   }, [toast, queryClient, courierProvider]);
 
   const bulkBookCourier = useCallback(async (ids: string[]) => {
+    if (courierProvider !== 'redx') {
+      toast({ title: '⚠️ শুধুমাত্র RedX সমর্থিত', description: 'বর্তমানে শুধুমাত্র RedX ইন্টিগ্রেটেড।', variant: 'destructive' });
+      return;
+    }
     const unbookedIds = ids.filter(id => {
       const order = orders?.find(o => o.id === id);
       return order && !(order as any).courier_booked;
@@ -90,26 +119,44 @@ const OrdersPage = () => {
       toast({ title: '⚠️ কোনো নতুন অর্ডার নেই', description: 'সিলেক্ট করা সব অর্ডার ইতিমধ্যে কুরিয়ারে বুক হয়েছে' });
       return;
     }
-    // Generate tracking IDs for each order
-    const updates = unbookedIds.map(id => {
-      const trackingId = generateMockTrackingId(courierProvider);
-      return supabase.from('orders').update({ 
-        courier_booked: true, 
-        tracking_id: trackingId, 
-        courier_provider: courierProvider 
-      } as any).eq('id', id);
-    });
-    const results = await Promise.all(updates);
-    const hasError = results.some(r => r.error);
-    if (hasError) {
-      toast({ title: 'ত্রুটি!', description: 'বাল্ক কুরিয়ার বুক করতে সমস্যা হয়েছে', variant: 'destructive' });
+
+    setBookingInProgress('bulk');
+    const { data: sessionData } = await supabase.auth.getSession();
+    const accessToken = sessionData?.session?.access_token;
+    if (!accessToken) {
+      toast({ title: 'ত্রুটি!', description: 'আপনি লগইন করা নেই', variant: 'destructive' });
+      setBookingInProgress(null);
       return;
     }
+
+    const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const id of unbookedIds) {
+      try {
+        const res = await fetch(
+          `https://${projectId}.supabase.co/functions/v1/book-redx-courier`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+            body: JSON.stringify({ order_id: id }),
+          }
+        );
+        if (res.ok) successCount++;
+        else failCount++;
+      } catch {
+        failCount++;
+      }
+    }
+
     queryClient.invalidateQueries({ queryKey: ['orders'] });
     setSelectedIds(new Set());
+    setBookingInProgress(null);
     toast({
-      title: '✅ বাল্ক কুরিয়ার বুক সফল!',
-      description: `${toBengaliNum(unbookedIds.length)} টি অর্ডার ${courierProvider === 'redx' ? 'RedX' : courierProvider === 'pathao' ? 'Pathao' : 'Steadfast'} কুরিয়ারে যুক্ত হয়েছে`,
+      title: successCount > 0 ? '✅ বাল্ক কুরিয়ার বুক সম্পন্ন!' : '❌ বাল্ক বুক ব্যর্থ!',
+      description: `সফল: ${toBengaliNum(successCount)}, ব্যর্থ: ${toBengaliNum(failCount)}`,
+      duration: 8000,
     });
   }, [orders, toast, queryClient, courierProvider]);
 
@@ -423,10 +470,15 @@ const OrdersPage = () => {
                           ) : (
                             <button
                               onClick={() => bookCourier(o.id, o.customer_name)}
-                              className="p-1.5 rounded-lg text-info/70 hover:text-info hover:bg-info/10 transition-all"
-                              title="কুরিয়ার বুক"
+                              disabled={bookingInProgress === o.id || bookingInProgress === 'bulk'}
+                              className="p-1.5 rounded-lg text-info/70 hover:text-info hover:bg-info/10 transition-all disabled:opacity-50"
+                              title="RedX কুরিয়ার বুক"
                             >
-                              <Truck className="h-4 w-4" />
+                              {bookingInProgress === o.id ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <Truck className="h-4 w-4" />
+                              )}
                             </button>
                           )}
                           <button
