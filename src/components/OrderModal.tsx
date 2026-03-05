@@ -189,7 +189,8 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
             <p className="text-muted-foreground text-sm mb-8">শীঘ্রই আমাদের টিম যোগাযোগ করবে।</p>
             <button
               onClick={onClose}
-              className="gradient-gold text-surface font-semibold px-8 py-3 rounded-xl hover:opacity-90 transition-opacity"
+              className="gradient-gold text-surface font-semibold px-8 py-3 rounded-sm hover:opacity-90 transition-opacity"
+              style={{ boxShadow: '0 4px 16px -4px hsl(var(--gold) / 0.4)' }}
             >
               ঠিক আছে
             </button>
