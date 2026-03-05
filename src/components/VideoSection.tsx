@@ -32,17 +32,6 @@ const VideoSection = ({ videoId = 'dQw4w9WgXcQ', sectionTitle = 'Kronos — ক�
       }}
     >
       <div className="max-w-4xl mx-auto">
-        {/* Badge */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="flex justify-center mb-4"
-        >
-          <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide gradient-gold text-surface shadow-sm">
-            ▶ Live Look
-          </span>
-        </motion.div>
 
         {/* Title */}
         <motion.h2
