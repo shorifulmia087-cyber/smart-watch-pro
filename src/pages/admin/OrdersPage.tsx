@@ -284,54 +284,77 @@ const OrdersPage = () => {
   };
 
   return (
-    <div className="space-y-5 max-w-[1400px]">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-semibold text-foreground">সকল অর্ডার</h2>
-          <p className="text-[11px] text-muted-foreground">মোট {toBengaliNum(filtered.length)} টি অর্ডার</p>
+    <div className="space-y-5 w-full">
+      {/* ─── Bento Filter/Search Header ─── */}
+      <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-4 md:p-5">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-lg font-bold text-foreground">সকল অর্ডার</h2>
+            <p className="text-[11px] text-muted-foreground mt-0.5">মোট {toBengaliNum(filtered.length)} টি অর্ডার পাওয়া গেছে</p>
+          </div>
+          <div className="flex items-center gap-3 flex-wrap">
+            {/* Courier Provider */}
+            <div className="flex items-center gap-2 bg-muted/30 border border-border/40 rounded-sm px-3 py-2">
+              <Truck className="h-4 w-4 text-gold" />
+              <select
+                value={courierProvider}
+                onChange={e => setCourierProvider(e.target.value as 'redx' | 'pathao' | 'steadfast')}
+                className="bg-transparent border-none outline-none text-sm font-medium text-foreground cursor-pointer"
+              >
+                <option value="redx">RedX</option>
+                <option value="pathao">Pathao</option>
+                <option value="steadfast">Steadfast</option>
+              </select>
+            </div>
+            {/* Search */}
+            <div className="flex items-center gap-2 bg-muted/30 border border-border/40 rounded-sm px-3 py-2 min-w-[240px]">
+              <Search className="h-4 w-4 text-muted-foreground shrink-0" />
+              <input
+                type="text" value={search} onChange={e => { setSearch(e.target.value); setPage(0); }}
+                placeholder="নাম, ফোন বা TrxID দিয়ে খুঁজুন..."
+                className="bg-transparent border-none outline-none w-full text-sm text-foreground placeholder:text-muted-foreground"
+              />
+            </div>
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 glass-card rounded-xl px-3 py-2">
-            <Truck className="h-4 w-4 text-muted-foreground" />
-            <select
-              value={courierProvider}
-              onChange={e => setCourierProvider(e.target.value as 'redx' | 'pathao' | 'steadfast')}
-              className="bg-transparent border-none outline-none text-sm font-medium text-foreground cursor-pointer"
+
+        {/* Filter Pills */}
+        <div className="flex items-center gap-2 flex-wrap mt-4 pt-4 border-t border-border/20">
+          <Filter className="h-4 w-4 text-muted-foreground" />
+          {[undefined, 'pending', 'processing', 'shipped', 'completed', 'returned'].map((s) => (
+            <button
+              key={s ?? 'all'}
+              onClick={() => { setFilter(s as OrderStatus | undefined); setPage(0); }}
+              className={`px-3.5 py-1.5 rounded-sm text-xs font-medium transition-all duration-200 border ${
+                filter === s
+                  ? 'gradient-gold text-white border-transparent shadow-sm'
+                  : 'bg-transparent text-muted-foreground border-border/40 hover:border-gold/30 hover:text-gold'
+              }`}
             >
-              <option value="redx">RedX</option>
-              <option value="pathao">Pathao</option>
-              <option value="steadfast">Steadfast</option>
-            </select>
-          </div>
-          <div className="flex items-center gap-2 glass-card rounded-xl px-3 py-2 min-w-[240px]">
-            <Search className="h-4 w-4 text-muted-foreground shrink-0" />
-            <input
-              type="text" value={search} onChange={e => { setSearch(e.target.value); setPage(0); }}
-              placeholder="নাম, ফোন বা TrxID দিয়ে খুঁজুন..."
-              className="bg-transparent border-none outline-none w-full text-sm text-foreground placeholder:text-muted-foreground"
-            />
-          </div>
+              {s ? statusLabels[s as OrderStatus] : 'সব'}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Bulk Actions Bar */}
+      {/* ─── Bulk Actions Bar ─── */}
       {someSelected && (
-        <div className="flex items-center gap-3 glass-card rounded-xl px-4 py-3 border-l-4 border-l-accent">
-          <span className="text-sm font-semibold text-foreground" style={{ fontFamily: "'Hind Siliguri', sans-serif", fontSize: '14px', letterSpacing: '0.02em' }}>
+        <div className="flex items-center gap-3 bg-gold/5 border border-gold/20 rounded-sm px-4 py-3">
+          <span className="text-sm font-semibold text-foreground">
             {toBengaliNum(selectedIds.size)} টি সিলেক্ট করা হয়েছে
           </span>
           <div className="flex items-center gap-2 ml-auto">
             <button
               onClick={() => bulkBookCourier(Array.from(selectedIds))}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold bg-accent text-accent-foreground hover:bg-accent/90 transition-colors shadow-sm"
+              className="flex items-center gap-2 px-4 py-2 rounded-sm text-xs font-semibold gradient-gold text-white hover:opacity-90 transition-all shadow-sm"
+              style={{ boxShadow: '0 4px 12px -4px hsl(var(--gold) / 0.3)' }}
             >
               <Package className="h-3.5 w-3.5" />
               সব কুরিয়ারে যুক্ত করুন
             </button>
             <button
               onClick={() => setSelectedIds(new Set())}
-              className="px-3 py-2 rounded-lg text-xs font-medium text-muted-foreground hover:bg-muted transition-colors"
+              className="px-3 py-2 rounded-sm text-xs font-medium text-muted-foreground hover:bg-muted transition-colors border border-border/40"
             >
               বাতিল
             </button>
@@ -339,39 +362,21 @@ const OrdersPage = () => {
         </div>
       )}
 
-      {/* Filters */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <Filter className="h-4 w-4 text-muted-foreground" />
-        {[undefined, 'pending', 'processing', 'shipped', 'completed', 'returned'].map((s) => (
-          <button
-            key={s ?? 'all'}
-            onClick={() => { setFilter(s as OrderStatus | undefined); setPage(0); }}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 border ${
-              filter === s
-                ? 'bg-foreground text-background border-foreground shadow-sm'
-                : 'bg-card text-muted-foreground border-border hover:border-foreground/20 hover:bg-muted'
-            }`}
-          >
-            {s ? statusLabels[s as OrderStatus] : 'সব'}
-          </button>
-        ))}
-      </div>
-
-      {/* Table */}
+      {/* ─── Order Table ─── */}
       {isLoading ? (
         <div className="space-y-2">
-          {Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} className="h-14 rounded-xl" />)}
+          {Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} className="h-14 rounded-sm" />)}
         </div>
       ) : !paged.length ? (
-        <div className="glass-card rounded-2xl p-16 text-center text-muted-foreground">
+        <div className="bg-surface dark:bg-card rounded-sm border border-border/30 p-16 text-center text-muted-foreground shadow-sm">
           কোনো অর্ডার পাওয়া যায়নি।
         </div>
       ) : (
-        <div className="glass-card rounded-2xl overflow-hidden">
+        <div className="bg-surface dark:bg-card rounded-sm border border-border/30 overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="bg-muted/40 hover:bg-muted/40 border-b border-border/60">
+                <TableRow className="bg-muted/30 hover:bg-muted/30 border-b border-border/40">
                   <TableHead className="w-[40px]">
                     <Checkbox
                       checked={allPageSelected}
@@ -379,19 +384,19 @@ const OrdersPage = () => {
                       className="border-muted-foreground/40"
                     />
                   </TableHead>
-                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground w-[50px]">#</TableHead>
-                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">কাস্টমার</TableHead>
-                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">ফোন</TableHead>
-                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">মডেল</TableHead>
-                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground text-center">পরিমাণ</TableHead>
-                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">মোট</TableHead>
-                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">TrxID</TableHead>
-                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">ট্র্যাকিং</TableHead>
-                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">ট্র্যাক স্ট্যাটাস</TableHead>
-                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">এলাকা</TableHead>
-                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">তারিখ</TableHead>
-                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">স্ট্যাটাস</TableHead>
-                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground text-right">অ্যাকশন</TableHead>
+                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 w-[50px]">#</TableHead>
+                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">কাস্টমার</TableHead>
+                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">ফোন</TableHead>
+                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">মডেল</TableHead>
+                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 text-center">পরিমাণ</TableHead>
+                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">মোট</TableHead>
+                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">TrxID</TableHead>
+                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">ট্র্যাকিং</TableHead>
+                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">ট্র্যাক স্ট্যাটাস</TableHead>
+                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">এলাকা</TableHead>
+                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">তারিখ</TableHead>
+                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">স্ট্যাটাস</TableHead>
+                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 text-right">অ্যাকশন</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -400,7 +405,7 @@ const OrdersPage = () => {
                   const courierBooked = (o as any).courier_booked === true;
                     return (
                     <React.Fragment key={o.id}>
-                    <TableRow className={`group hover:bg-muted/30 transition-colors duration-200 border-b border-border/40 ${selectedIds.has(o.id) ? 'bg-accent/5' : ''}`}>
+                    <TableRow className={`group hover:bg-gold/[0.03] transition-colors duration-200 border-b border-border/20 ${selectedIds.has(o.id) ? 'bg-gold/5' : ''}`}>
                       <TableCell>
                         <Checkbox
                           checked={selectedIds.has(o.id)}
@@ -422,17 +427,17 @@ const OrdersPage = () => {
                         <div>
                           <span>{o.watch_model}</span>
                           {(o as any).selected_color && (
-                            <span className="block text-[11px] text-accent font-medium mt-0.5">🎨 {(o as any).selected_color}</span>
+                            <span className="block text-[11px] text-gold font-medium mt-0.5">🎨 {(o as any).selected_color}</span>
                           )}
                         </div>
                       </TableCell>
                       <TableCell className="text-center font-inter text-sm text-foreground">{toBengaliNum(o.quantity)}</TableCell>
-                      <TableCell className="font-semibold text-accent font-inter text-sm">
+                      <TableCell className="font-semibold text-gold font-inter text-sm">
                         ৳{formatBengaliPrice(o.total_price)}
                       </TableCell>
                       <TableCell>
                         {o.trx_id ? (
-                          <span className="bg-accent/10 text-accent px-2 py-1 rounded-lg text-[11px] font-mono font-semibold">
+                          <span className="bg-gold/10 text-gold px-2 py-1 rounded-sm text-[11px] font-mono font-semibold border border-gold/15">
                             {o.trx_id}
                           </span>
                         ) : (
@@ -442,7 +447,7 @@ const OrdersPage = () => {
                       <TableCell>
                         {(o as any).tracking_id ? (
                           <div className="flex flex-col gap-0.5">
-                            <span className="bg-success/10 text-success px-2 py-1 rounded-lg text-[11px] font-mono font-semibold">
+                            <span className="bg-success/10 text-success px-2 py-1 rounded-sm text-[11px] font-mono font-semibold border border-success/15">
                               {(o as any).tracking_id}
                             </span>
                             <span className="text-[10px] text-muted-foreground">
@@ -458,7 +463,7 @@ const OrdersPage = () => {
                         {courierBooked ? (
                           <button
                             onClick={() => setExpandedOrderId(expandedOrderId === o.id ? null : o.id)}
-                            className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-semibold border transition-colors cursor-pointer ${
+                            className={`inline-flex items-center gap-1 px-2 py-1 rounded-sm text-[10px] font-semibold border transition-colors cursor-pointer ${
                               o.status === 'completed'
                                 ? 'bg-success/10 text-success border-success/20'
                                 : o.status === 'shipped'
@@ -485,7 +490,7 @@ const OrdersPage = () => {
                         <select
                           value={o.status}
                           onChange={(e) => updateStatus.mutate({ id: o.id, status: e.target.value as OrderStatus })}
-                          className={`text-[11px] font-medium px-3 py-1.5 rounded-full border cursor-pointer appearance-none transition-colors ${statusStyles[o.status]}`}
+                          className={`text-[11px] font-semibold px-3 py-1.5 rounded-sm border cursor-pointer appearance-none transition-colors ${statusStyles[o.status]}`}
                         >
                           {Object.entries(statusLabels).map(([k, v]) => (
                             <option key={k} value={k}>{v}</option>
@@ -496,7 +501,7 @@ const OrdersPage = () => {
                         <div className="flex items-center justify-end gap-1.5">
                           {courierBooked ? (
                             <span 
-                              className="p-1.5 rounded-lg text-success cursor-help" 
+                              className="p-1.5 rounded-sm text-success cursor-help" 
                               title={`✅ কুরিয়ার: ${(o as any).courier_provider || 'N/A'} | ট্র্যাকিং: ${(o as any).tracking_id || 'N/A'}`}
                             >
                               <CheckCircle2 className="h-4 w-4" />
@@ -505,7 +510,7 @@ const OrdersPage = () => {
                             <button
                               onClick={() => bookCourier(o.id, o.customer_name)}
                               disabled={bookingInProgress === o.id || bookingInProgress === 'bulk'}
-                              className="p-1.5 rounded-lg text-info/70 hover:text-info hover:bg-info/10 transition-all disabled:opacity-50"
+                              className="p-1.5 rounded-sm text-gold/70 hover:text-gold hover:bg-gold/10 transition-all disabled:opacity-50"
                               title="কুরিয়ার বুক"
                             >
                               {bookingInProgress === o.id ? (
@@ -517,7 +522,7 @@ const OrdersPage = () => {
                           )}
                           <button
                             onClick={() => downloadInvoice(o)}
-                            className="p-1.5 rounded-lg text-accent/70 hover:text-accent hover:bg-accent/10 transition-all"
+                            className="p-1.5 rounded-sm text-gold/70 hover:text-gold hover:bg-gold/10 transition-all"
                             title="ইনভয়েস ডাউনলোড"
                           >
                             <FileText className="h-4 w-4" />
@@ -527,7 +532,7 @@ const OrdersPage = () => {
                     </TableRow>
                     {/* Expandable Live Tracking Row */}
                     {expandedOrderId === o.id && (
-                      <TableRow className="bg-muted/20 hover:bg-muted/20">
+                      <TableRow className="bg-muted/10 hover:bg-muted/10">
                         <TableCell colSpan={14} className="py-4 px-6">
                           <div className="flex items-start justify-between">
                             <LiveTracking
@@ -537,7 +542,7 @@ const OrdersPage = () => {
                             />
                             <button
                               onClick={() => setExpandedOrderId(null)}
-                              className="p-1 rounded-lg hover:bg-muted text-muted-foreground"
+                              className="p-1.5 rounded-sm hover:bg-muted text-muted-foreground"
                             >
                               <X className="h-4 w-4" />
                             </button>
@@ -552,8 +557,9 @@ const OrdersPage = () => {
             </Table>
           </div>
 
+          {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between px-5 py-3 border-t border-border/60 bg-muted/20">
+            <div className="flex items-center justify-between px-5 py-3 border-t border-border/30 bg-muted/10">
               <p className="text-[11px] text-muted-foreground">
                 পৃষ্ঠা {toBengaliNum(page + 1)} / {toBengaliNum(totalPages)}
               </p>
@@ -561,14 +567,14 @@ const OrdersPage = () => {
                 <button
                   onClick={() => setPage(p => Math.max(0, p - 1))}
                   disabled={page === 0}
-                  className="px-3 py-1.5 rounded-lg text-[11px] font-medium bg-card border border-border hover:bg-muted disabled:opacity-40 transition-colors flex items-center gap-1"
+                  className="px-3 py-1.5 rounded-sm text-[11px] font-medium bg-surface dark:bg-card border border-border/40 hover:border-gold/30 hover:text-gold disabled:opacity-40 transition-colors flex items-center gap-1"
                 >
                   <ChevronLeft className="h-3.5 w-3.5" /> পূর্ববর্তী
                 </button>
                 <button
                   onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
                   disabled={page >= totalPages - 1}
-                  className="px-3 py-1.5 rounded-lg text-[11px] font-medium bg-card border border-border hover:bg-muted disabled:opacity-40 transition-colors flex items-center gap-1"
+                  className="px-3 py-1.5 rounded-sm text-[11px] font-medium bg-surface dark:bg-card border border-border/40 hover:border-gold/30 hover:text-gold disabled:opacity-40 transition-colors flex items-center gap-1"
                 >
                   পরবর্তী <ChevronRight className="h-3.5 w-3.5" />
                 </button>
