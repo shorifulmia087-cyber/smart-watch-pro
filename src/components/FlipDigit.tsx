@@ -21,7 +21,7 @@ const FlipDigit = ({ value }: FlipDigitProps) => {
       setPrevious(current);
       setCurrent(value);
       setFlipping(true);
-      const t = setTimeout(() => setFlipping(false), 600);
+      const t = setTimeout(() => setFlipping(false), 400);
       return () => clearTimeout(t);
     }
   }, [value]);
