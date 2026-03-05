@@ -16,6 +16,9 @@ interface OrderModalProps {
   deliveryChargeInside?: number;
   deliveryChargeOutside?: number;
   onlinePaymentEnabled?: boolean;
+  bkashNumber?: string;
+  nagadNumber?: string;
+  rocketNumber?: string;
 }
 
 const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInside = 70, deliveryChargeOutside = 150, onlinePaymentEnabled = true }: OrderModalProps) => {
