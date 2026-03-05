@@ -19,76 +19,76 @@ const FlipDigit = ({ value }: FlipDigitProps) => {
     }
     if (value !== current) {
       setPrevious(current);
+      setCurrent(value);
       setFlipping(true);
-      setTimeout(() => {
-        setCurrent(value);
-        setFlipping(false);
-      }, 400);
+      const t = setTimeout(() => setFlipping(false), 500);
+      return () => clearTimeout(t);
     }
   }, [value]);
 
+  const digitStyle = "font-extrabold text-white text-xl sm:text-2xl md:text-3xl tabular-nums";
+
   return (
-    <div className="relative w-[28px] h-[40px] sm:w-[36px] sm:h-[50px] md:w-[44px] md:h-[58px] text-center" style={{ perspective: '200px' }}>
-      {/* Static bottom half — shows NEW value */}
-      <div className="absolute inset-0 rounded-md sm:rounded-lg overflow-hidden bg-gradient-to-b from-[#2a2a2e] to-[#1a1a1e] border border-white/[0.06]">
-        <div className="absolute bottom-0 left-0 right-0 h-1/2 overflow-hidden">
-          <span className="absolute bottom-0 left-0 right-0 h-[200%] flex items-center justify-center font-extrabold text-white text-xl sm:text-2xl md:text-3xl tabular-nums drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-            {flipping ? value : current}
-          </span>
-        </div>
+    <div
+      className="relative w-[28px] h-[40px] sm:w-[36px] sm:h-[50px] md:w-[44px] md:h-[58px]"
+      style={{ perspective: '300px' }}
+    >
+      {/* ── STATIC LAYERS (always visible) ── */}
+
+      {/* Top half — shows CURRENT */}
+      <div className="absolute top-0 left-0 right-0 h-1/2 overflow-hidden rounded-t-md sm:rounded-t-lg bg-[#2e2e32] z-[1]">
+        <span className={`absolute top-0 left-0 right-0 h-[200%] flex items-center justify-center ${digitStyle}`}>
+          {current}
+        </span>
       </div>
 
-      {/* Static top half — shows CURRENT value */}
-      <div className="absolute inset-0 rounded-md sm:rounded-lg overflow-hidden bg-gradient-to-b from-[#3a3a3e] to-[#2a2a2e] border border-white/[0.06]">
-        <div className="absolute top-0 left-0 right-0 h-1/2 overflow-hidden">
-          <span className="absolute top-0 left-0 right-0 h-[200%] flex items-center justify-center font-extrabold text-white text-xl sm:text-2xl md:text-3xl tabular-nums drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-            {current}
-          </span>
-        </div>
+      {/* Bottom half — shows CURRENT */}
+      <div className="absolute bottom-0 left-0 right-0 h-1/2 overflow-hidden rounded-b-md sm:rounded-b-lg bg-[#242428] z-[1]">
+        <span className={`absolute bottom-0 left-0 right-0 h-[200%] flex items-center justify-center ${digitStyle}`}>
+          {current}
+        </span>
       </div>
 
-      {/* Center divider line */}
-      <div className="absolute left-0 right-0 top-1/2 -translate-y-px h-[1.5px] bg-black/60 z-20" />
+      {/* ── FLIP LAYERS (only during animation) ── */}
 
-      {/* Flipping top half (folds down) — shows PREVIOUS value on front */}
       {flipping && (
-        <div
-          className="absolute inset-0 rounded-md sm:rounded-lg overflow-hidden z-30"
-          style={{
-            transformOrigin: 'bottom center',
-            animation: 'flipTop 0.4s ease-in forwards',
-            backfaceVisibility: 'hidden',
-          }}
-        >
-          <div className="absolute top-0 left-0 right-0 h-1/2 overflow-hidden bg-gradient-to-b from-[#3a3a3e] to-[#2a2a2e] rounded-t-md sm:rounded-t-lg">
-            <span className="absolute top-0 left-0 right-0 h-[200%] flex items-center justify-center font-extrabold text-white text-xl sm:text-2xl md:text-3xl tabular-nums">
+        <>
+          {/* Upper flap — falls DOWN, shows PREVIOUS number */}
+          <div
+            className="absolute top-0 left-0 right-0 h-1/2 overflow-hidden rounded-t-md sm:rounded-t-lg bg-[#2e2e32] z-[3]"
+            style={{
+              transformOrigin: 'bottom center',
+              animation: 'flipTopDown 0.5s ease-in forwards',
+              backfaceVisibility: 'hidden',
+            }}
+          >
+            <span className={`absolute top-0 left-0 right-0 h-[200%] flex items-center justify-center ${digitStyle}`}>
               {previous}
             </span>
           </div>
-        </div>
-      )}
 
-      {/* Flipping bottom half (unfolds from top) — shows NEW value */}
-      {flipping && (
-        <div
-          className="absolute inset-0 rounded-md sm:rounded-lg overflow-hidden z-30"
-          style={{
-            transformOrigin: 'top center',
-            animation: 'flipBottom 0.4s 0.2s ease-out forwards',
-            backfaceVisibility: 'hidden',
-            transform: 'rotateX(90deg)',
-          }}
-        >
-          <div className="absolute bottom-0 left-0 right-0 h-1/2 overflow-hidden bg-gradient-to-b from-[#2a2a2e] to-[#1a1a1e] rounded-b-md sm:rounded-b-lg">
-            <span className="absolute bottom-0 left-0 right-0 h-[200%] flex items-center justify-center font-extrabold text-white text-xl sm:text-2xl md:text-3xl tabular-nums">
-              {value}
+          {/* Lower flap — unfolds from TOP, shows CURRENT number */}
+          <div
+            className="absolute bottom-0 left-0 right-0 h-1/2 overflow-hidden rounded-b-md sm:rounded-b-lg bg-[#242428] z-[3]"
+            style={{
+              transformOrigin: 'top center',
+              animation: 'flipBottomDown 0.5s 0.25s ease-out forwards',
+              backfaceVisibility: 'hidden',
+              transform: 'rotateX(90deg)',
+            }}
+          >
+            <span className={`absolute bottom-0 left-0 right-0 h-[200%] flex items-center justify-center ${digitStyle}`}>
+              {current}
             </span>
           </div>
-        </div>
+        </>
       )}
 
-      {/* Subtle shine on top half */}
-      <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white/[0.08] to-transparent rounded-t-md sm:rounded-t-lg z-10 pointer-events-none" />
+      {/* ── CENTER HAIRLINE ── */}
+      <div className="absolute left-0 right-0 top-1/2 h-px bg-black/50 z-[5]" />
+
+      {/* ── TOP SHINE ── */}
+      <div className="absolute top-0 left-0 right-0 h-1/2 rounded-t-md sm:rounded-t-lg bg-gradient-to-b from-white/[0.07] to-transparent z-[4] pointer-events-none" />
     </div>
   );
 };
