@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { formatBengaliPrice } from '@/lib/bengali';
@@ -14,18 +14,38 @@ interface HeroSliderProps {
 
 const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিমিয়াম ক্রাফটসম্যানশিপ, অতুলনীয় ডিজাইন।', price = 0, discountPercent = 0 }: HeroSliderProps) => {
   const [current, setCurrent] = useState(0);
+  const [direction, setDirection] = useState(1); // 1 = right-to-left, -1 = left-to-right
+  const autoSlideRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const originalPrice = discountPercent > 0 ? Math.round(price / (1 - discountPercent / 100)) : price;
 
-  const next = useCallback(() => setCurrent((c) => (c + 1) % images.length), [images.length]);
-  const prev = useCallback(() => setCurrent((c) => (c - 1 + images.length) % images.length), [images.length]);
+  const resetAutoSlide = useCallback(() => {
+    if (autoSlideRef.current) clearInterval(autoSlideRef.current);
+    if (images.length > 1) {
+      autoSlideRef.current = setInterval(() => {
+        setDirection(1);
+        setCurrent((c) => (c + 1) % images.length);
+      }, 3000);
+    }
+  }, [images.length]);
 
-  // Auto-slide every 4 seconds when multiple images
+  const next = useCallback(() => {
+    setDirection(1);
+    setCurrent((c) => (c + 1) % images.length);
+    resetAutoSlide();
+  }, [images.length, resetAutoSlide]);
+
+  const prev = useCallback(() => {
+    setDirection(-1);
+    setCurrent((c) => (c - 1 + images.length) % images.length);
+    resetAutoSlide();
+  }, [images.length, resetAutoSlide]);
+
+  // Start auto-slide
   useEffect(() => {
-    if (images.length <= 1) return;
-    const interval = setInterval(next, 3000);
-    return () => clearInterval(interval);
-  }, [images.length, next]);
+    resetAutoSlide();
+    return () => { if (autoSlideRef.current) clearInterval(autoSlideRef.current); };
+  }, [resetAutoSlide]);
 
   return (
     <section className="bg-surface">
@@ -45,16 +65,16 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
 
       <div className="relative max-w-6xl mx-auto px-4 pb-6">
         <div className="relative aspect-[4/3] md:aspect-[16/9] rounded-2xl overflow-hidden bg-muted">
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="wait" initial={false}>
             <motion.img
               key={`${images[current]?.src}-${current}`}
               src={images[current]?.src}
               alt={images[current]?.label}
               className="absolute inset-0 w-full h-full object-cover"
-              initial={{ opacity: 0, scale: 1.05 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
+              initial={{ opacity: 0, x: direction > 0 ? '30%' : '-30%' }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: direction > 0 ? '-15%' : '15%' }}
+              transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
             />
           </AnimatePresence>
 
