@@ -139,6 +139,7 @@ const ProductsPage = () => {
       sourcing_cost: form.sourcing_cost,
       meta_title: form.meta_title || null,
       meta_description: form.meta_description || null,
+      available_colors: form.available_colors,
       ...(editingId ? { id: editingId } : {}),
     } as any, {
       onSuccess: () => {
