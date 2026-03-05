@@ -212,7 +212,7 @@ const CourierSettingsPage = () => {
             <span className={`text-[11px] font-medium ${isSandbox ? 'text-warning' : 'text-muted-foreground'}`}>Test</span>
             <Switch
               checked={!isSandbox}
-              onCheckedChange={(checked) => updateField('is_sandbox', !checked)}
+              onCheckedChange={(checked) => toggleSandboxMode(!checked)}
             />
             <span className={`text-[11px] font-medium ${!isSandbox ? 'text-success' : 'text-muted-foreground'}`}>Live</span>
           </div>
