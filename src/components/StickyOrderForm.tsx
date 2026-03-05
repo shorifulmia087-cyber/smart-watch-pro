@@ -131,7 +131,7 @@ const StickyOrderForm = () => {
               </div>
               <textarea
                 value={address} onChange={e => setAddress(e.target.value)} required
-                placeholder="সম্পূর্ণ ঠিকানা *" rows={2} maxLength={500}
+                placeholder="সম্পূর্ণ ঠিকানা (বাড়ি, এলাকা, জেলা) *" rows={2} maxLength={500}
                 className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 resize-none"
               />
               
