@@ -38,7 +38,7 @@ const VideoSection = ({ videoId = 'dQw4w9WgXcQ', sectionTitle = 'Kronos — ক�
           className="relative aspect-video rounded-3xl overflow-hidden bg-muted shadow-lg"
         >
           <iframe
-            src={`https://www.youtube.com/embed/${videoId}?autoplay=${isVisible ? 1 : 0}&mute=1&loop=1&playlist=${videoId}&controls=1&modestbranding=1`}
+            src={`https://www.youtube.com/embed/${videoId}?autoplay=${isVisible ? 1 : 0}&loop=1&playlist=${videoId}&controls=1&modestbranding=1`}
             title="Product Video"
             className="w-full h-full"
             allow="autoplay; encrypted-media"
