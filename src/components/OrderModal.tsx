@@ -261,7 +261,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
                 <h3 className="text-lg font-bold text-foreground">অর্ডার করুন</h3>
                 <p className="text-xs text-muted-foreground mt-0.5">{watchName}</p>
               </div>
-              <button onClick={onClose} className="w-9 h-9 rounded-full bg-muted/60 backdrop-blur-sm flex items-center justify-center hover:bg-muted transition-colors">
+              <button onClick={onClose} className="w-9 h-9 rounded-sm bg-muted/60 backdrop-blur-sm flex items-center justify-center hover:bg-muted transition-colors">
                 <X className="w-4 h-4 text-foreground" />
               </button>
             </div>
