@@ -34,6 +34,7 @@ const OrdersPage = () => {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(0);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
   const pageSize = 15;
   const { data: orders, isLoading } = useOrders(filter);
   const { data: settings } = useSettings();
