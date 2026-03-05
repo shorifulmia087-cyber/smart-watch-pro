@@ -452,7 +452,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
               disabled={loading}
               whileHover={{ scale: loading ? 1 : 1.01 }}
               whileTap={{ scale: loading ? 1 : 0.98 }}
-              className={`w-full gradient-gold text-surface font-semibold py-3.5 rounded-xl text-base disabled:opacity-70 flex items-center justify-center gap-2 shadow-lg ${touched && !isFormValid ? 'opacity-80' : ''}`}
+              className={`w-full gradient-gold text-surface font-semibold py-3.5 rounded-sm text-base disabled:opacity-70 flex items-center justify-center gap-2 ${touched && !isFormValid ? 'opacity-80' : ''}`}
               style={{
                 boxShadow: '0 4px 16px -4px hsl(var(--gold) / 0.35)',
               }}
