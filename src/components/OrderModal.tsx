@@ -70,6 +70,10 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
     const cleanAddress = sanitizeForDisplay(address);
 
     if (!cleanName || !cleanPhone || !cleanAddress) return;
+    if (availableColors.length > 0 && !selectedColor) {
+      toast({ title: 'কালার সিলেক্ট করুন', variant: 'destructive' });
+      return;
+    }
     if (!isValidPhone(cleanPhone)) {
       toast({ title: 'সঠিক মোবাইল নম্বর দিন', variant: 'destructive' });
       return;
