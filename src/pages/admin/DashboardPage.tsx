@@ -1,6 +1,6 @@
 import { useOrders, useProducts } from '@/hooks/useSupabaseData';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
-import { TrendingUp, ShoppingCart, Clock, DollarSign, Package, ArrowUpRight, CalendarIcon } from 'lucide-react';
+import { TrendingUp, ShoppingCart, Clock, DollarSign, Package, ArrowUpRight, CalendarIcon, Box } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useMemo, useState } from 'react';
 import { format, subDays, startOfDay, endOfDay, isWithinInterval } from 'date-fns';
@@ -57,8 +57,10 @@ const DashboardPage = () => {
     const totalRevenue = filteredOrders.reduce((s, o) => s + o.total_price, 0);
     const todayRevenue = todayOrders.reduce((s, o) => s + o.total_price, 0);
     const pending = filteredOrders.filter(o => o.status === 'pending').length;
-    return { total: filteredOrders.length, pending, todayRevenue, totalRevenue, todayOrders: todayOrders.length };
-  }, [filteredOrders]);
+    const totalProducts = products?.length ?? 0;
+    const inStockProducts = products?.filter(p => p.stock_status === 'in_stock').length ?? 0;
+    return { total: filteredOrders.length, pending, todayRevenue, totalRevenue, todayOrders: todayOrders.length, totalProducts, inStockProducts };
+  }, [filteredOrders, products]);
 
   const dayCount = useMemo(() => {
     const diff = Math.ceil((dateRange.to.getTime() - dateRange.from.getTime()) / (1000 * 60 * 60 * 24));
@@ -163,9 +165,9 @@ const DashboardPage = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         {isLoading ? (
-          Array.from({ length: 4 }).map((_, i) => (
+          Array.from({ length: 6 }).map((_, i) => (
             <Skeleton key={i} className="h-[140px] rounded-2xl" />
           ))
         ) : (
@@ -194,9 +196,23 @@ const DashboardPage = () => {
             <StatCard
               icon={Package} label="মোট আয়"
               value={`৳${formatBengaliPrice(stats.totalRevenue)}`}
-              sub={`${toBengaliNum(products?.length ?? 0)} প্রোডাক্ট`}
+              sub={`${toBengaliNum(dayCount)} দিনের`}
               variant="accent"
               sparkData={sparkData.revenue}
+            />
+            <StatCard
+              icon={Box} label="মোট প্রোডাক্ট"
+              value={toBengaliNum(stats.totalProducts)}
+              sub="সকল প্রোডাক্ট"
+              variant="info"
+              sparkData={[]}
+            />
+            <StatCard
+              icon={Package} label="স্টকে আছে"
+              value={toBengaliNum(stats.inStockProducts)}
+              sub={`${toBengaliNum(stats.totalProducts - stats.inStockProducts)} স্টক আউট`}
+              variant="success"
+              sparkData={[]}
             />
           </>
         )}
