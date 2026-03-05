@@ -2,13 +2,26 @@ import { useState, useRef } from 'react';
 import { useSettings, useUpdateSettings } from '@/hooks/useSupabaseData';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
-  Globe, Megaphone, Type, FileText, Save, Loader2, CheckCircle2, MessageCircle, Upload, X, Image,
+  Globe, Megaphone, Type, FileText, Save, Loader2, CheckCircle2, MessageCircle, Upload, X,
 } from 'lucide-react';
 import type { Database } from '@/integrations/supabase/types';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 type SettingsRow = Database['public']['Tables']['site_settings']['Row'];
+
+const toDateTimeLocalValue = (value?: string | null) => {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  const timezoneOffset = date.getTimezoneOffset() * 60_000;
+  return new Date(date.getTime() - timezoneOffset).toISOString().slice(0, 16);
+};
+
+const fromDateTimeLocalValue = (value: string) => {
+  if (!value) return null;
+  return new Date(value).toISOString();
+};
 
 const SiteControlPage = () => {
   const { data: settings, isLoading } = useSettings();
@@ -24,7 +37,7 @@ const SiteControlPage = () => {
   }
 
   const save = () => {
-    updateSettings.mutate(form, {
+    updateSettings.mutate(form as any, {
       onSuccess: () => {
         setSaved(true);
         setTimeout(() => setSaved(false), 2000);
@@ -87,10 +100,23 @@ const SiteControlPage = () => {
         <Section title="অ্যানাউন্সমেন্ট" icon={<Megaphone className="h-4 w-4 text-warning" />}>
           <div className="space-y-4">
             <Field label="টেক্সট" value={form.announcement_text || ''} onChange={v => setForm({ ...form, announcement_text: v })} />
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label="ছাড় %" type="number" value={String(form.discount_percent ?? 30)} onChange={v => setForm({ ...form, discount_percent: Number(v) })} />
-              <Field label="কাউন্টডাউন (ঘণ্টা)" type="number" value={String(form.countdown_hours ?? 2)} onChange={v => setForm({ ...form, countdown_hours: Number(v) })} />
+              <Field label="Fallback কাউন্টডাউন (ঘণ্টা)" type="number" value={String(form.countdown_hours ?? 2)} onChange={v => setForm({ ...form, countdown_hours: Number(v) })} />
+              <DateTimeField
+                label="অফার শুরুর সময়"
+                value={(form as any).offer_start_at}
+                onChange={v => setForm({ ...form, offer_start_at: v } as any)}
+              />
+              <DateTimeField
+                label="অফার শেষ সময়"
+                value={(form as any).offer_end_at}
+                onChange={v => setForm({ ...form, offer_end_at: v } as any)}
+              />
             </div>
+            <p className="text-xs text-muted-foreground">
+              অফার শুরুর/শেষের সময় সেট করলে উপরের টাইমার সেটি অনুযায়ী চলবে।
+            </p>
             <label className="flex items-center gap-2 text-sm cursor-pointer">
               <input type="checkbox" checked={form.timer_enabled ?? true} onChange={e => setForm({ ...form, timer_enabled: e.target.checked })} className="rounded accent-accent" />
               টাইমার চালু
@@ -115,7 +141,7 @@ const SiteControlPage = () => {
           <Field label="ফুটার টেক্সট" value={form.footer_text || ''} onChange={v => setForm({ ...form, footer_text: v })} />
         </Section>
 
-        <Section title="WhatsApp" icon={<MessageCircle className="h-4 w-4 text-[#25D366]" />}>
+        <Section title="WhatsApp" icon={<MessageCircle className="h-4 w-4 text-success" />}>
           <Field
             label="WhatsApp নম্বর (দেশ কোড সহ, যেমন 8801XXXXXXXXX)"
             value={(form as any).whatsapp_number || ''}
@@ -167,12 +193,13 @@ const LogoUpload = ({ currentUrl, onUploaded, onRemove }: { currentUrl: string; 
         <div className="flex items-center gap-3 p-3 bg-muted rounded-xl">
           <img src={currentUrl} alt="Logo" className="h-10 w-auto object-contain rounded" />
           <span className="text-xs text-muted-foreground flex-1 truncate">{currentUrl.split('/').pop()}</span>
-          <button onClick={onRemove} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors">
+          <button type="button" onClick={onRemove} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors">
             <X className="h-4 w-4" />
           </button>
         </div>
       ) : (
         <button
+          type="button"
           onClick={() => fileRef.current?.click()}
           disabled={uploading}
           className="w-full flex items-center justify-center gap-2 p-4 border-2 border-dashed border-border rounded-xl text-sm text-muted-foreground hover:border-accent hover:text-accent transition-colors cursor-pointer"
@@ -185,6 +212,22 @@ const LogoUpload = ({ currentUrl, onUploaded, onRemove }: { currentUrl: string; 
     </div>
   );
 };
+
+const DateTimeField = ({ label, value, onChange }: {
+  label: string;
+  value?: string | null;
+  onChange: (v: string | null) => void;
+}) => (
+  <div>
+    <label className="text-[11px] font-medium text-muted-foreground mb-1.5 block">{label}</label>
+    <input
+      type="datetime-local"
+      value={toDateTimeLocalValue(value)}
+      onChange={(e) => onChange(fromDateTimeLocalValue(e.target.value))}
+      className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all"
+    />
+  </div>
+);
 
 const Section = ({ title, icon, children }: { title: string; icon: React.ReactNode; children: React.ReactNode }) => (
   <div className="p-5 md:p-6 space-y-4">

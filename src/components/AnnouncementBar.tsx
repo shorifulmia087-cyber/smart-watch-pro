@@ -6,35 +6,76 @@ interface AnnouncementBarProps {
   countdownHours?: number;
   announcementText?: string;
   timerEnabled?: boolean;
+  offerStartAt?: string | null;
+  offerEndAt?: string | null;
 }
+
+const toTimeParts = (totalSeconds: number) => {
+  if (totalSeconds <= 0) return { h: 0, m: 0, s: 0 };
+  return {
+    h: Math.floor(totalSeconds / 3600),
+    m: Math.floor((totalSeconds % 3600) / 60),
+    s: totalSeconds % 60,
+  };
+};
 
 const AnnouncementBar = ({
   discountPercent = 30,
   countdownHours = 2,
   announcementText,
   timerEnabled = true,
+  offerStartAt,
+  offerEndAt,
 }: AnnouncementBarProps) => {
   const [time, setTime] = useState({ h: countdownHours, m: 0, s: 0 });
+  const [timerLabel, setTimerLabel] = useState('সময় বাকি আছে');
 
   useEffect(() => {
-    setTime({ h: countdownHours, m: 0, s: 0 });
-  }, [countdownHours]);
+    if (!offerStartAt || !offerEndAt) {
+      setTime({ h: countdownHours, m: 0, s: 0 });
+      setTimerLabel('সময় বাকি আছে');
+    }
+  }, [countdownHours, offerStartAt, offerEndAt]);
 
   useEffect(() => {
     if (!timerEnabled) return;
-    const timer = setInterval(() => {
+
+    const start = offerStartAt ? new Date(offerStartAt).getTime() : NaN;
+    const end = offerEndAt ? new Date(offerEndAt).getTime() : NaN;
+    const hasSchedule = Number.isFinite(start) && Number.isFinite(end) && end > start;
+
+    const tick = () => {
+      if (hasSchedule) {
+        const now = Date.now();
+
+        if (now < start) {
+          setTimerLabel('অফার শুরু হতে বাকি');
+          setTime(toTimeParts(Math.floor((start - now) / 1000)));
+          return;
+        }
+
+        if (now <= end) {
+          setTimerLabel('সময় বাকি আছে');
+          setTime(toTimeParts(Math.floor((end - now) / 1000)));
+          return;
+        }
+
+        setTimerLabel('অফার শেষ');
+        setTime({ h: 0, m: 0, s: 0 });
+        return;
+      }
+
+      setTimerLabel('সময় বাকি আছে');
       setTime((prev) => {
         const totalSeconds = prev.h * 3600 + prev.m * 60 + prev.s - 1;
-        if (totalSeconds <= 0) return { h: 0, m: 0, s: 0 };
-        return {
-          h: Math.floor(totalSeconds / 3600),
-          m: Math.floor((totalSeconds % 3600) / 60),
-          s: totalSeconds % 60,
-        };
+        return toTimeParts(totalSeconds);
       });
-    }, 1000);
+    };
+
+    tick();
+    const timer = setInterval(tick, 1000);
     return () => clearInterval(timer);
-  }, [timerEnabled]);
+  }, [timerEnabled, offerStartAt, offerEndAt]);
 
   const pad = (n: number) => toBengaliNum(String(n).padStart(2, '0'));
 
@@ -50,7 +91,7 @@ const AnnouncementBar = ({
             <span className="text-gold/90 tabular-nums font-bold tracking-wide text-lg md:text-xl">
               {pad(time.h)}:{pad(time.m)}:{pad(time.s)}
             </span>
-            <span className="hidden sm:inline text-gold/70 font-medium">সময় বাকি আছে</span>
+            <span className="hidden sm:inline text-gold/70 font-medium">{timerLabel}</span>
           </>
         )}
       </div>
