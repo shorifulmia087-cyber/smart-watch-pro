@@ -8,6 +8,7 @@ import AnalyticsPage from './admin/AnalyticsPage';
 import SiteControlPage from './admin/SiteControlPage';
 import ReviewsPage from './admin/ReviewsPage';
 import PaymentSettingsPage from './admin/PaymentSettingsPage';
+import ProfileSettingsPage from './admin/ProfileSettingsPage';
 import { Loader2 } from 'lucide-react';
 import { Routes, Route } from 'react-router-dom';
 
@@ -45,6 +46,7 @@ const Admin = () => {
         <Route path="payment" element={<PaymentSettingsPage />} />
         <Route path="analytics" element={<AnalyticsPage />} />
         <Route path="settings" element={<SiteControlPage />} />
+        <Route path="profile" element={<ProfileSettingsPage />} />
       </Route>
     </Routes>
   );
