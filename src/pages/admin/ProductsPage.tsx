@@ -503,53 +503,34 @@ const ProductsPage = () => {
   );
 };
 
-/* ─── Reusable Section Card ──────────────────────────────────── */
-const SectionCard = ({ icon, title, color, badge, children }: {
-  icon: React.ReactNode; title: string; color: string; badge?: string; children: React.ReactNode;
-}) => {
-  const colorMap: Record<string, string> = {
-    accent: 'bg-accent/15 text-accent border-accent/20',
-    pink: 'bg-pink-500/15 text-pink-500 border-pink-500/20',
-    warning: 'bg-warning/15 text-warning border-warning/20',
-    info: 'bg-info/15 text-info border-info/20',
-    success: 'bg-success/15 text-success border-success/20',
-  };
-  const dotColor: Record<string, string> = {
-    accent: 'from-accent to-accent/60',
-    pink: 'from-pink-500 to-pink-400',
-    warning: 'from-warning to-yellow-400',
-    info: 'from-info to-blue-400',
-    success: 'from-success to-emerald-400',
-  };
+/* ─── Bento Card ──────────────────────────────────── */
+const BentoCard = ({ title, icon, badge, children }: {
+  title: string; icon: React.ReactNode; badge?: string; children: React.ReactNode;
+}) => (
+  <motion.div
+    initial={{ opacity: 0, y: 8 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.3 }}
+    className="rounded-xl bg-white dark:bg-card border border-slate-100 dark:border-border/30 shadow-sm hover:shadow-md transition-shadow overflow-hidden"
+  >
+    <div className="px-5 py-3.5 border-b border-slate-100 dark:border-border/20 flex items-center gap-2.5">
+      <span className="text-slate-400 dark:text-muted-foreground">{icon}</span>
+      <h3 className="text-xs font-semibold text-slate-900 dark:text-foreground uppercase tracking-wider">{title}</h3>
+      {badge && <span className="text-[10px] text-slate-400 dark:text-muted-foreground/60 ml-auto bg-slate-50 dark:bg-muted/30 px-2 py-0.5 rounded-full border border-slate-100 dark:border-border/20">{badge}</span>}
+    </div>
+    <div className="p-5 space-y-4">{children}</div>
+  </motion.div>
+);
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="rounded-2xl border border-border/40 bg-card overflow-hidden shadow-sm hover:shadow-md transition-shadow"
-    >
-      <div className="px-5 py-3.5 border-b border-border/20 bg-muted/30 flex items-center gap-3">
-        <div className={`w-7 h-7 rounded-lg ${colorMap[color] || colorMap.accent} flex items-center justify-center border`}>
-          {icon}
-        </div>
-        <h3 className="text-xs font-bold text-foreground/80 uppercase tracking-wider">{title}</h3>
-        {badge && <span className="text-[10px] font-normal text-muted-foreground/60 ml-auto bg-muted/50 px-2 py-0.5 rounded-full">{badge}</span>}
-      </div>
-      <div className="p-5 space-y-4">{children}</div>
-    </motion.div>
-  );
-};
-
-/* ─── Reusable Premium Field ──────────────────────────────────── */
-const PremiumField = ({ label, value, onChange, type = 'text' }: {
-  label: string; value: string; onChange: (v: string) => void; type?: string;
+/* ─── Bento Field ──────────────────────────────────── */
+const BentoField = ({ label, value, onChange, type = 'text', placeholder }: {
+  label: string; value: string; onChange: (v: string) => void; type?: string; placeholder?: string;
 }) => (
   <div>
-    <label className="text-[11px] font-semibold text-muted-foreground mb-1.5 block uppercase tracking-wider">{label}</label>
+    <label className="text-[11px] font-medium text-slate-500 dark:text-muted-foreground mb-1.5 block">{label}</label>
     <input
-      type={type} value={value} onChange={e => onChange(e.target.value)}
-      className="w-full bg-background border border-border/60 rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all hover:border-border placeholder:text-muted-foreground"
+      type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
+      className="w-full bg-transparent border border-slate-200 dark:border-border/60 rounded-lg px-3 py-2.5 text-sm text-slate-900 dark:text-foreground focus:outline-none focus:ring-2 focus:ring-slate-900/10 dark:focus:ring-accent/20 focus:border-slate-400 dark:focus:border-accent/40 transition-all placeholder:text-slate-400 dark:placeholder:text-muted-foreground"
     />
   </div>
 );
