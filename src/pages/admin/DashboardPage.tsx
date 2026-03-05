@@ -118,10 +118,10 @@ const DashboardPage = () => {
   return (
     <div className="space-y-6 max-w-[1400px]">
       {/* Date Filter */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-lg font-semibold text-foreground">ড্যাশবোর্ড</h2>
-          <p className="text-[11px] text-muted-foreground">
+          <p className="text-[11px] text-muted-foreground mt-0.5">
             {format(dateRange.from, 'd MMM', { locale: bn })} — {format(dateRange.to, 'd MMM, yyyy', { locale: bn })}
           </p>
         </div>
@@ -141,12 +141,51 @@ const DashboardPage = () => {
           </div>
           <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
             <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="h-8 gap-1.5 rounded-xl text-xs">
+              <Button
+                variant={activePreset === -1 ? "default" : "outline"}
+                size="sm"
+                className={cn(
+                  "h-9 gap-2 rounded-xl text-xs font-semibold transition-all duration-200",
+                  activePreset === -1
+                    ? "bg-foreground text-background shadow-md hover:bg-foreground/90"
+                    : "border-dashed hover:border-solid hover:bg-muted/60"
+                )}
+              >
                 <CalendarIcon className="h-3.5 w-3.5" />
-                কাস্টম
+                {activePreset === -1 ? (
+                  <span>
+                    {format(dateRange.from, 'd MMM', { locale: bn })} - {format(dateRange.to, 'd MMM', { locale: bn })}
+                  </span>
+                ) : (
+                  'কাস্টম'
+                )}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="end">
+            <PopoverContent className="w-auto p-0 rounded-2xl border border-border/60 shadow-xl" align="end" sideOffset={8}>
+              <div className="p-4 pb-2 border-b border-border/40">
+                <h4 className="text-sm font-semibold text-foreground">তারিখ নির্বাচন করুন</h4>
+                <p className="text-[11px] text-muted-foreground mt-0.5">শুরু ও শেষ তারিখ সিলেক্ট করুন</p>
+              </div>
+              <div className="flex gap-2 p-3 pb-1 flex-wrap">
+                {[
+                  { label: 'গত ৭ দিন', days: 7 },
+                  { label: 'গত ১৫ দিন', days: 15 },
+                  { label: 'গত ৩০ দিন', days: 30 },
+                  { label: 'গত ৬০ দিন', days: 60 },
+                ].map((q) => (
+                  <button
+                    key={q.days}
+                    onClick={() => {
+                      setDateRange({ from: subDays(new Date(), q.days), to: new Date() });
+                      setActivePreset(-1);
+                      setCalendarOpen(false);
+                    }}
+                    className="px-3 py-1.5 text-[11px] font-medium rounded-lg border border-border/50 text-muted-foreground hover:bg-muted hover:text-foreground transition-all duration-150"
+                  >
+                    {q.label}
+                  </button>
+                ))}
+              </div>
               <Calendar
                 mode="range"
                 selected={{ from: dateRange.from, to: dateRange.to }}
@@ -157,11 +196,18 @@ const DashboardPage = () => {
                     if (range.to) setCalendarOpen(false);
                   }
                 }}
-                numberOfMonths={1}
+                numberOfMonths={2}
                 disabled={(date) => date > new Date()}
                 initialFocus
                 className={cn("p-3 pointer-events-auto")}
               />
+              {activePreset === -1 && (
+                <div className="px-4 py-2.5 border-t border-border/40 bg-muted/30 rounded-b-2xl">
+                  <p className="text-[11px] text-muted-foreground text-center">
+                    📅 {format(dateRange.from, 'd MMMM yyyy', { locale: bn })} — {format(dateRange.to, 'd MMMM yyyy', { locale: bn })}
+                  </p>
+                </div>
+              )}
             </PopoverContent>
           </Popover>
         </div>
