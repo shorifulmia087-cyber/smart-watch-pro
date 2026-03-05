@@ -54,7 +54,7 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
               initial={{ opacity: 0, scale: 1.05 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.98 }}
-              transition={{ duration: 0.7, ease: [0.77, 0, 0.18, 1] }}
+              transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
             />
           </AnimatePresence>
 
