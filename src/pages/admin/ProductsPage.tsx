@@ -625,10 +625,10 @@ const PremiumField = ({ label, value, onChange, type = 'text' }: {
   label: string; value: string; onChange: (v: string) => void; type?: string;
 }) => (
   <div>
-    <label className="text-[11px] font-semibold text-muted-foreground/80 mb-1.5 block uppercase tracking-wider">{label}</label>
+    <label className="text-[11px] font-semibold text-muted-foreground mb-1.5 block uppercase tracking-wider">{label}</label>
     <input
       type={type} value={value} onChange={e => onChange(e.target.value)}
-      className="w-full bg-muted/50 border border-border/50 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all hover:border-border"
+      className="w-full bg-background border border-border/60 rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all hover:border-border placeholder:text-muted-foreground"
     />
   </div>
 );
