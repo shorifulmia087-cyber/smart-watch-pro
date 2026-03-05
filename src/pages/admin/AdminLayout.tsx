@@ -5,10 +5,12 @@ import AdminTopbar from './AdminTopbar';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
 import { AdminThemeProvider, useAdminTheme } from '@/hooks/useAdminTheme';
+import { useAutoLogout } from '@/hooks/useAutoLogout';
 
 const AdminLayoutInner = () => {
   const location = useLocation();
   const { theme } = useAdminTheme();
+  useAutoLogout();
 
   return (
     <div className={theme === 'dark' ? 'dark' : ''}>
