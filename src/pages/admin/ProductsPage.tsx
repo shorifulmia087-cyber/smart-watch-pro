@@ -251,13 +251,13 @@ const ProductsPage = () => {
                     <TableCell className="py-4 text-right" onClick={e => e.stopPropagation()}>
                       <div className="flex items-center justify-end gap-2.5">
                         <button onClick={() => openEdit(p)} className="p-2 rounded-full text-info/70 hover:text-info hover:bg-info/10 transition-all">
-                          <Pencil className="h-6 w-6" />
+                          <Pencil className="h-5 w-5" />
                         </button>
                         <button
                           onClick={() => setDeleteTarget({ id: p.id, name: p.name })}
                           className="p-2 rounded-full text-destructive/60 hover:text-destructive hover:bg-destructive/10 transition-all"
                         >
-                          <Trash2 className="h-6 w-6" />
+                          <Trash2 className="h-5 w-5" />
                         </button>
                       </div>
                     </TableCell>
