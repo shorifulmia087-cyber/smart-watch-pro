@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { useSettings, useUpdateSettings, useReviewImages, useAddReviewImage, useDeleteReviewImage } from '@/hooks/useSupabaseData';
+import { useState, useRef } from 'react';
+import { useSettings, useUpdateSettings, useReviewImages, useUploadReviewImage, useDeleteReviewImage } from '@/hooks/useSupabaseData';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
-  Globe, Megaphone, Type, FileText, CreditCard, Truck, Save, Loader2, CheckCircle2, Image, Plus, Trash2,
+  Globe, Megaphone, Type, FileText, CreditCard, Truck, Save, Loader2, CheckCircle2, Image, Upload, Trash2,
 } from 'lucide-react';
 import type { Database } from '@/integrations/supabase/types';
 
@@ -17,9 +17,9 @@ const SiteControlPage = () => {
 
   // Review images
   const { data: reviewImages } = useReviewImages();
-  const addReviewImage = useAddReviewImage();
+  const uploadReviewImage = useUploadReviewImage();
   const deleteReviewImage = useDeleteReviewImage();
-  const [newImageUrl, setNewImageUrl] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (settings && !initialized) {
     setForm({ ...settings });
@@ -35,11 +35,13 @@ const SiteControlPage = () => {
     });
   };
 
-  const handleAddReviewImage = () => {
-    if (!newImageUrl.trim()) return;
-    addReviewImage.mutate({ image_url: newImageUrl.trim(), sort_order: (reviewImages?.length || 0) }, {
-      onSuccess: () => setNewImageUrl(''),
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    Array.from(files).forEach((file, i) => {
+      uploadReviewImage.mutate({ file, sort_order: (reviewImages?.length || 0) + i });
     });
+    e.target.value = '';
   };
 
   if (isLoading) {
@@ -110,23 +112,28 @@ const SiteControlPage = () => {
 
         <Section title="রিভিউ গ্যালারি" icon={<Image className="h-4 w-4 text-accent" />}>
           <div className="space-y-4">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={newImageUrl}
-                onChange={e => setNewImageUrl(e.target.value)}
-                placeholder="ছবির URL পেস্ট করুন..."
-                className="flex-1 bg-muted border border-border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all"
-              />
-              <button
-                onClick={handleAddReviewImage}
-                disabled={addReviewImage.isPending || !newImageUrl.trim()}
-                className="gradient-gold text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:opacity-90 flex items-center gap-1.5 disabled:opacity-50"
-              >
-                {addReviewImage.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-                যোগ করুন
-              </button>
-            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleFileUpload}
+              className="hidden"
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploadReviewImage.isPending}
+              className="w-full border-2 border-dashed border-border rounded-xl py-6 flex flex-col items-center gap-2 text-muted-foreground hover:border-accent/50 hover:text-accent transition-colors cursor-pointer"
+            >
+              {uploadReviewImage.isPending ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : (
+                <Upload className="h-6 w-6" />
+              )}
+              <span className="text-sm font-medium">
+                {uploadReviewImage.isPending ? 'আপলোড হচ্ছে...' : 'ছবি আপলোড করুন (একাধিক সিলেক্ট করা যাবে)'}
+              </span>
+            </button>
             {reviewImages && reviewImages.length > 0 && (
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
                 {reviewImages.map((img) => (
@@ -143,7 +150,7 @@ const SiteControlPage = () => {
               </div>
             )}
             {(!reviewImages || reviewImages.length === 0) && (
-              <p className="text-sm text-muted-foreground text-center py-4">কোনো রিভিউ ছবি নেই। উপরে URL দিয়ে যোগ করুন।</p>
+              <p className="text-sm text-muted-foreground text-center py-4">কোনো রিভিউ ছবি নেই। উপরে ক্লিক করে আপলোড করুন।</p>
             )}
           </div>
         </Section>

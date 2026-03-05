@@ -162,10 +162,16 @@ export const useReviewImages = () => {
   });
 };
 
-export const useAddReviewImage = () => {
+export const useUploadReviewImage = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ image_url, sort_order }: { image_url: string; sort_order: number }) => {
+    mutationFn: async ({ file, sort_order }: { file: File; sort_order: number }) => {
+      const ext = file.name.split('.').pop();
+      const filePath = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error: uploadError } = await supabase.storage.from('review-images').upload(filePath, file);
+      if (uploadError) throw uploadError;
+      const { data: urlData } = supabase.storage.from('review-images').getPublicUrl(filePath);
+      const image_url = urlData.publicUrl;
       const { error } = await supabase.from('review_images' as any).insert({ image_url, sort_order } as any);
       if (error) throw error;
     },
