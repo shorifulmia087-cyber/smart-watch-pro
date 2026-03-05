@@ -127,6 +127,9 @@ const AnnouncementBar = ({
     { value: pad(time.s), label: 'সেকেন্ড' },
   ];
 
+  // Hide when timer is off or countdown has expired
+  if (!timerEnabled || expired) return null;
+
   return (
     <div className="sticky top-0 z-50 bg-[#0a0a0f] py-2.5 sm:py-3 px-3 sm:px-4 shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
       <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6">
