@@ -387,6 +387,7 @@ const OrdersPage = () => {
                   <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">মোট</TableHead>
                   <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">TrxID</TableHead>
                   <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">ট্র্যাকিং</TableHead>
+                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">ট্র্যাক স্ট্যাটাস</TableHead>
                   <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">এলাকা</TableHead>
                   <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">তারিখ</TableHead>
                   <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">স্ট্যাটাস</TableHead>
