@@ -9,6 +9,8 @@ import OrderModal from '@/components/OrderModal';
 import FloatingNotification from '@/components/FloatingNotification';
 import CollectionGrid from '@/components/CollectionGrid';
 import LoadingOverlay from '@/components/LoadingOverlay';
+import StickyOrderForm from '@/components/StickyOrderForm';
+import WhatsAppButton from '@/components/WhatsAppButton';
 import { formatBengaliPrice } from '@/lib/bengali';
 import { useSettings, useFeaturedProduct, useProducts } from '@/hooks/useSupabaseData';
 import { motion } from 'framer-motion';
@@ -109,6 +111,7 @@ const Index = () => {
         />
       </motion.div>
 
+      <StickyOrderForm />
       <ReviewGallery />
       <DeliveryChecker />
       <CollectionGrid
@@ -162,6 +165,7 @@ const Index = () => {
         onlinePaymentEnabled={settings?.online_payment_enabled}
       />
       <FloatingNotification />
+      <WhatsAppButton />
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import { useOrders, useProducts } from '@/hooks/useSupabaseData';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
-import { TrendingUp, ShoppingCart, Clock, DollarSign, Package, ArrowUpRight, CalendarIcon, Box, Truck, CheckCircle2, XCircle, AlertTriangle } from 'lucide-react';
+import { TrendingUp, ShoppingCart, Clock, DollarSign, Package, ArrowUpRight, CalendarIcon, Box, Truck, CheckCircle2, XCircle, AlertTriangle, RotateCcw, Calculator } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useMemo, useState } from 'react';
 import { format, subDays, startOfDay, endOfDay, isWithinInterval } from 'date-fns';
@@ -60,18 +60,29 @@ const DashboardPage = () => {
     const shipped = filteredOrders.filter(o => o.status === 'shipped').length;
     const completed = filteredOrders.filter(o => o.status === 'completed').length;
     const cancelled = filteredOrders.filter(o => o.status === 'cancelled').length;
+    const returned = filteredOrders.filter(o => o.status === 'returned').length;
     const totalProducts = products?.length ?? 0;
     const inStockProducts = products?.filter(p => p.stock_status === 'in_stock').length ?? 0;
-    // Gross Profit: sum(total_price) - sum(sourcing_cost * quantity) from completed orders
     const totalSourcingCost = filteredOrders
-      .filter(o => o.status !== 'cancelled')
+      .filter(o => o.status !== 'cancelled' && o.status !== 'returned')
       .reduce((s, o) => {
         const product = products?.find(p => p.name === o.watch_model);
         const cost = (product as any)?.sourcing_cost || 0;
         return s + (cost * o.quantity);
       }, 0);
     const grossProfit = totalRevenue - totalSourcingCost;
-    return { total: filteredOrders.length, pending, shipped, completed, cancelled, todayRevenue, totalRevenue, todayOrders: todayOrders.length, totalProducts, inStockProducts, grossProfit };
+    const returnRate = filteredOrders.length > 0 ? Math.round((returned / filteredOrders.length) * 100) : 0;
+    // Daily profit: today's revenue - today's sourcing - estimated delivery & return cost
+    const todaySourcing = todayOrders
+      .filter(o => o.status !== 'cancelled' && o.status !== 'returned')
+      .reduce((s, o) => {
+        const product = products?.find(p => p.name === o.watch_model);
+        const cost = (product as any)?.sourcing_cost || 0;
+        return s + (cost * o.quantity);
+      }, 0);
+    const todayDeliveryCost = todayOrders.reduce((s, o) => s + o.delivery_charge, 0);
+    const estimatedDailyProfit = todayRevenue - todaySourcing - todayDeliveryCost;
+    return { total: filteredOrders.length, pending, shipped, completed, cancelled, returned, returnRate, todayRevenue, totalRevenue, todayOrders: todayOrders.length, totalProducts, inStockProducts, grossProfit, estimatedDailyProfit };
   }, [filteredOrders, products]);
 
   const dayCount = useMemo(() => {
@@ -261,6 +272,13 @@ const DashboardPage = () => {
               sparkData={[]}
             />
             <StatCard
+              icon={RotateCcw} label="রিটার্ন"
+              value={toBengaliNum(stats.returned)}
+              sub={`${toBengaliNum(stats.returnRate)}% রেট`}
+              variant="warning"
+              sparkData={[]}
+            />
+            <StatCard
               icon={DollarSign} label="আজকের আয়"
               value={`৳${formatBengaliPrice(stats.todayRevenue)}`}
               sub="আজকের মোট"
@@ -296,6 +314,38 @@ const DashboardPage = () => {
               sparkData={[]}
             />
           </>
+        )}
+      </div>
+
+      {/* Daily Profit Summary */}
+      <div className="glass-card rounded-2xl p-5 md:p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Calculator className="h-5 w-5 text-accent" />
+          <h3 className="font-semibold text-sm text-foreground">আজকের আনুমানিক প্রফিট</h3>
+        </div>
+        {isLoading ? (
+          <Skeleton className="h-20 rounded-xl" />
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="text-center p-3 bg-success/5 rounded-xl border border-success/10">
+              <p className="text-[11px] text-muted-foreground">আজকের আয়</p>
+              <p className="text-lg font-bold font-inter text-success">৳{formatBengaliPrice(stats.todayRevenue)}</p>
+            </div>
+            <div className="text-center p-3 bg-destructive/5 rounded-xl border border-destructive/10">
+              <p className="text-[11px] text-muted-foreground">সোর্সিং + ডেলিভারি</p>
+              <p className="text-lg font-bold font-inter text-destructive">−৳{formatBengaliPrice(stats.todayRevenue - stats.estimatedDailyProfit)}</p>
+            </div>
+            <div className="text-center p-3 bg-warning/5 rounded-xl border border-warning/10">
+              <p className="text-[11px] text-muted-foreground">রিটার্ন রেট</p>
+              <p className="text-lg font-bold font-inter text-warning">{toBengaliNum(stats.returnRate)}%</p>
+            </div>
+            <div className="text-center p-3 bg-accent/5 rounded-xl border border-accent/10">
+              <p className="text-[11px] text-muted-foreground">আনুমানিক প্রফিট</p>
+              <p className={`text-lg font-bold font-inter ${stats.estimatedDailyProfit >= 0 ? 'text-accent' : 'text-destructive'}`}>
+                ৳{formatBengaliPrice(Math.abs(stats.estimatedDailyProfit))}
+              </p>
+            </div>
+          </div>
         )}
       </div>
 
@@ -362,7 +412,7 @@ const DashboardPage = () => {
                   dataKey="status" type="category"
                   tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" width={80}
                   axisLine={false} tickLine={false}
-                  tickFormatter={(v) => ({ pending: 'পেন্ডিং', processing: 'প্রসেসিং', shipped: 'শিপড', completed: 'সম্পন্ন' }[v] || v)}
+                  tickFormatter={(v) => ({ pending: 'পেন্ডিং', processing: 'প্রসেসিং', shipped: 'শিপড', completed: 'সম্পন্ন', cancelled: 'ক্যানসেল', returned: 'রিটার্ন' }[v] || v)}
                 />
                 <Tooltip
                   contentStyle={{
@@ -459,9 +509,10 @@ const StatusBadge = ({ status }: { status: string }) => {
     shipped: 'bg-accent/10 text-accent border-accent/20',
     completed: 'bg-success/10 text-success border-success/20',
     cancelled: 'bg-destructive/10 text-destructive border-destructive/20',
+    returned: 'bg-orange-500/10 text-orange-600 border-orange-500/20',
   };
   const labels: Record<string, string> = {
-    pending: 'পেন্ডিং', processing: 'প্রসেসিং', shipped: 'শিপড', completed: 'সম্পন্ন', cancelled: 'ক্যানসেল',
+    pending: 'পেন্ডিং', processing: 'প্রসেসিং', shipped: 'শিপড', completed: 'সম্পন্ন', cancelled: 'ক্যানসেল', returned: 'রিটার্ন',
   };
   return (
     <span className={`text-[10px] font-medium px-2.5 py-1 rounded-full border ${styles[status] || 'bg-muted text-muted-foreground'}`}>

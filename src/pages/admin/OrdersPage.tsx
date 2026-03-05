@@ -12,7 +12,7 @@ import type { Database } from '@/integrations/supabase/types';
 type OrderStatus = Database['public']['Enums']['order_status'];
 
 const statusLabels: Record<OrderStatus, string> = {
-  pending: 'পেন্ডিং', processing: 'প্রসেসিং', shipped: 'শিপড', completed: 'সম্পন্ন', cancelled: 'ক্যানসেল',
+  pending: 'পেন্ডিং', processing: 'প্রসেসিং', shipped: 'শিপড', completed: 'সম্পন্ন', cancelled: 'ক্যানসেল', returned: 'রিটার্ন',
 };
 
 const statusStyles: Record<OrderStatus, string> = {
@@ -21,6 +21,7 @@ const statusStyles: Record<OrderStatus, string> = {
   shipped: 'bg-accent/10 text-accent border-accent/20',
   completed: 'bg-success/10 text-success border-success/20',
   cancelled: 'bg-destructive/10 text-destructive border-destructive/20',
+  returned: 'bg-orange-500/10 text-orange-600 border-orange-500/20',
 };
 
 const OrdersPage = () => {
@@ -111,7 +112,7 @@ ${order.trx_id ? `TrxID: ${order.trx_id}` : 'ক্যাশ অন ডেলি
       {/* Filters */}
       <div className="flex items-center gap-2 flex-wrap">
         <Filter className="h-4 w-4 text-muted-foreground" />
-        {[undefined, 'pending', 'processing', 'shipped', 'completed'].map((s) => (
+        {[undefined, 'pending', 'processing', 'shipped', 'completed', 'returned'].map((s) => (
           <button
             key={s ?? 'all'}
             onClick={() => { setFilter(s as OrderStatus | undefined); setPage(0); }}

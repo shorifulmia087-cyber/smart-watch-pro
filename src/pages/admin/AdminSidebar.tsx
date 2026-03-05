@@ -4,6 +4,7 @@ import { useSettings } from '@/hooks/useSupabaseData';
 import {
   LayoutDashboard, ShoppingCart, Package, BarChart3, Settings2,
   LogOut, ChevronRight, X, Star, CreditCard, UserCog, Users, Truck, Activity,
+  MessageSquare, UsersRound,
 } from 'lucide-react';
 import {
   Sidebar, SidebarContent, SidebarFooter, SidebarGroup,
@@ -18,8 +19,10 @@ const navItems = [
   { title: 'প্রোডাক্ট', url: '/admin/products', icon: Package },
   { title: 'কাস্টমার', url: '/admin/customers', icon: Users },
   { title: 'রিভিউ', url: '/admin/reviews', icon: Star },
+  { title: 'টিম', url: '/admin/team', icon: UsersRound },
   { title: 'পেমেন্ট', url: '/admin/payment', icon: CreditCard },
   { title: 'কুরিয়ার', url: '/admin/courier', icon: Truck },
+  { title: 'SMS', url: '/admin/sms', icon: MessageSquare },
   { title: 'অ্যানালিটিক্স', url: '/admin/analytics', icon: BarChart3 },
   { title: 'FB Pixel', url: '/admin/pixel', icon: Activity },
   { title: 'সাইট কন্ট্রোল', url: '/admin/settings', icon: Settings2 },
