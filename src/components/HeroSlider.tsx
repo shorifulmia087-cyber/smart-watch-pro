@@ -22,7 +22,7 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
 
   return (
     <section className="bg-surface">
-      <div className="text-center pt-16 pb-8 px-4">
+      <div className="text-center pt-10 pb-6 px-4">
         <motion.p
           key={subtitle}
           initial={{ opacity: 0, y: 20 }}
@@ -89,7 +89,7 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pb-16 px-4">
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pb-10 px-4">
         <div className="relative w-full sm:w-auto">
             <motion.button
               onClick={onOrderClick}

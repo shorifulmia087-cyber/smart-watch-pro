@@ -10,7 +10,7 @@ const FeatureList = ({ features, sectionTitle = 'কেন Kronos বেছে �
   const items = features || [];
 
   return (
-    <section className="bg-ash py-20 px-4">
+    <section className="bg-ash py-12 px-4">
       <div className="max-w-2xl mx-auto">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}

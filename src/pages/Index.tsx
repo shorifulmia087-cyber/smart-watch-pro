@@ -117,7 +117,7 @@ const Index = () => {
         sectionTitle={settings?.collection_section_title}
       />
 
-      <section className="bg-ink py-16 px-4">
+      <section className="bg-ink py-12 px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

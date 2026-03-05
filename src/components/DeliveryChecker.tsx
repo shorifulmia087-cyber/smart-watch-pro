@@ -13,7 +13,7 @@ const DeliveryChecker = () => {
   };
 
   return (
-    <section className="bg-ash py-20 px-4">
+    <section className="bg-ash py-12 px-4">
       <div className="max-w-xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
