@@ -404,13 +404,13 @@ const ProductsPage = () => {
             <SectionCard icon={<Globe className="w-4 h-4" />} title="SEO সেটিংস" color="warning">
               <PremiumField label="Meta Title" value={form.meta_title} onChange={v => setForm({ ...form, meta_title: v })} />
               <div>
-                <label className="text-[11px] font-semibold text-muted-foreground/80 mb-1.5 block uppercase tracking-wider">Meta Description</label>
+                <label className="text-[11px] font-semibold text-muted-foreground mb-1.5 block uppercase tracking-wider">Meta Description</label>
                 <textarea
                   value={form.meta_description}
                   onChange={e => setForm({ ...form, meta_description: e.target.value })}
                   rows={2}
                   placeholder="সার্চ ইঞ্জিনে দেখানো বিবরণ..."
-                  className="w-full bg-muted/50 border border-border/50 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all resize-none hover:border-border"
+                  className="w-full bg-background border border-border/60 rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all resize-none hover:border-border placeholder:text-muted-foreground"
                 />
               </div>
             </SectionCard>
