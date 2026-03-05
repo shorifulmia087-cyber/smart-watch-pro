@@ -79,60 +79,20 @@ const AnnouncementBar = ({
 
   const pad = (n: number) => toBengaliNum(String(n).padStart(2, '0'));
 
-  const isExpired = time.h === 0 && time.m === 0 && time.s === 0 && timerLabel === 'অফার শেষ';
-
   return (
-    <div className="sticky top-0 z-50 bg-gradient-to-r from-ink via-ink/95 to-ink text-accent-foreground py-3.5 px-4 leading-relaxed overflow-hidden">
-      {/* Animated background shimmer */}
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gold/5 to-transparent animate-[shimmer_3s_ease-in-out_infinite]" />
-      
-      <div className="relative max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-5">
-        {/* Discount text with glow */}
-        <span className="text-gold font-bold text-lg md:text-xl drop-shadow-[0_0_12px_hsl(var(--gold)/0.5)] animate-pulse">
+    <div className="sticky top-0 z-50 bg-ink text-accent-foreground py-4 px-4 leading-relaxed">
+      <div className="max-w-6xl mx-auto flex items-center justify-center gap-4 text-base md:text-lg">
+        <span className="text-gold font-bold text-lg md:text-xl">
           {announcementText || `🔥 ${toBengaliNum(discountPercent)}% ছাড়`}
         </span>
-
         {timerEnabled && (
-          <div className="flex items-center gap-2 sm:gap-3">
-            <span className="hidden sm:inline text-gold/40 text-xl">|</span>
-            
-            {/* Timer digits */}
-            <div className="flex items-center gap-1.5">
-              {[
-                { value: pad(time.h), label: 'ঘণ্টা' },
-                { value: pad(time.m), label: 'মিনিট' },
-                { value: pad(time.s), label: 'সেকেন্ড' },
-              ].map((unit, i) => (
-                <div key={i} className="flex items-center gap-1.5">
-                  {i > 0 && (
-                    <span className="text-gold/60 font-bold text-lg animate-pulse">:</span>
-                  )}
-                  <div className="flex flex-col items-center">
-                    <span className={`
-                      tabular-nums font-extrabold text-lg md:text-xl px-2.5 py-1 rounded-lg
-                      bg-gold/15 border border-gold/25 text-gold
-                      drop-shadow-[0_0_8px_hsl(var(--gold)/0.4)]
-                      ${isExpired ? 'opacity-50' : ''}
-                    `}>
-                      {unit.value}
-                    </span>
-                    <span className="text-gold/50 text-[10px] font-medium mt-0.5">{unit.label}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Timer label badge */}
-            <span className={`
-              text-xs sm:text-sm font-semibold px-3 py-1 rounded-full ml-1
-              ${isExpired 
-                ? 'bg-destructive/20 text-destructive border border-destructive/30' 
-                : 'bg-gold/15 text-gold border border-gold/25 drop-shadow-[0_0_6px_hsl(var(--gold)/0.3)]'
-              }
-            `}>
-              {timerLabel}
+          <>
+            <span className="text-gold/60 text-xl">|</span>
+            <span className="text-gold/90 tabular-nums font-bold tracking-wide text-lg md:text-xl">
+              {pad(time.h)}:{pad(time.m)}:{pad(time.s)}
             </span>
-          </div>
+            <span className="text-gold/70 font-medium">{timerLabel}</span>
+          </>
         )}
       </div>
     </div>
