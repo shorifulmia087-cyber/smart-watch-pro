@@ -248,7 +248,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
           exit={{ y: 100, opacity: 0 }}
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           onClick={(e) => e.stopPropagation()}
-          className="bg-surface w-full md:max-w-md md:rounded-2xl rounded-t-2xl max-h-[90vh] overflow-y-auto relative"
+          className="bg-surface w-full md:max-w-md md:rounded-sm rounded-t-sm max-h-[90vh] overflow-y-auto relative border border-border/30"
           style={{
             boxShadow: '0 -8px 40px -8px hsl(var(--ink) / 0.15), 0 0 0 1px hsl(var(--border) / 0.4)',
           }}
