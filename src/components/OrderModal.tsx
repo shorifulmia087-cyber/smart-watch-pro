@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Minus, Plus, Loader2, Check, Copy } from 'lucide-react';
+import { X, Minus, Plus, Loader2, Check, Copy, AlertCircle } from 'lucide-react';
 import { toBengaliNum, formatBengaliPrice } from '@/lib/bengali';
 import { useCreateOrder } from '@/hooks/useSupabaseData';
 import { useRateLimit } from '@/hooks/useRateLimit';
@@ -22,6 +22,14 @@ interface OrderModalProps {
   availableColors?: string[];
 }
 
+interface FormErrors {
+  name?: string;
+  phone?: string;
+  address?: string;
+  color?: string;
+  txnId?: string;
+}
+
 const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInside = 70, deliveryChargeOutside = 150, onlinePaymentEnabled = true, bkashNumber = '', nagadNumber = '', rocketNumber = '', availableColors = [] }: OrderModalProps) => {
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState<'cod' | 'online'>('cod');
@@ -35,7 +43,9 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
   const [success, setSuccess] = useState(false);
   const [location, setLocation] = useState<'dhaka' | 'outside'>('dhaka');
   const [selectedColor, setSelectedColor] = useState('');
-  // Honeypot fields - hidden from real users, bots will fill them
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [touched, setTouched] = useState(false);
+  // Honeypot fields
   const [honeypot, setHoneypot] = useState('');
   const [honeypot2, setHoneypot2] = useState('');
   const createOrder = useCreateOrder();
@@ -44,7 +54,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
 
   useEffect(() => {
     if (!isOpen) {
-      setQty(1); setTab('cod'); setName(''); setEmail(''); setPhone(''); setAddress(''); setTxnId(''); setLoading(false); setSuccess(false); setLocation('dhaka'); setHoneypot(''); setHoneypot2(''); setSelectedColor('');
+      setQty(1); setTab('cod'); setName(''); setEmail(''); setPhone(''); setAddress(''); setTxnId(''); setLoading(false); setSuccess(false); setLocation('dhaka'); setHoneypot(''); setHoneypot2(''); setSelectedColor(''); setErrors({}); setTouched(false);
     }
   }, [isOpen]);
 
@@ -52,10 +62,56 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
   const subtotal = qty * unitPrice;
   const grandTotal = subtotal + deliveryCharge;
 
+  const validate = useCallback((): FormErrors => {
+    const errs: FormErrors = {};
+    const cleanName = name.trim();
+    const cleanPhone = phone.replace(/[\s-]/g, '');
+    const cleanAddress = address.trim();
+
+    if (!cleanName) errs.name = 'নাম লিখুন';
+    else if (cleanName.length < 3) errs.name = 'নাম কমপক্ষে ৩ অক্ষরের হতে হবে';
+
+    if (!cleanPhone) errs.phone = 'মোবাইল নম্বর দিন';
+    else if (!isValidPhone(cleanPhone)) errs.phone = 'সঠিক ১১ সংখ্যার মোবাইল নম্বর দিন';
+
+    if (!cleanAddress) errs.address = 'ঠিকানা লিখুন';
+    else if (cleanAddress.length < 10) errs.address = 'সম্পূর্ণ ঠিকানা দিন (কমপক্ষে ১০ অক্ষর)';
+
+    if (availableColors.length > 0 && !selectedColor) errs.color = 'একটি কালার সিলেক্ট করুন';
+
+    if (tab === 'online') {
+      const requiredLen = payMethod === 'bkash' ? 10 : payMethod === 'nagad' ? 8 : 10;
+      if (!txnId) errs.txnId = 'ট্রানজেকশন আইডি দিন';
+      else if (txnId.length !== requiredLen) {
+        const label = payMethod === 'bkash' ? '১০' : payMethod === 'nagad' ? '৮' : '১০';
+        errs.txnId = `ট্রানজেকশন আইডি ঠিক ${label} অক্ষরের হতে হবে`;
+      }
+    }
+
+    return errs;
+  }, [name, phone, address, selectedColor, availableColors, tab, payMethod, txnId]);
+
+  // Re-validate on field changes after first submit attempt
+  useEffect(() => {
+    if (touched) {
+      setErrors(validate());
+    }
+  }, [touched, validate]);
+
   const handleSubmit = async () => {
     // Honeypot check
     if (isBot(honeypot) || isBot(honeypot2)) {
-      setSuccess(true); // Silently "accept" to confuse bots
+      setSuccess(true);
+      return;
+    }
+
+    // Mark as touched to show errors
+    setTouched(true);
+    const validationErrors = validate();
+    setErrors(validationErrors);
+
+    if (Object.keys(validationErrors).length > 0) {
+      toast({ title: 'তথ্য পূরণ করুন', description: 'সকল প্রয়োজনীয় ফিল্ড সঠিকভাবে পূরণ করুন।', variant: 'destructive' });
       return;
     }
 
@@ -69,20 +125,6 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
     const cleanPhone = phone.replace(/[\s-]/g, '');
     const cleanAddress = sanitizeForDisplay(address);
 
-    if (!cleanName || !cleanPhone || !cleanAddress) return;
-    if (availableColors.length > 0 && !selectedColor) {
-      toast({ title: 'কালার সিলেক্ট করুন', variant: 'destructive' });
-      return;
-    }
-    if (!isValidPhone(cleanPhone)) {
-      toast({ title: 'সঠিক মোবাইল নম্বর দিন', variant: 'destructive' });
-      return;
-    }
-
-    if (tab === 'online') {
-      const requiredLen = payMethod === 'bkash' ? 10 : payMethod === 'nagad' ? 8 : 10;
-      if (!txnId || txnId.length !== requiredLen) return;
-    }
     setLoading(true);
 
     const orderData = {
@@ -115,6 +157,8 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
       });
     }
   };
+
+  const isFormValid = Object.keys(validate()).length === 0;
 
   if (!isOpen) return null;
 
@@ -177,6 +221,16 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
       </AnimatePresence>
     );
   }
+
+  const ErrorMessage = ({ error }: { error?: string }) => {
+    if (!error || !touched) return null;
+    return (
+      <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="text-xs text-destructive mt-1 flex items-center gap-1">
+        <AlertCircle className="w-3 h-3 flex-shrink-0" />
+        {error}
+      </motion.p>
+    );
+  };
 
   return (
     <AnimatePresence>
@@ -270,12 +324,19 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
 
             {/* Form Fields */}
             <div className="space-y-3">
-              <div className="relative">
-                <input value={name} onChange={(e) => setName(e.target.value)} placeholder="আপনার নাম" className="w-full bg-muted/40 border border-border/60 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/40 transition-all" maxLength={100} />
+              <div>
+                <input value={name} onChange={(e) => setName(e.target.value)} placeholder="আপনার নাম *" className={`w-full bg-muted/40 border rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/40 transition-all ${touched && errors.name ? 'border-destructive/60 bg-destructive/5' : 'border-border/60'}`} maxLength={100} />
+                <ErrorMessage error={errors.name} />
               </div>
               <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ইমেইল (ঐচ্ছিক)" className="w-full bg-muted/40 border border-border/60 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/40 transition-all" maxLength={255} />
-              <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="মোবাইল নম্বর" className="w-full bg-muted/40 border border-border/60 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/40 transition-all" maxLength={15} />
-              <textarea value={address} onChange={(e) => setAddress(e.target.value)} placeholder="সম্পূর্ণ ঠিকানা" rows={2} className="w-full bg-muted/40 border border-border/60 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/40 transition-all resize-none" maxLength={500} />
+              <div>
+                <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="মোবাইল নম্বর *" className={`w-full bg-muted/40 border rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/40 transition-all ${touched && errors.phone ? 'border-destructive/60 bg-destructive/5' : 'border-border/60'}`} maxLength={15} />
+                <ErrorMessage error={errors.phone} />
+              </div>
+              <div>
+                <textarea value={address} onChange={(e) => setAddress(e.target.value)} placeholder="সম্পূর্ণ ঠিকানা *" rows={2} className={`w-full bg-muted/40 border rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/40 transition-all resize-none ${touched && errors.address ? 'border-destructive/60 bg-destructive/5' : 'border-border/60'}`} maxLength={500} />
+                <ErrorMessage error={errors.address} />
+              </div>
               
               {/* Color Selection */}
               {availableColors.length > 0 && (
@@ -297,6 +358,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
                       </button>
                     ))}
                   </div>
+                  <ErrorMessage error={errors.color} />
                 </div>
               )}
               {/* Honeypot fields */}
@@ -370,16 +432,11 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
                           <input
                             value={txnId}
                             onChange={(e) => setTxnId(e.target.value.replace(/[^a-zA-Z0-9]/g, ''))}
-                            placeholder={`ট্রানজেকশন আইডি (${label} অক্ষর)`}
+                            placeholder={`ট্রানজেকশন আইডি (${label} অক্ষর) *`}
                             maxLength={requiredLen}
-                            className="w-full bg-muted/40 border border-border/60 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/40 transition-all font-mono"
+                            className={`w-full bg-muted/40 border rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/40 transition-all font-mono ${touched && errors.txnId ? 'border-destructive/60 bg-destructive/5' : 'border-border/60'}`}
                           />
-                          {txnId && txnId.length !== requiredLen && (
-                            <p className="text-xs text-destructive mt-1.5 flex items-center gap-1">
-                              <span className="w-1 h-1 rounded-full bg-destructive inline-block" />
-                              ট্রানজেকশন আইডি ঠিক {label} অক্ষরের হতে হবে।
-                            </p>
-                          )}
+                          <ErrorMessage error={errors.txnId} />
                         </>
                       );
                     })()}
@@ -394,7 +451,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
               disabled={loading}
               whileHover={{ scale: loading ? 1 : 1.01 }}
               whileTap={{ scale: loading ? 1 : 0.98 }}
-              className="w-full gradient-gold text-surface font-semibold py-3.5 rounded-xl text-base disabled:opacity-70 flex items-center justify-center gap-2 shadow-lg"
+              className={`w-full gradient-gold text-surface font-semibold py-3.5 rounded-xl text-base disabled:opacity-70 flex items-center justify-center gap-2 shadow-lg ${touched && !isFormValid ? 'opacity-80' : ''}`}
               style={{
                 boxShadow: '0 4px 16px -4px hsl(var(--gold) / 0.35)',
               }}
