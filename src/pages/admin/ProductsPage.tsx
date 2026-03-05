@@ -608,7 +608,7 @@ const SectionCard = ({ icon, title, color, badge, children }: {
       transition={{ duration: 0.3 }}
       className="rounded-2xl border border-border/40 bg-white dark:bg-slate-900 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
     >
-      <div className="px-5 py-3.5 border-b border-border/30 bg-muted/20 flex items-center gap-3">
+      <div className="px-5 py-3.5 border-b border-border/30 bg-white dark:bg-slate-900 flex items-center gap-3">
         <div className={`w-7 h-7 rounded-lg ${colorMap[color] || colorMap.accent} flex items-center justify-center border`}>
           {icon}
         </div>
