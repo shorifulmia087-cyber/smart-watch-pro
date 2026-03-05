@@ -336,8 +336,8 @@ const ProductsPage = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="text-[11px] font-semibold text-muted-foreground/80 mb-1.5 block uppercase tracking-wider">স্টক</label>
-                  <select value={form.stock_status} onChange={e => setForm({ ...form, stock_status: e.target.value })} className="w-full bg-muted/50 border border-border/50 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all hover:border-border">
+                  <label className="text-[11px] font-semibold text-muted-foreground mb-1.5 block uppercase tracking-wider">স্টক</label>
+                  <select value={form.stock_status} onChange={e => setForm({ ...form, stock_status: e.target.value })} className="w-full bg-background border border-border/60 rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all hover:border-border">
                     <option value="in_stock">ইন স্টক</option>
                     <option value="out_of_stock">আউট অফ স্টক</option>
                   </select>
