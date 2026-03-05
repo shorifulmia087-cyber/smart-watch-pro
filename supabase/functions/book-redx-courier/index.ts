@@ -100,14 +100,13 @@ serve(async (req) => {
     const redxPayload = {
       customer_name: order.customer_name,
       customer_phone: order.phone,
-      delivery_area: order.delivery_location === "dhaka" ? "Dhaka" : "Outside Dhaka",
-      delivery_area_id: order.delivery_location === "dhaka" ? 1 : 2,
+      delivery_area: order.delivery_location === "dhaka" ? "Dhaka" : order.address,
       customer_address: order.address,
       merchant_invoice_id: order.id.slice(0, 8).toUpperCase(),
-      cash_collection_amount: String(cashCollection),
-      parcel_weight: "500",
+      cash_collection_amount: cashCollection,
+      parcel_weight: 500,
       instruction: `Product: ${order.watch_model}, Qty: ${order.quantity}`,
-      value: String(order.total_price),
+      value: order.total_price,
     };
 
     console.log(`[RedX ${isSandbox ? 'SANDBOX' : 'PRODUCTION'}] Calling: ${baseUrl}/v1.0.0-beta/parcel`);
