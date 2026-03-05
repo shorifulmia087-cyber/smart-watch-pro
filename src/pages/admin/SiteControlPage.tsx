@@ -127,6 +127,65 @@ const SiteControlPage = () => {
   );
 };
 
+const LogoUpload = ({ currentUrl, onUploaded, onRemove }: { currentUrl: string; onUploaded: (url: string) => void; onRemove: () => void }) => {
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      toast.error('শুধুমাত্র ইমেজ ফাইল আপলোড করুন');
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('ফাইল সাইজ ২MB এর বেশি হতে পারবে না');
+      return;
+    }
+
+    setUploading(true);
+    const ext = file.name.split('.').pop();
+    const path = `logo-${Date.now()}.${ext}`;
+
+    const { error } = await supabase.storage.from('brand-assets').upload(path, file, { upsert: true });
+    if (error) {
+      toast.error('আপলোড ব্যর্থ হয়েছে');
+      setUploading(false);
+      return;
+    }
+
+    const { data: urlData } = supabase.storage.from('brand-assets').getPublicUrl(path);
+    onUploaded(urlData.publicUrl);
+    toast.success('লোগো আপলোড সফল!');
+    setUploading(false);
+  };
+
+  return (
+    <div>
+      <label className="text-[11px] font-medium text-muted-foreground mb-1.5 block">ব্র্যান্ড লোগো</label>
+      {currentUrl ? (
+        <div className="flex items-center gap-3 p-3 bg-muted rounded-xl">
+          <img src={currentUrl} alt="Logo" className="h-10 w-auto object-contain rounded" />
+          <span className="text-xs text-muted-foreground flex-1 truncate">{currentUrl.split('/').pop()}</span>
+          <button onClick={onRemove} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      ) : (
+        <button
+          onClick={() => fileRef.current?.click()}
+          disabled={uploading}
+          className="w-full flex items-center justify-center gap-2 p-4 border-2 border-dashed border-border rounded-xl text-sm text-muted-foreground hover:border-accent hover:text-accent transition-colors cursor-pointer"
+        >
+          {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+          {uploading ? 'আপলোড হচ্ছে...' : 'লোগো আপলোড করুন'}
+        </button>
+      )}
+      <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleUpload} />
+    </div>
+  );
+};
+
 const Section = ({ title, icon, children }: { title: string; icon: React.ReactNode; children: React.ReactNode }) => (
   <div className="p-5 md:p-6 space-y-4">
     <h3 className="font-semibold text-sm flex items-center gap-2">{icon} {title}</h3>
