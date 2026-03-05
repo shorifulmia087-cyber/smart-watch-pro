@@ -21,6 +21,7 @@ const statusLabels: Record<OrderStatus, string> = {
   processing: 'প্রসেসিং',
   shipped: 'শিপড',
   completed: 'সম্পন্ন',
+  cancelled: 'ক্যানসেল',
 };
 
 const statusColors: Record<OrderStatus, string> = {
@@ -28,6 +29,7 @@ const statusColors: Record<OrderStatus, string> = {
   processing: 'bg-blue-100 text-blue-800',
   shipped: 'bg-purple-100 text-purple-800',
   completed: 'bg-emerald-100 text-emerald-800',
+  cancelled: 'bg-red-100 text-red-800',
 };
 
 const AdminDashboard = () => {
