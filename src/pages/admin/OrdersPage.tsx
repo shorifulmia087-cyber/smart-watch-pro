@@ -11,7 +11,7 @@ import type { Database } from '@/integrations/supabase/types';
 type OrderStatus = Database['public']['Enums']['order_status'];
 
 const statusLabels: Record<OrderStatus, string> = {
-  pending: 'পেন্ডিং', processing: 'প্রসেসিং', shipped: 'শিপড', completed: 'সম্পন্ন',
+  pending: 'পেন্ডিং', processing: 'প্রসেসিং', shipped: 'শিপড', completed: 'সম্পন্ন', cancelled: 'ক্যানসেল',
 };
 
 const statusStyles: Record<OrderStatus, string> = {
@@ -19,6 +19,7 @@ const statusStyles: Record<OrderStatus, string> = {
   processing: 'bg-info/10 text-info border-info/20',
   shipped: 'bg-accent/10 text-accent border-accent/20',
   completed: 'bg-success/10 text-success border-success/20',
+  cancelled: 'bg-destructive/10 text-destructive border-destructive/20',
 };
 
 const OrdersPage = () => {

@@ -1,6 +1,6 @@
 import { useOrders, useProducts } from '@/hooks/useSupabaseData';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
-import { TrendingUp, ShoppingCart, Clock, DollarSign, Package, ArrowUpRight, CalendarIcon, Box } from 'lucide-react';
+import { TrendingUp, ShoppingCart, Clock, DollarSign, Package, ArrowUpRight, CalendarIcon, Box, Truck, CheckCircle2, XCircle } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useMemo, useState } from 'react';
 import { format, subDays, startOfDay, endOfDay, isWithinInterval } from 'date-fns';
@@ -57,9 +57,12 @@ const DashboardPage = () => {
     const totalRevenue = filteredOrders.reduce((s, o) => s + o.total_price, 0);
     const todayRevenue = todayOrders.reduce((s, o) => s + o.total_price, 0);
     const pending = filteredOrders.filter(o => o.status === 'pending').length;
+    const shipped = filteredOrders.filter(o => o.status === 'shipped').length;
+    const completed = filteredOrders.filter(o => o.status === 'completed').length;
+    const cancelled = filteredOrders.filter(o => o.status === 'cancelled').length;
     const totalProducts = products?.length ?? 0;
     const inStockProducts = products?.filter(p => p.stock_status === 'in_stock').length ?? 0;
-    return { total: filteredOrders.length, pending, todayRevenue, totalRevenue, todayOrders: todayOrders.length, totalProducts, inStockProducts };
+    return { total: filteredOrders.length, pending, shipped, completed, cancelled, todayRevenue, totalRevenue, todayOrders: todayOrders.length, totalProducts, inStockProducts };
   }, [filteredOrders, products]);
 
   const dayCount = useMemo(() => {
@@ -165,10 +168,10 @@ const DashboardPage = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-9 gap-4">
         {isLoading ? (
-          Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-[140px] rounded-2xl" />
+          Array.from({ length: 9 }).map((_, i) => (
+            <Skeleton key={i} className="h-[130px] rounded-2xl" />
           ))
         ) : (
           <>
@@ -182,7 +185,28 @@ const DashboardPage = () => {
             <StatCard
               icon={Clock} label="পেন্ডিং"
               value={toBengaliNum(stats.pending)}
-              sub="অপেক্ষমাণ অর্ডার"
+              sub="অপেক্ষমাণ"
+              variant="warning"
+              sparkData={[]}
+            />
+            <StatCard
+              icon={Truck} label="ডেলিভারিতে"
+              value={toBengaliNum(stats.shipped)}
+              sub="In Transit"
+              variant="accent"
+              sparkData={[]}
+            />
+            <StatCard
+              icon={CheckCircle2} label="সম্পন্ন"
+              value={toBengaliNum(stats.completed)}
+              sub="কমপ্লিট"
+              variant="success"
+              sparkData={[]}
+            />
+            <StatCard
+              icon={XCircle} label="ক্যানসেল"
+              value={toBengaliNum(stats.cancelled)}
+              sub="বাতিল"
               variant="warning"
               sparkData={[]}
             />
@@ -210,7 +234,7 @@ const DashboardPage = () => {
             <StatCard
               icon={Package} label="স্টকে আছে"
               value={toBengaliNum(stats.inStockProducts)}
-              sub={`${toBengaliNum(stats.totalProducts - stats.inStockProducts)} স্টক আউট`}
+              sub={`${toBengaliNum(stats.totalProducts - stats.inStockProducts)} আউট`}
               variant="success"
               sparkData={[]}
             />
@@ -377,9 +401,10 @@ const StatusBadge = ({ status }: { status: string }) => {
     processing: 'bg-info/10 text-info border-info/20',
     shipped: 'bg-accent/10 text-accent border-accent/20',
     completed: 'bg-success/10 text-success border-success/20',
+    cancelled: 'bg-destructive/10 text-destructive border-destructive/20',
   };
   const labels: Record<string, string> = {
-    pending: 'পেন্ডিং', processing: 'প্রসেসিং', shipped: 'শিপড', completed: 'সম্পন্ন',
+    pending: 'পেন্ডিং', processing: 'প্রসেসিং', shipped: 'শিপড', completed: 'সম্পন্ন', cancelled: 'ক্যানসেল',
   };
   return (
     <span className={`text-[10px] font-medium px-2.5 py-1 rounded-full border ${styles[status] || 'bg-muted text-muted-foreground'}`}>
