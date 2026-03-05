@@ -117,7 +117,7 @@ serve(async (req) => {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        "API-ACCESS-TOKEN": `Bearer ${apiKey}`,
+        "API-ACCESS-TOKEN": apiKey.startsWith("Bearer ") ? apiKey : `Bearer ${apiKey}`,
       },
       body: JSON.stringify(redxPayload),
     });
