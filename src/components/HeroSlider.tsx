@@ -104,19 +104,27 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
               এখনই কিনুন — ৳{formatBengaliPrice(price)}
             </motion.button>
         </div>
-        <div className="flex flex-col items-center gap-1 px-6 py-3 rounded-xl bg-muted w-full sm:w-auto">
-          {discountPercent > 0 ? (
-            <>
-              <span className="line-through text-muted-foreground text-sm">মূল্য: ৳{formatBengaliPrice(originalPrice)}</span>
-              <div className="flex items-center gap-2">
-                <span className="text-foreground font-bold text-base">অফার মূল্য: ৳{formatBengaliPrice(price)}</span>
-                <span className="bg-destructive/10 text-destructive text-xs font-semibold px-2 py-0.5 rounded-md">-{discountPercent}%</span>
-              </div>
-            </>
-          ) : (
+        {discountPercent > 0 ? (
+          <motion.div
+            className="relative flex flex-col items-center gap-2 px-8 py-4 rounded-2xl border-2 border-gold/40 bg-gradient-to-br from-gold/10 via-accent/5 to-transparent shadow-lg w-full sm:w-auto overflow-hidden"
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            <div className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs font-bold px-3 py-1 rounded-bl-xl rounded-tr-xl shadow-md">
+              -{discountPercent}% ছাড়
+            </div>
+            <span className="line-through text-muted-foreground text-sm">মূল্য: ৳{formatBengaliPrice(originalPrice)}</span>
+            <span className="text-foreground font-extrabold text-xl tracking-tight">
+              অফার মূল্য: <span className="text-gold">৳{formatBengaliPrice(price)}</span>
+            </span>
+            <span className="text-xs text-muted-foreground font-medium">সীমিত সময়ের জন্য</span>
+          </motion.div>
+        ) : (
+          <div className="flex flex-col items-center gap-1 px-6 py-3 rounded-xl bg-muted w-full sm:w-auto">
             <span className="text-foreground font-bold text-base">মূল্য: ৳{formatBengaliPrice(price)}</span>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </section>
   );
