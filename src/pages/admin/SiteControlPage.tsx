@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useSettings, useUpdateSettings } from '@/hooks/useSupabaseData';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
-  Globe, Megaphone, Type, FileText, Save, Loader2, CheckCircle2,
+  Globe, Megaphone, Type, FileText, Save, Loader2, CheckCircle2, MessageCircle,
 } from 'lucide-react';
 import type { Database } from '@/integrations/supabase/types';
 
@@ -104,6 +104,14 @@ const SiteControlPage = () => {
             <Field label="CTA সাবটাইটেল" value={form.footer_cta_subtitle || ''} onChange={v => setForm({ ...form, footer_cta_subtitle: v })} />
           </div>
           <Field label="ফুটার টেক্সট" value={form.footer_text || ''} onChange={v => setForm({ ...form, footer_text: v })} />
+        </Section>
+
+        <Section title="WhatsApp" icon={<MessageCircle className="h-4 w-4 text-[#25D366]" />}>
+          <Field
+            label="WhatsApp নম্বর (দেশ কোড সহ, যেমন 8801XXXXXXXXX)"
+            value={(form as any).whatsapp_number || ''}
+            onChange={v => setForm({ ...form, whatsapp_number: v } as any)}
+          />
         </Section>
       </div>
     </div>

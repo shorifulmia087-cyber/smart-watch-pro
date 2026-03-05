@@ -41,7 +41,10 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
 
   const handleSubmit = async () => {
     if (!name.trim() || !phone.trim() || !address.trim()) return;
-    if (tab === 'online' && (!txnId || txnId.length < 8 || txnId.length > 15)) return;
+    if (tab === 'online') {
+      const requiredLen = payMethod === 'bkash' ? 10 : payMethod === 'nagad' ? 8 : 10;
+      if (!txnId || txnId.length !== requiredLen) return;
+    }
     setLoading(true);
 
     const orderData = {
@@ -236,16 +239,24 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
                     ))}
                   </div>
                   <div>
-                    <input
-                      value={txnId}
-                      onChange={(e) => setTxnId(e.target.value.replace(/[^a-zA-Z0-9]/g, ''))}
-                      placeholder="ট্রানজেকশন আইডি (৮-১৫ অক্ষর)"
-                      maxLength={15}
-                      className="w-full bg-ash border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 font-mono"
-                    />
-                    {txnId && (txnId.length < 8 || txnId.length > 15) && (
-                      <p className="text-xs text-destructive mt-1">ট্রানজেকশন আইডি ৮-১৫ অক্ষরের হতে হবে।</p>
-                    )}
+                    {(() => {
+                      const requiredLen = payMethod === 'bkash' ? 10 : payMethod === 'nagad' ? 8 : 10;
+                      const label = payMethod === 'bkash' ? '১০' : payMethod === 'nagad' ? '৮' : '১০';
+                      return (
+                        <>
+                          <input
+                            value={txnId}
+                            onChange={(e) => setTxnId(e.target.value.replace(/[^a-zA-Z0-9]/g, ''))}
+                            placeholder={`ট্রানজেকশন আইডি (${label} অক্ষর)`}
+                            maxLength={requiredLen}
+                            className="w-full bg-ash border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 font-mono"
+                          />
+                          {txnId && txnId.length !== requiredLen && (
+                            <p className="text-xs text-destructive mt-1">ট্রানজেকশন আইডি ঠিক {label} অক্ষরের হতে হবে।</p>
+                          )}
+                        </>
+                      );
+                    })()}
                   </div>
                 </motion.div>
               )}

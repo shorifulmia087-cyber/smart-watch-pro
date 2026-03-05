@@ -177,6 +177,7 @@ export type Database = {
           timer_enabled: boolean
           updated_at: string
           video_section_title: string
+          whatsapp_number: string
         }
         Insert: {
           announcement_text?: string
@@ -202,6 +203,7 @@ export type Database = {
           timer_enabled?: boolean
           updated_at?: string
           video_section_title?: string
+          whatsapp_number?: string
         }
         Update: {
           announcement_text?: string
@@ -227,6 +229,7 @@ export type Database = {
           timer_enabled?: boolean
           updated_at?: string
           video_section_title?: string
+          whatsapp_number?: string
         }
         Relationships: []
       }
