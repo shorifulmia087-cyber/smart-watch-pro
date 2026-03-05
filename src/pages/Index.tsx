@@ -169,6 +169,9 @@ const Index = () => {
         deliveryChargeInside={settings?.delivery_charge_inside}
         deliveryChargeOutside={settings?.delivery_charge_outside}
         onlinePaymentEnabled={settings?.online_payment_enabled}
+        bkashNumber={settings?.bkash_number}
+        nagadNumber={settings?.nagad_number}
+        rocketNumber={settings?.rocket_number}
       />
       <FloatingNotification />
       <WhatsAppButton />
