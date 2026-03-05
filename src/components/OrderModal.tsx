@@ -95,9 +95,14 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
       supabase.functions.invoke('send-order-email', { body: orderData }).catch(console.error);
       setLoading(false);
       setSuccess(true);
-    } catch {
+    } catch (err: any) {
       setLoading(false);
-      toast({ title: 'ত্রুটি হয়েছে', variant: 'destructive' });
+      console.error('Order submission failed:', err);
+      toast({ 
+        title: 'অর্ডার সমস্যা', 
+        description: err?.message || 'অনুগ্রহ করে সব তথ্য সঠিকভাবে পূরণ করে আবার চেষ্টা করুন।', 
+        variant: 'destructive' 
+      });
     }
   };
 
