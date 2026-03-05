@@ -1,0 +1,1 @@
+ALTER TABLE public.site_settings ADD COLUMN whatsapp_number text NOT NULL DEFAULT '8801XXXXXXXXX';

@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trash2, Loader2, AlertTriangle } from 'lucide-react';
 
@@ -9,7 +10,17 @@ interface DeleteProductDialogProps {
   isDeleting: boolean;
 }
 
+const CONFIRM_TEXT = 'মুছে ফেলুন';
+
 const DeleteProductDialog = ({ open, onClose, onConfirm, productName, isDeleting }: DeleteProductDialogProps) => {
+  const [typed, setTyped] = useState('');
+
+  useEffect(() => {
+    if (!open) setTyped('');
+  }, [open]);
+
+  const canDelete = typed === CONFIRM_TEXT;
+
   return (
     <AnimatePresence>
       {open && (
@@ -44,6 +55,19 @@ const DeleteProductDialog = ({ open, onClose, onConfirm, productName, isDeleting
                   <span className="text-destructive/80">এই কাজটি আর ফেরত নেওয়া যাবে না।</span>
                 </p>
               </div>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
+                  নিশ্চিত করতে <span className="font-bold text-destructive">"{CONFIRM_TEXT}"</span> টাইপ করুন
+                </label>
+                <input
+                  type="text"
+                  value={typed}
+                  onChange={e => setTyped(e.target.value)}
+                  placeholder={CONFIRM_TEXT}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-destructive/30 transition-all"
+                  autoFocus
+                />
+              </div>
               <div className="flex gap-3 pt-1">
                 <button
                   onClick={onClose}
@@ -54,8 +78,8 @@ const DeleteProductDialog = ({ open, onClose, onConfirm, productName, isDeleting
                 </button>
                 <button
                   onClick={onConfirm}
-                  disabled={isDeleting}
-                  className="flex-1 px-5 py-3 rounded-xl text-sm font-semibold bg-destructive text-white hover:bg-destructive/90 transition-all disabled:opacity-60 flex items-center justify-center gap-2 shadow-sm"
+                  disabled={isDeleting || !canDelete}
+                  className="flex-1 px-5 py-3 rounded-xl text-sm font-semibold bg-destructive text-white hover:bg-destructive/90 transition-all disabled:opacity-40 flex items-center justify-center gap-2 shadow-sm"
                 >
                   {isDeleting ? (
                     <>

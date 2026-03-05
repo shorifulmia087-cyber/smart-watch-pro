@@ -1,7 +1,9 @@
 import { MessageCircle } from 'lucide-react';
+import { useSettings } from '@/hooks/useSupabaseData';
 
 const WhatsAppButton = () => {
-  const phoneNumber = '8801XXXXXXXXX'; // placeholder
+  const { data: settings } = useSettings();
+  const phoneNumber = (settings as any)?.whatsapp_number || '8801XXXXXXXXX';
   const message = encodeURIComponent('আমি একটি প্রোডাক্ট সম্পর্কে জানতে চাই।');
 
   return (

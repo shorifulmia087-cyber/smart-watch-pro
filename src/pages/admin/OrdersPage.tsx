@@ -1,8 +1,9 @@
 import { useState, useMemo, useCallback } from 'react';
-import { useOrders, useUpdateOrderStatus } from '@/hooks/useSupabaseData';
+import { useOrders, useUpdateOrderStatus, useSettings } from '@/hooks/useSupabaseData';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
 import { Search, Filter, ChevronLeft, ChevronRight, Truck, FileText } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import jsPDF from 'jspdf';
 import {
   Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
 } from '@/components/ui/table';
@@ -30,6 +31,7 @@ const OrdersPage = () => {
   const [page, setPage] = useState(0);
   const pageSize = 15;
   const { data: orders, isLoading } = useOrders(filter);
+  const { data: settings } = useSettings();
   const updateStatus = useUpdateOrderStatus();
   const { toast } = useToast();
 
@@ -42,39 +44,94 @@ const OrdersPage = () => {
   }, [toast]);
 
   const downloadInvoice = useCallback((order: any) => {
-    const invoiceContent = `
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         ইনভয়েস / INVOICE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-অর্ডার ID: ${order.id.slice(0, 8).toUpperCase()}
-তারিখ: ${new Date(order.created_at).toLocaleDateString('bn-BD')}
-
-কাস্টমার: ${order.customer_name}
-ফোন: ${order.phone}
-ঠিকানা: ${order.address}
-এলাকা: ${order.delivery_location === 'dhaka' ? 'ঢাকা' : 'ঢাকার বাইরে'}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-প্রোডাক্ট: ${order.watch_model}
-পরিমাণ: ${order.quantity}
-মূল্য: ৳${order.total_price.toLocaleString()}
-ডেলিভারি চার্জ: ৳${order.delivery_charge.toLocaleString()}
-পেমেন্ট: ${order.payment_method}
-${order.trx_id ? `TrxID: ${order.trx_id}` : 'ক্যাশ অন ডেলিভারি'}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-মোট: ৳${order.total_price.toLocaleString()}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    `;
-    const blob = new Blob([invoiceContent], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `invoice-${order.id.slice(0, 8)}.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast({ title: 'ইনভয়েস ডাউনলোড হয়েছে' });
-  }, [toast]);
+    const brandName = settings?.brand_name || 'Kronos Premium Watch';
+    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+    
+    // Header
+    doc.setFillColor(10, 10, 10);
+    doc.rect(0, 0, 210, 40, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(20);
+    doc.text(brandName, 15, 22);
+    doc.setFontSize(10);
+    doc.text('INVOICE', 15, 32);
+    
+    // Invoice details
+    doc.setTextColor(60, 60, 60);
+    doc.setFontSize(10);
+    const orderId = order.id.slice(0, 8).toUpperCase();
+    doc.text(`Invoice #: INV-${orderId}`, 140, 22);
+    doc.text(`Date: ${new Date(order.created_at).toLocaleDateString('en-GB')}`, 140, 28);
+    
+    // Customer info
+    let y = 55;
+    doc.setFontSize(12);
+    doc.setTextColor(30, 30, 30);
+    doc.text('Bill To:', 15, y);
+    doc.setFontSize(10);
+    doc.setTextColor(80, 80, 80);
+    y += 8;
+    doc.text(`Name: ${order.customer_name}`, 15, y);
+    y += 6;
+    doc.text(`Phone: ${order.phone}`, 15, y);
+    y += 6;
+    doc.text(`Address: ${order.address}`, 15, y);
+    y += 6;
+    doc.text(`Area: ${order.delivery_location === 'dhaka' ? 'Dhaka' : 'Outside Dhaka'}`, 15, y);
+    
+    // Table header
+    y += 15;
+    doc.setFillColor(245, 245, 245);
+    doc.rect(15, y - 5, 180, 10, 'F');
+    doc.setTextColor(30, 30, 30);
+    doc.setFontSize(10);
+    doc.text('Product', 18, y + 1);
+    doc.text('Qty', 110, y + 1);
+    doc.text('Price', 135, y + 1);
+    doc.text('Total', 165, y + 1);
+    
+    // Table row
+    y += 12;
+    doc.setTextColor(60, 60, 60);
+    doc.text(order.watch_model, 18, y);
+    doc.text(String(order.quantity), 110, y);
+    const unitPrice = (order.total_price - order.delivery_charge) / order.quantity;
+    doc.text(`Tk ${unitPrice.toLocaleString()}`, 135, y);
+    doc.text(`Tk ${(order.total_price - order.delivery_charge).toLocaleString()}`, 165, y);
+    
+    // Summary
+    y += 15;
+    doc.setDrawColor(220, 220, 220);
+    doc.line(110, y, 195, y);
+    y += 8;
+    doc.text('Subtotal:', 110, y);
+    doc.text(`Tk ${(order.total_price - order.delivery_charge).toLocaleString()}`, 165, y);
+    y += 7;
+    doc.text('Delivery Charge:', 110, y);
+    doc.text(`Tk ${order.delivery_charge.toLocaleString()}`, 165, y);
+    y += 7;
+    doc.text(`Payment: ${order.payment_method === 'cod' ? 'Cash on Delivery' : order.payment_method.toUpperCase()}`, 110, y);
+    if (order.trx_id) {
+      y += 7;
+      doc.text(`TrxID: ${order.trx_id}`, 110, y);
+    }
+    y += 3;
+    doc.line(110, y, 195, y);
+    y += 8;
+    doc.setFontSize(13);
+    doc.setTextColor(30, 30, 30);
+    doc.text('Grand Total:', 110, y);
+    doc.text(`Tk ${order.total_price.toLocaleString()}`, 165, y);
+    
+    // Footer
+    doc.setFontSize(8);
+    doc.setTextColor(150, 150, 150);
+    doc.text('Thank you for your purchase!', 105, 280, { align: 'center' });
+    doc.text(`${brandName} | Generated on ${new Date().toLocaleDateString('en-GB')}`, 105, 285, { align: 'center' });
+    
+    doc.save(`invoice-${orderId}.pdf`);
+    toast({ title: 'PDF ইনভয়েস ডাউনলোড হয়েছে' });
+  }, [toast, settings]);
 
   const filtered = useMemo(() => {
     if (!orders) return [];
