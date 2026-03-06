@@ -112,16 +112,16 @@ const AdvancePaymentsPage = () => {
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/30 hover:bg-muted/30 border-b border-border/40">
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 w-[50px]">#</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">কাস্টমার</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">ফোন</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">পেমেন্ট মেথড</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">TrxID</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">পেমেন্ট ধরন</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">অগ্রিম</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">মোট মূল্য</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">বাকি</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">তারিখ</TableHead>
+                  <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 w-[50px]">#</TableHead>
+                  <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">কাস্টমার</TableHead>
+                  <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">ফোন</TableHead>
+                  <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">পেমেন্ট মেথড</TableHead>
+                  <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">TrxID</TableHead>
+                  <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">পেমেন্ট ধরন</TableHead>
+                  <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">অগ্রিম</TableHead>
+                  <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">মোট মূল্য</TableHead>
+                  <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">বাকি</TableHead>
+                  <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">তারিখ</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
