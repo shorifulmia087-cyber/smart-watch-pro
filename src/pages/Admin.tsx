@@ -68,6 +68,7 @@ const Admin = () => {
         <Route path="products" element={<ProductsPage />} />
         <Route path="customers" element={<CustomersPage />} />
         <Route path="reviews" element={<ReviewsPage />} />
+        <Route path="fraud-checker" element={<FraudCheckerPage />} />
         <Route path="team" element={<TeamPage />} />
         <Route path="payment" element={<PaymentSettingsPage />} />
         <Route path="advance-payments" element={<AdvancePaymentsPage />} />
