@@ -29,7 +29,7 @@ const PaymentSettingsPage = () => {
 
   if (isLoading) {
     return (
-      <div className="space-y-5 w-full max-w-[1000px]">
+      <div className="space-y-5 w-full">
         {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-[120px] rounded-sm" />)}
       </div>
     );
