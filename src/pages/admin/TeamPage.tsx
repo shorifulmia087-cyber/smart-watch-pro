@@ -180,6 +180,7 @@ const TeamPage = () => {
                 <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">User ID</TableHead>
                 <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">রোল</TableHead>
                 <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground text-center">স্ট্যাটাস</TableHead>
+                <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground text-center">অ্যাকশন</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -198,6 +199,18 @@ const TeamPage = () => {
                       <span className="text-[10px] text-success font-medium">আপনি</span>
                     ) : (
                       <span className="text-[10px] text-muted-foreground">অ্যাক্টিভ</span>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {m.user_id !== user?.id && (
+                      <button
+                        onClick={() => handleRemove(m.user_id)}
+                        disabled={removingId === m.user_id}
+                        className="text-destructive hover:text-destructive/80 disabled:opacity-50 transition-colors"
+                        title="রিমুভ করুন"
+                      >
+                        {removingId === m.user_id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                      </button>
                     )}
                   </TableCell>
                 </TableRow>
