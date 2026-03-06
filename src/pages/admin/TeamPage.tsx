@@ -12,6 +12,7 @@ type TeamMember = {
   id: string;
   user_id: string;
   role: string;
+  created_at: string;
   email?: string;
 };
 
