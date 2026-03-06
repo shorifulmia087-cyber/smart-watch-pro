@@ -52,44 +52,42 @@ const CollectionGrid = ({ currentProductId, onSelectProduct, sectionTitle = 'আ
           </motion.p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {otherProducts.map((product, i) => (
             <motion.button
               key={product.id}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.08, duration: 0.4 }}
-              whileHover={{ y: -4, boxShadow: '0 8px 30px -8px hsl(var(--gold) / 0.12)' }}
+              transition={{ delay: i * 0.06, duration: 0.35 }}
               onClick={() => onSelectProduct(product)}
-              className="group text-left rounded-xl overflow-hidden bg-surface border border-border/40 shadow-sm hover:shadow-lg transition-shadow"
+              className="group text-left rounded-sm overflow-hidden bg-surface border-[0.5px] border-border/30 shadow-[0_1px_3px_0_rgba(0,0,0,0.04)] hover:shadow-[0_2px_8px_0_rgba(0,0,0,0.06)] transition-shadow duration-200"
             >
-              <div className="aspect-square overflow-hidden bg-muted relative">
+              <div className="aspect-square overflow-hidden bg-muted relative rounded-sm">
                 {product.thumbnail_url ? (
                   <img
                     src={product.thumbnail_url}
                     alt={product.name}
+                    loading="lazy"
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm">
+                  <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">
                     ছবি নেই
                   </div>
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 {product.discount_percent > 0 && (
-                  <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-bold gradient-gold text-surface shadow-sm">
+                  <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded-sm text-[10px] sm:text-xs font-bold gradient-gold text-surface shadow-sm">
                     -{product.discount_percent}%
                   </div>
                 )}
               </div>
-              <div className="p-5">
-                <h3 className="font-bold text-foreground text-lg group-hover:text-gold transition-colors duration-200">{product.name}</h3>
-                <p className="text-muted-foreground text-sm mt-1 line-clamp-2 leading-relaxed">{product.subtitle}</p>
-                <div className="flex items-center gap-2 mt-3">
-                  <span className="text-gold font-bold text-xl font-inter">৳{formatBengaliPrice(product.price)}</span>
+              <div className="p-2.5 sm:p-4">
+                <h3 className="font-semibold text-foreground text-xs sm:text-sm leading-tight line-clamp-2 group-hover:text-gold transition-colors duration-200">{product.name}</h3>
+                <div className="flex items-baseline gap-1.5 mt-1.5 sm:mt-2">
+                  <span className="text-gold font-bold text-sm sm:text-base font-inter">৳{formatBengaliPrice(product.price)}</span>
                   {product.discount_percent > 0 && (
-                    <span className="text-muted-foreground text-sm line-through">
+                    <span className="text-muted-foreground text-[10px] sm:text-xs line-through">
                       ৳{formatBengaliPrice(Math.round(product.price / (1 - product.discount_percent / 100)))}
                     </span>
                   )}
