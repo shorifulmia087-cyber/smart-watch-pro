@@ -18,9 +18,11 @@ type TeamMember = {
 const TeamPage = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [newEmail, setNewEmail] = useState('');
   const [newRole, setNewRole] = useState<'admin' | 'user'>('user');
   const [adding, setAdding] = useState(false);
+  const [removingId, setRemovingId] = useState<string | null>(null);
 
   const { data: members, isLoading } = useQuery({
     queryKey: ['team-members'],
