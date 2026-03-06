@@ -94,6 +94,11 @@ export type Database = {
           customer_name: string
           delivery_charge: number
           delivery_location: string
+          fraud_flag: string | null
+          fraud_success_rate: number | null
+          fraud_total_cancel: number | null
+          fraud_total_delivered: number | null
+          fraud_total_parcels: number | null
           id: string
           payment_method: string
           payment_type: string
@@ -116,6 +121,11 @@ export type Database = {
           customer_name: string
           delivery_charge?: number
           delivery_location?: string
+          fraud_flag?: string | null
+          fraud_success_rate?: number | null
+          fraud_total_cancel?: number | null
+          fraud_total_delivered?: number | null
+          fraud_total_parcels?: number | null
           id?: string
           payment_method: string
           payment_type?: string
@@ -138,6 +148,11 @@ export type Database = {
           customer_name?: string
           delivery_charge?: number
           delivery_location?: string
+          fraud_flag?: string | null
+          fraud_success_rate?: number | null
+          fraud_total_cancel?: number | null
+          fraud_total_delivered?: number | null
+          fraud_total_parcels?: number | null
           id?: string
           payment_method?: string
           payment_type?: string
@@ -262,6 +277,7 @@ export type Database = {
           hero_subtitle: string
           id: string
           logo_url: string | null
+          min_success_rate: number
           nagad_number: string
           offer_end_at: string | null
           offer_start_at: string | null
@@ -293,6 +309,7 @@ export type Database = {
           hero_subtitle?: string
           id?: string
           logo_url?: string | null
+          min_success_rate?: number
           nagad_number?: string
           offer_end_at?: string | null
           offer_start_at?: string | null
@@ -324,6 +341,7 @@ export type Database = {
           hero_subtitle?: string
           id?: string
           logo_url?: string | null
+          min_success_rate?: number
           nagad_number?: string
           offer_end_at?: string | null
           offer_start_at?: string | null
