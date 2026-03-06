@@ -27,6 +27,8 @@ const labelConfig = {
 const CustomersPage = () => {
   const { data: orders, isLoading } = useOrders();
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(0);
+  const pageSize = 20;
 
   const customers = useMemo(() => {
     if (!orders) return [];
