@@ -538,7 +538,7 @@ const OrdersPage = () => {
               </select>
             </div>
             {/* Search */}
-            <div className="flex items-center gap-2.5 bg-muted/20 dark:bg-muted/10 border border-border/30 rounded-lg px-3.5 py-2.5 flex-1 lg:min-w-[280px]">
+            <div className="flex items-center gap-2 bg-muted/30 border border-border/40 rounded-sm px-3 py-2.5 flex-1 lg:min-w-[280px]">
               <Search className="h-4 w-4 text-muted-foreground shrink-0" />
               <input
                 type="text" value={search} onChange={e => { setSearch(e.target.value); setPage(0); }}
