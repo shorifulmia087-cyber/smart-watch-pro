@@ -77,19 +77,22 @@ const CustomersPage = () => {
   }), [customers]);
 
   return (
-    <div className="space-y-5 max-w-[1400px]">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-semibold text-foreground">কাস্টমার তালিকা</h2>
-          <p className="text-[11px] text-muted-foreground">মোট {toBengaliNum(summary.total)} জন কাস্টমার</p>
-        </div>
-        <div className="flex items-center gap-2 glass-card rounded-xl px-3 py-2 min-w-[240px]">
-          <Search className="h-4 w-4 text-muted-foreground shrink-0" />
-          <input
-            type="text" value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="নাম বা ফোন দিয়ে খুঁজুন..."
-            className="bg-transparent border-none outline-none w-full text-sm text-foreground placeholder:text-muted-foreground"
-          />
+    <div className="space-y-5 w-full">
+      {/* Bento Header */}
+      <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-4 md:p-5">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-bold text-foreground">কাস্টমার তালিকা</h2>
+            <p className="text-[11px] text-muted-foreground mt-0.5">মোট {toBengaliNum(summary.total)} জন কাস্টমার</p>
+          </div>
+          <div className="flex items-center gap-2 bg-muted/30 border border-border/40 rounded-sm px-3 py-2 min-w-[240px]">
+            <Search className="h-4 w-4 text-muted-foreground shrink-0" />
+            <input
+              type="text" value={search} onChange={e => setSearch(e.target.value)}
+              placeholder="নাম বা ফোন দিয়ে খুঁজুন..."
+              className="bg-transparent border-none outline-none w-full text-sm text-foreground placeholder:text-muted-foreground"
+            />
+          </div>
         </div>
       </div>
 
@@ -103,18 +106,18 @@ const CustomersPage = () => {
 
       {isLoading ? (
         <div className="space-y-2">
-          {Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} className="h-14 rounded-xl" />)}
+          {Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} className="h-14 rounded-sm" />)}
         </div>
       ) : !filtered.length ? (
-        <div className="glass-card rounded-2xl p-16 text-center text-muted-foreground">
+        <div className="bg-surface dark:bg-card rounded-sm border border-border/30 p-16 text-center text-muted-foreground shadow-sm">
           কোনো কাস্টমার পাওয়া যায়নি।
         </div>
       ) : (
-        <div className="glass-card rounded-2xl overflow-hidden">
+        <div className="bg-surface dark:bg-card rounded-sm border border-border/30 overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="bg-muted/40 hover:bg-muted/40 border-b border-border/60">
+                <TableRow className="bg-muted/30 hover:bg-muted/30 border-b border-border/40">
                   <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">কাস্টমার</TableHead>
                   <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">ফোন</TableHead>
                   <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground text-center">অর্ডার</TableHead>
@@ -127,7 +130,7 @@ const CustomersPage = () => {
                 {filtered.map((c) => {
                   const lbl = labelConfig[c.label];
                   return (
-                    <TableRow key={c.phone} className="hover:bg-muted/30 transition-colors border-b border-border/40">
+                    <TableRow key={c.phone} className="hover:bg-gold/[0.03] transition-colors border-b border-border/30">
                       <TableCell>
                         <div>
                           <p className="font-medium text-sm text-foreground">{c.name}</p>
@@ -141,7 +144,7 @@ const CustomersPage = () => {
                         {new Date(c.lastOrder).toLocaleDateString('bn-BD')}
                       </TableCell>
                       <TableCell>
-                        <span className={`text-[10px] font-medium px-2.5 py-1 rounded-full border inline-flex items-center gap-1 ${lbl.bg}`}>
+                        <span className={`text-[10px] font-medium px-2.5 py-1 rounded-sm border inline-flex items-center gap-1 ${lbl.bg}`}>
                           <lbl.icon className="h-3 w-3" />
                           {lbl.text}
                         </span>
@@ -168,9 +171,9 @@ const variantMap: Record<string, { bg: string; color: string }> = {
 const SummaryCard = ({ icon: Icon, label, value, variant }: { icon: any; label: string; value: string; variant: string }) => {
   const v = variantMap[variant] || variantMap.info;
   return (
-    <div className="glass-card rounded-2xl p-4 hover:shadow-md transition-all duration-300">
+    <div className="bg-surface dark:bg-card rounded-sm border border-border/30 p-4 shadow-sm hover:shadow-md transition-all duration-300">
       <div className="flex items-center gap-3">
-        <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${v.bg}`}>
+        <div className={`w-9 h-9 rounded-sm flex items-center justify-center ${v.bg}`}>
           <Icon className={`h-4 w-4 ${v.color}`} />
         </div>
         <div>

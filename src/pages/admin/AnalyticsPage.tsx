@@ -13,7 +13,7 @@ const COLORS = ['hsl(var(--accent))', 'hsl(var(--info))', 'hsl(var(--success))',
 const tooltipStyle = {
   background: 'hsl(var(--card))',
   border: '1px solid hsl(var(--border))',
-  borderRadius: '12px',
+  borderRadius: '4px',
   fontSize: '12px',
   boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
 };
@@ -74,31 +74,34 @@ const AnalyticsPage = () => {
   }, [orders]);
 
   return (
-    <div className="space-y-6 max-w-[1400px]">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-semibold text-foreground">বিস্তারিত অ্যানালিটিক্স</h2>
-          <p className="text-[11px] text-muted-foreground">বিক্রয় ও ব্যবহারকারীর আচরণ</p>
-        </div>
-        <div className="flex gap-0.5 glass-card rounded-xl p-1">
-          {([7, 14, 30] as const).map(r => (
-            <button
-              key={r}
-              onClick={() => setRange(r)}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
-                range === r ? 'bg-foreground text-background shadow-sm' : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              {toBengaliNum(r)} দিন
-            </button>
-          ))}
+    <div className="space-y-5 w-full">
+      {/* Bento Header */}
+      <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-4 md:p-5">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-bold text-foreground">বিস্তারিত অ্যানালিটিক্স</h2>
+            <p className="text-[11px] text-muted-foreground mt-0.5">বিক্রয় ও ব্যবহারকারীর আচরণ</p>
+          </div>
+          <div className="flex gap-0.5 bg-muted/30 border border-border/40 rounded-sm p-1">
+            {([7, 14, 30] as const).map(r => (
+              <button
+                key={r}
+                onClick={() => setRange(r)}
+                className={`px-3.5 py-1.5 rounded-sm text-xs font-medium transition-all duration-200 ${
+                  range === r ? 'gradient-gold text-white shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {toBengaliNum(r)} দিন
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {isLoading ? (
-          Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-24 rounded-2xl" />)
+          Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-24 rounded-sm" />)
         ) : (
           <>
             <MiniStat icon={Wallet} label="গড় অর্ডার মূল্য" value={`৳${formatBengaliPrice(avgOrderValue)}`} variant="accent" />
@@ -109,10 +112,10 @@ const AnalyticsPage = () => {
       </div>
 
       {/* Revenue Trend */}
-      <div className="glass-card rounded-2xl p-5 md:p-6">
+      <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6">
         <h3 className="font-semibold text-sm text-foreground mb-1">আয়ের ট্রেন্ড</h3>
         <p className="text-[11px] text-muted-foreground mb-5">দৈনিক আয় ও অর্ডার সংখ্যা</p>
-        {isLoading ? <Skeleton className="h-[300px] rounded-xl" /> : (
+        {isLoading ? <Skeleton className="h-[300px] rounded-sm" /> : (
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart data={dailyData}>
               <defs>
@@ -132,10 +135,10 @@ const AnalyticsPage = () => {
       </div>
 
       {/* Revenue Trend 30 Days */}
-      <div className="glass-card rounded-2xl p-5 md:p-6">
+      <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6">
         <h3 className="font-semibold text-sm text-foreground mb-1">৩০ দিনের রাজস্ব ট্রেন্ড</h3>
         <p className="text-[11px] text-muted-foreground mb-5">গত ৩০ দিনের আয়ের গতিবিধি</p>
-        {isLoading ? <Skeleton className="h-[280px] rounded-xl" /> : (
+        {isLoading ? <Skeleton className="h-[280px] rounded-sm" /> : (
           <ResponsiveContainer width="100%" height={280}>
             <AreaChart data={revenueTrend30}>
               <defs>
@@ -156,11 +159,10 @@ const AnalyticsPage = () => {
 
       {/* Bottom Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Sales Geography */}
-        <div className="glass-card rounded-2xl p-5 md:p-6">
+        <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6">
           <h3 className="font-semibold text-sm text-foreground mb-1">সেলস জিওগ্রাফি</h3>
           <p className="text-[11px] text-muted-foreground mb-5">শহর অনুযায়ী বিক্রয়</p>
-          {isLoading ? <Skeleton className="h-[250px] rounded-xl" /> : (
+          {isLoading ? <Skeleton className="h-[250px] rounded-sm" /> : (
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={locationData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
@@ -170,24 +172,24 @@ const AnalyticsPage = () => {
                   name === 'revenue' ? `৳${value.toLocaleString()}` : value,
                   name === 'revenue' ? 'রাজস্ব' : 'অর্ডার'
                 ]} />
-                <Bar dataKey="orders" fill="hsl(var(--info))" radius={[6, 6, 0, 0]} barSize={40} name="অর্ডার" />
-                <Bar dataKey="revenue" fill="hsl(var(--accent))" radius={[6, 6, 0, 0]} barSize={40} name="রাজস্ব" />
+                <Bar dataKey="orders" fill="hsl(var(--info))" radius={[4, 4, 0, 0]} barSize={40} name="অর্ডার" />
+                <Bar dataKey="revenue" fill="hsl(var(--accent))" radius={[4, 4, 0, 0]} barSize={40} name="রাজস্ব" />
               </BarChart>
             </ResponsiveContainer>
           )}
         </div>
 
-        <div className="glass-card rounded-2xl p-5 md:p-6">
+        <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6">
           <h3 className="font-semibold text-sm text-foreground mb-1">দৈনিক অর্ডার</h3>
           <p className="text-[11px] text-muted-foreground mb-5">প্রতিদিন কতটি অর্ডার এসেছে</p>
-          {isLoading ? <Skeleton className="h-[250px] rounded-xl" /> : (
+          {isLoading ? <Skeleton className="h-[250px] rounded-sm" /> : (
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={dailyData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
                 <XAxis dataKey="day" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" allowDecimals={false} axisLine={false} tickLine={false} />
                 <Tooltip contentStyle={tooltipStyle} />
-                <Bar dataKey="orders" fill="hsl(var(--info))" radius={[6, 6, 0, 0]} barSize={24} name="অর্ডার" />
+                <Bar dataKey="orders" fill="hsl(var(--info))" radius={[4, 4, 0, 0]} barSize={24} name="অর্ডার" />
               </BarChart>
             </ResponsiveContainer>
           )}
@@ -203,16 +205,16 @@ const AnalyticsPage = () => {
 };
 
 const PieCard = ({ title, data, isLoading }: { title: string; data: { name: string; value: number }[]; isLoading: boolean }) => (
-  <div className="glass-card rounded-2xl p-5 md:p-6">
+  <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6">
     <h3 className="font-semibold text-sm text-foreground mb-4">{title}</h3>
-    {isLoading ? <Skeleton className="h-[180px] rounded-xl" /> : (
+    {isLoading ? <Skeleton className="h-[180px] rounded-sm" /> : (
       <>
         <ResponsiveContainer width="100%" height={140}>
           <PieChart>
             <Pie data={data} cx="50%" cy="50%" innerRadius={35} outerRadius={55} paddingAngle={4} dataKey="value">
               {data.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
             </Pie>
-            <Tooltip contentStyle={{ fontSize: '11px', borderRadius: '8px', background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }} />
+            <Tooltip contentStyle={{ fontSize: '11px', borderRadius: '4px', background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }} />
           </PieChart>
         </ResponsiveContainer>
         <div className="flex flex-wrap gap-2 mt-2">
@@ -237,9 +239,9 @@ const variantMap: Record<string, { bg: string; color: string }> = {
 const MiniStat = ({ icon: Icon, label, value, variant }: { icon: any; label: string; value: string; variant: string }) => {
   const v = variantMap[variant] || variantMap.accent;
   return (
-    <div className="glass-card rounded-2xl p-5 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">
+    <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">
       <div className="flex items-center gap-3">
-        <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${v.bg}`}>
+        <div className={`w-9 h-9 rounded-sm flex items-center justify-center ${v.bg}`}>
           <Icon className={`h-4 w-4 ${v.color}`} />
         </div>
         <div>

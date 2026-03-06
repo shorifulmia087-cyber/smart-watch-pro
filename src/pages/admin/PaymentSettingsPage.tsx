@@ -29,32 +29,36 @@ const PaymentSettingsPage = () => {
 
   if (isLoading) {
     return (
-      <div className="space-y-6 max-w-[900px]">
-        {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-[120px] rounded-2xl" />)}
+      <div className="space-y-5 w-full max-w-[1000px]">
+        {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-[120px] rounded-sm" />)}
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 max-w-[900px]">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-semibold">পেমেন্ট সেটিংস</h2>
-          <p className="text-[11px] text-muted-foreground">পেমেন্ট মেথড ও ডেলিভারি চার্জ কনফিগার করুন</p>
+    <div className="space-y-5 w-full max-w-[1000px]">
+      {/* Bento Header */}
+      <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-4 md:p-5">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-bold text-foreground">পেমেন্ট সেটিংস</h2>
+            <p className="text-[11px] text-muted-foreground mt-0.5">পেমেন্ট মেথড ও ডেলিভারি চার্জ কনফিগার করুন</p>
+          </div>
+          <button
+            onClick={save}
+            disabled={updateSettings.isPending}
+            className="gradient-gold text-white font-semibold px-6 py-2.5 rounded-sm text-sm hover:opacity-90 flex items-center gap-2 transition-all shadow-sm"
+            style={{ boxShadow: '0 4px 12px -4px hsl(var(--gold) / 0.3)' }}
+          >
+            {updateSettings.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : saved ? <CheckCircle2 className="h-4 w-4" /> : <Save className="h-4 w-4" />}
+            {saved ? 'সংরক্ষিত!' : 'সংরক্ষণ করুন'}
+          </button>
         </div>
-        <button
-          onClick={save}
-          disabled={updateSettings.isPending}
-          className="gradient-gold text-white font-semibold px-6 py-2.5 rounded-xl text-sm hover:opacity-90 flex items-center gap-2 transition-all shadow-sm"
-        >
-          {updateSettings.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : saved ? <CheckCircle2 className="h-4 w-4" /> : <Save className="h-4 w-4" />}
-          {saved ? 'সংরক্ষিত!' : 'সংরক্ষণ করুন'}
-        </button>
       </div>
 
-      <div className="glass-card rounded-2xl divide-y divide-border/60">
+      <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm divide-y divide-border/30">
         <div className="p-5 md:p-6 space-y-4">
-          <h3 className="font-semibold text-sm flex items-center gap-2">
+          <h3 className="font-semibold text-sm flex items-center gap-2 text-foreground">
             <CreditCard className="h-4 w-4 text-success" /> মোবাইল ব্যাংকিং নম্বর
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -62,19 +66,19 @@ const PaymentSettingsPage = () => {
             <Field label="নগদ নম্বর" value={form.nagad_number || ''} onChange={v => setForm({ ...form, nagad_number: v })} />
             <Field label="রকেট নম্বর" value={form.rocket_number || ''} onChange={v => setForm({ ...form, rocket_number: v })} />
           </div>
-          <label className="flex items-center gap-2 text-sm cursor-pointer">
+          <label className="flex items-center gap-2 text-sm cursor-pointer text-foreground">
             <input
               type="checkbox"
               checked={form.online_payment_enabled ?? true}
               onChange={e => setForm({ ...form, online_payment_enabled: e.target.checked })}
-              className="rounded accent-accent"
+              className="rounded-sm accent-accent"
             />
             অনলাইন পেমেন্ট চালু
           </label>
         </div>
 
         <div className="p-5 md:p-6 space-y-4">
-          <h3 className="font-semibold text-sm flex items-center gap-2">
+          <h3 className="font-semibold text-sm flex items-center gap-2 text-foreground">
             <CreditCard className="h-4 w-4 text-info" /> ডেলিভারি চার্জ
           </h3>
           <div className="grid grid-cols-2 gap-4">
@@ -94,7 +98,7 @@ const Field = ({ label, value, onChange, type = 'text' }: {
     <label className="text-[11px] font-medium text-muted-foreground mb-1.5 block">{label}</label>
     <input
       type={type} value={value} onChange={e => onChange(e.target.value)}
-      className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all"
+      className="w-full bg-muted/30 border border-border/40 rounded-sm px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-gold/20 transition-all"
     />
   </div>
 );
