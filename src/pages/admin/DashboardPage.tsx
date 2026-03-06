@@ -169,7 +169,7 @@ const DashboardPage = () => {
                   key={p.label}
                   onClick={() => handlePreset(i)}
                   className={`px-3 py-1.5 rounded-sm text-xs font-semibold transition-all duration-200 ${
-                    activePreset === i ? 'bg-foreground text-background shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                    activePreset === i ? 'gradient-gold text-white shadow-sm' : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   {p.label}
