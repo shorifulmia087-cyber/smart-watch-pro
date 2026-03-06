@@ -8,8 +8,9 @@ interface AuthContextType {
   session: Session | null;
   user: User | null;
   isAdmin: boolean;
+  isSuperAdmin: boolean;
   isOrderManager: boolean;
-  hasAdminAccess: boolean; // admin OR order manager
+  hasAdminAccess: boolean;
   userRole: AppRole;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
@@ -22,6 +23,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [userRole, setUserRole] = useState<AppRole>(null);
+  const [isSuperAdminState, setIsSuperAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const checkRole = async (userId: string) => {
@@ -29,16 +31,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const { data: isAdmin } = await supabase.rpc('has_role', { _user_id: userId, _role: 'admin' });
       if (isAdmin) {
         setUserRole('admin');
+        // Check super admin
+        const { data: isSA } = await supabase.rpc('is_super_admin', { _user_id: userId });
+        setIsSuperAdmin(!!isSA);
         return;
       }
       const { data: isUser } = await supabase.rpc('has_role', { _user_id: userId, _role: 'user' });
       if (isUser) {
         setUserRole('user');
+        setIsSuperAdmin(false);
         return;
       }
       setUserRole(null);
+      setIsSuperAdmin(false);
     } catch {
       setUserRole(null);
+      setIsSuperAdmin(false);
     }
   };
 
@@ -95,14 +103,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signOut = async () => {
     await supabase.auth.signOut();
     setUserRole(null);
+    setIsSuperAdmin(false);
   };
 
   const isAdmin = userRole === 'admin';
+  const isSuperAdmin = isSuperAdminState;
   const isOrderManager = userRole === 'user';
   const hasAdminAccess = isAdmin || isOrderManager;
 
   return (
-    <AuthContext.Provider value={{ session, user, isAdmin, isOrderManager, hasAdminAccess, userRole, loading, signIn, signOut }}>
+    <AuthContext.Provider value={{ session, user, isAdmin, isSuperAdmin, isOrderManager, hasAdminAccess, userRole, loading, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );

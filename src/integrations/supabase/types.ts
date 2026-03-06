@@ -59,6 +59,30 @@ export type Database = {
         }
         Relationships: []
       }
+      facebook_pixel_settings: {
+        Row: {
+          access_token: string
+          enabled_events: string[]
+          id: string
+          pixel_id: string
+          updated_at: string
+        }
+        Insert: {
+          access_token?: string
+          enabled_events?: string[]
+          id?: string
+          pixel_id?: string
+          updated_at?: string
+        }
+        Update: {
+          access_token?: string
+          enabled_events?: string[]
+          id?: string
+          pixel_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           address: string
@@ -351,6 +375,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_super_admin: { Args: { _user_id: string }; Returns: boolean }
       remove_team_member: { Args: { _user_id: string }; Returns: Json }
     }
     Enums: {
