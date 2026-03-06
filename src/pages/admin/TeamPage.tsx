@@ -34,12 +34,51 @@ const TeamPage = () => {
   const handleInvite = async () => {
     if (!newEmail.trim()) return;
     setAdding(true);
-    toast({
-      title: 'আমন্ত্রণ পাঠানো হবে',
-      description: `${newEmail} কে ${newRole === 'admin' ? 'ফুল অ্যাডমিন' : 'অর্ডার ম্যানেজার'} হিসেবে যোগ করতে প্রথমে তাকে রেজিস্ট্রেশন করতে হবে।`,
-    });
-    setNewEmail('');
-    setAdding(false);
+    try {
+      const { data, error } = await supabase.rpc('add_team_member', {
+        _email: newEmail.trim(),
+        _role: newRole,
+      });
+
+      if (error) throw error;
+
+      const result = data as { success: boolean; error?: string; user_id?: string };
+
+      if (result.success) {
+        toast({
+          title: '✅ সফলভাবে যোগ করা হয়েছে',
+          description: `${newEmail} কে ${newRole === 'admin' ? 'ফুল অ্যাডমিন' : 'অর্ডার ম্যানেজার'} হিসেবে যোগ করা হয়েছে।`,
+        });
+        setNewEmail('');
+        // Refetch team members
+        window.location.reload();
+      } else if (result.error === 'user_not_found') {
+        toast({
+          title: '❌ ইউজার পাওয়া যায়নি',
+          description: `${newEmail} দিয়ে কোনো ভেরিফাইড অ্যাকাউন্ট পাওয়া যায়নি। প্রথমে এই ইমেইল দিয়ে সাইনআপ ও ইমেইল ভেরিফিকেশন সম্পন্ন করতে হবে।`,
+          variant: 'destructive',
+        });
+      } else if (result.error === 'already_exists') {
+        toast({
+          title: '⚠️ আগে থেকেই আছে',
+          description: `${newEmail} ইতিমধ্যে এই রোলে যোগ করা আছে।`,
+        });
+      } else if (result.error === 'permission_denied') {
+        toast({
+          title: '❌ অনুমতি নেই',
+          description: 'শুধু সুপার অ্যাডমিন টিম মেম্বার যোগ করতে পারেন।',
+          variant: 'destructive',
+        });
+      }
+    } catch (err: any) {
+      toast({
+        title: 'ত্রুটি',
+        description: err.message || 'কিছু একটা সমস্যা হয়েছে।',
+        variant: 'destructive',
+      });
+    } finally {
+      setAdding(false);
+    }
   };
 
   return (
