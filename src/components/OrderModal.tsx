@@ -102,6 +102,22 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
     }
   }, [touched, validate]);
 
+  // Fraud check on phone blur
+  const handlePhoneBlur = useCallback(async () => {
+    const clean = phone.replace(/[\s-]/g, '');
+    if (isValidPhone(clean) && fraudCheckedRef.current !== clean) {
+      fraudCheckedRef.current = clean;
+      await checkPhone(clean);
+    }
+  }, [phone, checkPhone]);
+
+  // If fraud blocks COD, force online tab
+  useEffect(() => {
+    if (fraudResult && fraudResult.flag === 'low_success' && tab === 'cod') {
+      setTab('online');
+    }
+  }, [fraudResult, tab]);
+
   const handleSubmit = async () => {
     if (isBot(honeypot) || isBot(honeypot2)) {
       setSuccess(true);
