@@ -296,6 +296,7 @@ const ProductsPage = () => {
             totalItems={filtered.length}
             pageSize={pageSize}
             onPageChange={setPage}
+            onPageSizeChange={s => { setPageSize(s); setPage(0); }}
           />
         </div>
       )}
