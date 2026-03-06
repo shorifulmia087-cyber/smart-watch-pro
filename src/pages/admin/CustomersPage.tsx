@@ -130,7 +130,7 @@ const CustomersPage = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filtered.map((c) => {
+                {filtered.slice(page * pageSize, (page + 1) * pageSize).map((c) => {
                   const lbl = labelConfig[c.label];
                   return (
                     <TableRow key={c.phone} className="hover:bg-gold/[0.03] transition-colors border-b border-border/30">
@@ -158,6 +158,13 @@ const CustomersPage = () => {
               </TableBody>
             </Table>
           </div>
+          <AdminPagination
+            currentPage={page}
+            totalPages={Math.ceil(filtered.length / pageSize)}
+            totalItems={filtered.length}
+            pageSize={pageSize}
+            onPageChange={setPage}
+          />
         </div>
       )}
     </div>

@@ -559,29 +559,13 @@ const OrdersPage = () => {
           </div>
 
           {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between px-5 py-3 border-t border-border/30 bg-muted/10">
-              <p className="text-[11px] text-muted-foreground">
-                পৃষ্ঠা {toBengaliNum(page + 1)} / {toBengaliNum(totalPages)}
-              </p>
-              <div className="flex gap-1.5">
-                <button
-                  onClick={() => setPage(p => Math.max(0, p - 1))}
-                  disabled={page === 0}
-                  className="px-3 py-1.5 rounded-sm text-[11px] font-medium bg-surface dark:bg-card border border-border/40 hover:border-gold/30 hover:text-gold disabled:opacity-40 transition-colors flex items-center gap-1"
-                >
-                  <ChevronLeft className="h-3.5 w-3.5" /> পূর্ববর্তী
-                </button>
-                <button
-                  onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
-                  disabled={page >= totalPages - 1}
-                  className="px-3 py-1.5 rounded-sm text-[11px] font-medium bg-surface dark:bg-card border border-border/40 hover:border-gold/30 hover:text-gold disabled:opacity-40 transition-colors flex items-center gap-1"
-                >
-                  পরবর্তী <ChevronRight className="h-3.5 w-3.5" />
-                </button>
-              </div>
-            </div>
-          )}
+          <AdminPagination
+            currentPage={page}
+            totalPages={totalPages}
+            totalItems={filtered.length}
+            pageSize={pageSize}
+            onPageChange={setPage}
+          />
         </div>
       )}
     </div>
