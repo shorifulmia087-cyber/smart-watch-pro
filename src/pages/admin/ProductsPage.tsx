@@ -20,6 +20,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import DeleteProductDialog from '@/components/admin/DeleteProductDialog';
 import { motion } from 'framer-motion';
+import { compressImage, generateThumbnail } from '@/lib/imageCompressor';
 
 const BUCKET = 'product-images';
 
