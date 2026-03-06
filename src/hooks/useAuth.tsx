@@ -23,6 +23,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [userRole, setUserRole] = useState<AppRole>(null);
+  const [isSuperAdminState, setIsSuperAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const checkRole = async (userId: string) => {
