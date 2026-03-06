@@ -3,19 +3,20 @@ import { supabase } from '@/integrations/supabase/client';
 
 export interface FraudResult {
   allowed: boolean;
-  flag: 'low_success' | 'new_customer' | 'good' | null;
+  flag: 'low_success' | 'new_customer' | 'good' | 'check_failed' | null;
   total_parcels: number;
   total_delivered: number;
   total_cancel: number;
   success_rate: number | null;
   message: string | null;
+  error_message: string | null;
 }
 
 export const useFraudCheck = () => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<FraudResult | null>(null);
 
-  const checkPhone = useCallback(async (phone: string) => {
+  const checkPhone = useCallback(async (phone: string): Promise<FraudResult | null> => {
     const clean = phone.replace(/[\s-]/g, '');
     if (!/^01[3-9]\d{8}$/.test(clean)) {
       setResult(null);
@@ -30,16 +31,38 @@ export const useFraudCheck = () => {
 
       if (error) {
         console.error('Fraud check error:', error);
-        setResult(null);
-        return null;
+        // On invoke error, allow order but flag as check_failed
+        const failResult: FraudResult = {
+          allowed: true,
+          flag: 'check_failed',
+          total_parcels: 0,
+          total_delivered: 0,
+          total_cancel: 0,
+          success_rate: null,
+          message: null,
+          error_message: 'ফাংশন কল ব্যর্থ হয়েছে',
+        };
+        setResult(failResult);
+        return failResult;
       }
 
-      setResult(data as FraudResult);
-      return data as FraudResult;
+      const res = data as FraudResult;
+      setResult(res);
+      return res;
     } catch (err) {
       console.error('Fraud check failed:', err);
-      setResult(null);
-      return null;
+      const failResult: FraudResult = {
+        allowed: true,
+        flag: 'check_failed',
+        total_parcels: 0,
+        total_delivered: 0,
+        total_cancel: 0,
+        success_rate: null,
+        message: null,
+        error_message: 'নেটওয়ার্ক ত্রুটি',
+      };
+      setResult(failResult);
+      return failResult;
     } finally {
       setLoading(false);
     }

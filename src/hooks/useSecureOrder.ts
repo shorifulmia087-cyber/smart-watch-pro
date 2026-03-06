@@ -20,6 +20,7 @@ interface SecureOrderData {
   fraud_total_cancel?: number;
   fraud_success_rate?: number;
   fraud_flag?: string;
+  fraud_error_message?: string;
 }
 
 export const useSecureOrder = () => {
