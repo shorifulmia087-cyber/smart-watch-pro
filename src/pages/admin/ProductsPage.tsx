@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
+import { sanitizeForDisplay } from '@/lib/security';
 import {
   useProducts, useUpsertProduct, useDeleteProduct, useToggleStock, useToggleFeatured,
 } from '@/hooks/useSupabaseData';
@@ -130,17 +131,22 @@ const ProductsPage = () => {
   const saveProduct = () => {
     if (!form.name || !form.price) return;
     upsertProduct.mutate({
-      name: form.name, price: form.price, subtitle: form.subtitle || null,
+      name: sanitizeForDisplay(form.name), price: form.price,
+      subtitle: form.subtitle ? sanitizeForDisplay(form.subtitle) : null,
       video_url: form.video_url || null, stock_status: form.stock_status,
       discount_percent: form.discount_percent, product_type: form.product_type,
       is_featured: form.is_featured, image_urls: form.image_urls,
-      description_list: form.description_list,
+      description_list: form.description_list.map(d => sanitizeForDisplay(d)),
       thumbnail_url: form.image_urls[0] || null,
-      features: form.features as any,
+      features: form.features.map(f => ({
+        icon: sanitizeForDisplay(f.icon),
+        title: sanitizeForDisplay(f.title),
+        desc: sanitizeForDisplay(f.desc),
+      })) as any,
       sourcing_cost: form.sourcing_cost,
-      meta_title: form.meta_title || null,
-      meta_description: form.meta_description || null,
-      available_colors: form.available_colors,
+      meta_title: form.meta_title ? sanitizeForDisplay(form.meta_title) : null,
+      meta_description: form.meta_description ? sanitizeForDisplay(form.meta_description) : null,
+      available_colors: form.available_colors.map(c => sanitizeForDisplay(c)),
       ...(editingId ? { id: editingId } : {}),
     } as any, {
       onSuccess: () => {
