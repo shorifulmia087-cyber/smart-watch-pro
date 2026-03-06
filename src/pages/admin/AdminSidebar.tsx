@@ -145,8 +145,12 @@ const AdminSidebar = () => {
             </div>
           ) : (
             <div className="flex justify-center">
-              <div className="w-8 h-8 rounded-sm gradient-gold flex items-center justify-center shadow-[0_2px_8px_hsl(var(--gold)/0.25)]">
-                <Sparkles className="h-4 w-4 text-white" strokeWidth={1.5} />
+              <div className="w-8 h-8 rounded-sm gradient-gold flex items-center justify-center shadow-[0_2px_8px_hsl(var(--gold)/0.25)] overflow-hidden">
+                {settings?.logo_url ? (
+                  <img src={settings.logo_url} alt="Logo" className="w-full h-full object-cover" />
+                ) : (
+                  <Sparkles className="h-4 w-4 text-white" strokeWidth={1.5} />
+                )}
               </div>
             </div>
           )}
