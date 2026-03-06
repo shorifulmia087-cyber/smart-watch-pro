@@ -159,12 +159,24 @@ const AdminSidebar = () => {
         {/* Thin separator */}
         <div className="mx-4 h-px bg-border/30" />
 
-        {/* Nav Groups */}
-        {renderNavGroup('প্রধান', mainNav)}
-        <div className="mx-4 h-px bg-border/20" />
-        {renderNavGroup('ম্যানেজমেন্ট', managementNav)}
-        <div className="mx-4 h-px bg-border/20" />
-        {renderNavGroup('সিস্টেম', systemNav)}
+        {/* Nav Groups — role-based */}
+        {isOrderManager ? (
+          <>
+            {renderNavGroup('অর্ডার ম্যানেজমেন্ট', [
+              { title: 'অর্ডার', url: '/admin/orders', icon: ShoppingCart },
+              { title: 'ট্র্যাকিং', url: '/admin/tracking', icon: Route },
+              { title: 'প্রোফাইল', url: '/admin/profile', icon: UserCog },
+            ])}
+          </>
+        ) : (
+          <>
+            {renderNavGroup('প্রধান', mainNav)}
+            <div className="mx-4 h-px bg-border/20" />
+            {renderNavGroup('ম্যানেজমেন্ট', managementNav)}
+            <div className="mx-4 h-px bg-border/20" />
+            {renderNavGroup('সিস্টেম', systemNav)}
+          </>
+        )}
       </SidebarContent>
 
       {/* Profile Footer — Bento Card */}
