@@ -9,6 +9,7 @@ import AnalyticsPage from './admin/AnalyticsPage';
 import SiteControlPage from './admin/SiteControlPage';
 import ReviewsPage from './admin/ReviewsPage';
 import PaymentSettingsPage from './admin/PaymentSettingsPage';
+import AdvancePaymentsPage from './admin/AdvancePaymentsPage';
 import ProfileSettingsPage from './admin/ProfileSettingsPage';
 import CourierSettingsPage from './admin/CourierSettingsPage';
 import CourierPaymentsPage from './admin/CourierPaymentsPage';
