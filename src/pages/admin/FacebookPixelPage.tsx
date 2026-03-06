@@ -95,7 +95,7 @@ const FacebookPixelPage = () => {
   }
 
   return (
-    <div className="space-y-5 w-full max-w-[1000px]">
+    <div className="space-y-5 w-full">
       {/* Bento Header */}
       <div className="bg-white dark:bg-card rounded-sm border border-border/30 shadow-sm p-4 md:p-5">
         <div className="flex items-center justify-between">
