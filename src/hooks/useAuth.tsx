@@ -8,8 +8,9 @@ interface AuthContextType {
   session: Session | null;
   user: User | null;
   isAdmin: boolean;
+  isSuperAdmin: boolean;
   isOrderManager: boolean;
-  hasAdminAccess: boolean; // admin OR order manager
+  hasAdminAccess: boolean;
   userRole: AppRole;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
