@@ -516,7 +516,7 @@ const OrdersPage = () => {
       )}
 
       {/* ─── Bento Filter/Search Header ─── */}
-      <div className="bg-white dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6">
+      <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6">
         {/* Title & Search Row */}
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-5">
           <div>
