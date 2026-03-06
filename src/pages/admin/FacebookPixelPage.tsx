@@ -116,7 +116,7 @@ const FacebookPixelPage = () => {
       </div>
 
       {/* Credentials */}
-      <div className="bg-white dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6 space-y-4">
+      <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6 space-y-4">
         <h3 className="font-semibold text-sm flex items-center gap-2 text-foreground">
           <Activity className="h-4 w-4 text-info" /> Pixel ক্রেডেনশিয়াল
         </h3>
