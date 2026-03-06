@@ -177,11 +177,12 @@ const ProductsPage = () => {
 
   return (
     <div className="space-y-5 w-full">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-semibold">প্রোডাক্ট ক্যাটালগ</h2>
-          <p className="text-[11px] text-muted-foreground">মোট {toBengaliNum(products?.length ?? 0)} টি প্রোডাক্ট</p>
-        </div>
+      <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-4 md:p-5">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-bold text-foreground">প্রোডাক্ট ক্যাটালগ</h2>
+            <p className="text-[11px] text-muted-foreground mt-0.5">মোট {toBengaliNum(products?.length ?? 0)} টি প্রোডাক্ট</p>
+          </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 bg-muted/30 border border-border/40 rounded-sm px-3 py-2 min-w-[200px]">
             <Search className="h-4 w-4 text-muted-foreground shrink-0" />
