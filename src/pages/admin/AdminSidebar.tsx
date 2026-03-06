@@ -4,7 +4,7 @@ import { useSettings } from '@/hooks/useSupabaseData';
 import {
   LayoutDashboard, ShoppingCart, Package, BarChart3, Settings2,
   LogOut, X, Star, CreditCard, UserCog, Users, Truck, Activity,
-  MessageSquare, UsersRound, Route, Wallet, Sparkles,
+  MessageSquare, UsersRound, Route, Wallet, Sparkles, ShieldCheck,
 } from 'lucide-react';
 import {
   Sidebar, SidebarContent, SidebarFooter, SidebarGroup,
@@ -23,6 +23,7 @@ const mainNav = [
 const managementNav = [
   { title: 'রিভিউ', url: '/admin/reviews', icon: Star },
   { title: 'টিম', url: '/admin/team', icon: UsersRound },
+  { title: 'ফ্রড চেকার', url: '/admin/fraud-checker', icon: ShieldCheck },
   { title: 'পেমেন্ট', url: '/admin/payment', icon: CreditCard },
   { title: 'অগ্রিম পেমেন্ট', url: '/admin/advance-payments', icon: Wallet },
   { title: 'কুরিয়ার', url: '/admin/courier', icon: Truck },

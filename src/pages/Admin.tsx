@@ -17,6 +17,7 @@ import TrackingDashboardPage from './admin/TrackingDashboardPage';
 import FacebookPixelPage from './admin/FacebookPixelPage';
 import SmsSettingsPage from './admin/SmsSettingsPage';
 import TeamPage from './admin/TeamPage';
+import FraudCheckerPage from './admin/FraudCheckerPage';
 import { Loader2 } from 'lucide-react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 
@@ -67,6 +68,7 @@ const Admin = () => {
         <Route path="products" element={<ProductsPage />} />
         <Route path="customers" element={<CustomersPage />} />
         <Route path="reviews" element={<ReviewsPage />} />
+        <Route path="fraud-checker" element={<FraudCheckerPage />} />
         <Route path="team" element={<TeamPage />} />
         <Route path="payment" element={<PaymentSettingsPage />} />
         <Route path="advance-payments" element={<AdvancePaymentsPage />} />
