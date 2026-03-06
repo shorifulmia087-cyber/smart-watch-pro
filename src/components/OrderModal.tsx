@@ -1,12 +1,12 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Minus, Plus, Loader2, Check, Copy, AlertCircle } from 'lucide-react';
 import { toBengaliNum, formatBengaliPrice } from '@/lib/bengali';
-import { useCreateOrder } from '@/hooks/useSupabaseData';
+import { useSecureOrder } from '@/hooks/useSecureOrder';
 import { useRateLimit } from '@/hooks/useRateLimit';
 import { sanitizeForDisplay, isValidPhone, isBot } from '@/lib/security';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useTurnstile } from '@/hooks/useTurnstile';
 
 interface OrderModalProps {
   isOpen: boolean;
