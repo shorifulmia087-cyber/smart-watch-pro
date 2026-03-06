@@ -642,22 +642,22 @@ const OrdersPage = () => {
                       className="border-muted-foreground/40"
                     />
                   </TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 w-[50px]">#</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">কাস্টমার</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">ঠিকানা</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">ফোন</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">রিস্ক</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">মডেল</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 text-center whitespace-nowrap">পরিমাণ</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">মোট</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">TrxID</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">পেমেন্ট</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">ট্র্যাকিং</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">ট্র্যাক স্ট্যাটাস</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">এলাকা</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">তারিখ</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">স্ট্যাটাস</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 text-right whitespace-nowrap">অ্যাকশন</TableHead>
+                   <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 w-[50px]">#</TableHead>
+                   <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">কাস্টমার</TableHead>
+                   <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">ঠিকানা</TableHead>
+                   <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">ফোন</TableHead>
+                   <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">রিস্ক</TableHead>
+                   <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">মডেল</TableHead>
+                   <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 text-center whitespace-nowrap">পরিমাণ</TableHead>
+                   <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">মোট</TableHead>
+                   <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">TrxID</TableHead>
+                   <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">পেমেন্ট</TableHead>
+                   <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">ট্র্যাকিং</TableHead>
+                   <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">ট্র্যাক স্ট্যাটাস</TableHead>
+                   <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">এলাকা</TableHead>
+                   <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">তারিখ</TableHead>
+                   <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">স্ট্যাটাস</TableHead>
+                   <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 text-right whitespace-nowrap">অ্যাকশন</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
