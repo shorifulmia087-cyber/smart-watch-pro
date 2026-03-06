@@ -17,7 +17,7 @@ Deno.serve(async (req) => {
       quantity, payment_method, trx_id, delivery_location,
       selected_color, turnstile_token, payment_type, advance_amount,
       fraud_total_parcels, fraud_total_delivered, fraud_total_cancel,
-      fraud_success_rate, fraud_flag,
+      fraud_success_rate, fraud_flag, fraud_error_message,
     } = body
 
     // === Input validation ===
