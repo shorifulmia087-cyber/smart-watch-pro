@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Package, Menu, X, User, ShoppingBag, LogIn, UserPlus, ChevronRight } from 'lucide-react';
+import { Package, Menu, X, Bell, ShoppingBag, LogIn, UserPlus, ChevronRight } from 'lucide-react';
 import { useSettings } from '@/hooks/useSupabaseData';
 import { useAuth } from '@/hooks/useAuth';
 import { motion, AnimatePresence } from 'framer-motion';
