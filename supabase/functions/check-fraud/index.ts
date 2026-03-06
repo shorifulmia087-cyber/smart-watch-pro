@@ -52,13 +52,15 @@ Deno.serve(async (req) => {
     // Call FraudChecker API
     let fraudRes: Response
     try {
+      const formData = new FormData()
+      formData.append('phone', cleanPhone)
+      
       fraudRes = await fetch('https://fraudchecker.link/api/v1/qc/', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Token ${FRAUD_API_KEY}`,
+          'Authorization': `Bearer ${FRAUD_API_KEY}`,
         },
-        body: JSON.stringify({ phone: cleanPhone }),
+        body: formData,
       })
     } catch (networkErr) {
       console.error('FraudChecker network error:', networkErr)
