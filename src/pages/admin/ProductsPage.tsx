@@ -9,6 +9,7 @@ import {
   Upload, X, ImagePlus, GripVertical, Package, Palette, Globe, Camera, ListChecks, Sparkles, Tag,
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import AdminPagination from '@/components/admin/AdminPagination';
 import {
   Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription,
 } from '@/components/ui/sheet';
