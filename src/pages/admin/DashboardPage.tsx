@@ -232,9 +232,9 @@ const DashboardPage = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-10 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         {isLoading ? (
-          Array.from({ length: 9 }).map((_, i) => (
+          Array.from({ length: 10 }).map((_, i) => (
             <Skeleton key={i} className="h-[120px] rounded-sm" />
           ))
         ) : (
@@ -244,12 +244,11 @@ const DashboardPage = () => {
             <StatCard icon={Truck} label="ডেলিভারিতে" value={toBengaliNum(stats.shipped)} sub="In Transit" variant="accent" sparkData={[]} />
             <StatCard icon={CheckCircle2} label="সম্পন্ন" value={toBengaliNum(stats.completed)} sub="কমপ্লিট" variant="success" sparkData={[]} />
             <StatCard icon={XCircle} label="ক্যানসেল" value={toBengaliNum(stats.cancelled)} sub="বাতিল" variant="warning" sparkData={[]} />
-            <StatCard icon={RotateCcw} label="রিটার্ন" value={toBengaliNum(stats.returned)} sub={`${toBengaliNum(stats.returnRate)}% রেট`} variant="warning" sparkData={[]} />
             <StatCard icon={DollarSign} label="আজকের আয়" value={`৳${formatBengaliPrice(stats.todayRevenue)}`} sub="আজকের মোট" variant="success" sparkData={sparkData.revenue} />
             <StatCard icon={Package} label="মোট আয়" value={`৳${formatBengaliPrice(stats.totalRevenue)}`} sub={`${toBengaliNum(dayCount)} দিনের`} variant="accent" sparkData={sparkData.revenue} />
-            <StatCard icon={Box} label="মোট প্রোডাক্ট" value={toBengaliNum(stats.totalProducts)} sub="সকল প্রোডাক্ট" variant="info" sparkData={[]} />
             <StatCard icon={TrendingUp} label="গ্রস প্রফিট" value={`৳${formatBengaliPrice(stats.grossProfit)}`} sub="আয় - সোর্সিং" variant="success" sparkData={[]} />
-            <StatCard icon={Package} label="স্টকে আছে" value={toBengaliNum(stats.inStockProducts)} sub={`${toBengaliNum(stats.totalProducts - stats.inStockProducts)} আউট`} variant={stats.inStockProducts < stats.totalProducts ? 'warning' : 'success'} sparkData={[]} />
+            <StatCard icon={RotateCcw} label="রিটার্ন" value={toBengaliNum(stats.returned)} sub={`${toBengaliNum(stats.returnRate)}% রেট`} variant="warning" sparkData={[]} />
+            <StatCard icon={Box} label="প্রোডাক্ট" value={toBengaliNum(stats.totalProducts)} sub={`${toBengaliNum(stats.inStockProducts)} স্টকে`} variant="info" sparkData={[]} />
           </>
         )}
       </div>
