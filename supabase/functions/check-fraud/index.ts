@@ -38,14 +38,43 @@ Deno.serve(async (req) => {
     // Call FraudChecker API
     let fraudRes: Response
     try {
-      fraudRes = await fetch('https://fraudchecker.link/api/v1/qc/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Token ${FRAUD_API_KEY}`,
-        },
-        body: JSON.stringify({ phone: cleanPhone }),
-      })
+      // Try multiple auth approaches
+      const attempts = [
+        { url: 'https://fraudchecker.link/api/v1/qc/', headers: { 'Content-Type': 'application/json', 'Authorization': `Token ${FRAUD_API_KEY}` } },
+        { url: 'https://fraudchecker.link/api/v1/qc', headers: { 'Content-Type': 'application/json', 'Authorization': `Token ${FRAUD_API_KEY}` } },
+        { url: 'https://fraudchecker.link/api/v1/qc/', headers: { 'Content-Type': 'application/json', 'Authorization': FRAUD_API_KEY } },
+      ]
+      
+      for (const attempt of attempts) {
+        console.log('Trying:', attempt.url, JSON.stringify(attempt.headers))
+        const res = await fetch(attempt.url, {
+          method: 'POST',
+          headers: attempt.headers,
+          body: JSON.stringify({ phone: cleanPhone }),
+        })
+        console.log('Response status:', res.status)
+        if (res.ok) {
+          fraudRes = res
+          break
+        }
+        const body = await res.text()
+        console.log('Response body:', body)
+        fraudRes = null as any
+      }
+      
+      if (!fraudRes || !fraudRes.ok) {
+        // None worked
+        return new Response(JSON.stringify({
+          allowed: true,
+          flag: 'check_failed',
+          total_parcels: 0,
+          total_delivered: 0,
+          total_cancel: 0,
+          success_rate: null,
+          message: null,
+          error_message: 'API Authentication failed - all methods tried',
+        }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+      }
     } catch (networkErr) {
       // Network error - allow order, report error
       console.error('FraudChecker network error:', networkErr)
