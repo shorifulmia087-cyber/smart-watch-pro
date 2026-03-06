@@ -209,19 +209,21 @@ const Index = () => {
         </div>
       </footer>
 
-      <OrderModal
-        isOpen={orderOpen}
-        onClose={() => setOrderOpen(false)}
-        unitPrice={currentProduct.price}
-        watchName={currentProduct.name}
-        deliveryChargeInside={settings?.delivery_charge_inside}
-        deliveryChargeOutside={settings?.delivery_charge_outside}
-        onlinePaymentEnabled={settings?.online_payment_enabled}
-        bkashNumber={settings?.bkash_number}
-        nagadNumber={settings?.nagad_number}
-        rocketNumber={settings?.rocket_number}
-        availableColors={(currentProduct as any).available_colors || []}
-      />
+      <Suspense fallback={null}>
+        <OrderModal
+          isOpen={orderOpen}
+          onClose={() => setOrderOpen(false)}
+          unitPrice={currentProduct.price}
+          watchName={currentProduct.name}
+          deliveryChargeInside={settings?.delivery_charge_inside}
+          deliveryChargeOutside={settings?.delivery_charge_outside}
+          onlinePaymentEnabled={settings?.online_payment_enabled}
+          bkashNumber={settings?.bkash_number}
+          nagadNumber={settings?.nagad_number}
+          rocketNumber={settings?.rocket_number}
+          availableColors={(currentProduct as any).available_colors || []}
+        />
+      </Suspense>
       
       <WhatsAppButton />
     </div>
