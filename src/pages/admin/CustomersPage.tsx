@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useOrders } from '@/hooks/useSupabaseData';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
 import { Search, Users, Crown, UserCheck, UserPlus } from 'lucide-react';
+import AdminPagination from '@/components/admin/AdminPagination';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
