@@ -1,13 +1,6 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, lazy, Suspense } from 'react';
 import AnnouncementBar from '@/components/AnnouncementBar';
 import HeroSlider from '@/components/HeroSlider';
-import FeatureList from '@/components/FeatureList';
-import VideoSection from '@/components/VideoSection';
-import ReviewGallery from '@/components/ReviewGallery';
-import DeliveryChecker from '@/components/DeliveryChecker';
-import OrderModal from '@/components/OrderModal';
-
-import CollectionGrid from '@/components/CollectionGrid';
 import LoadingOverlay from '@/components/LoadingOverlay';
 import StickyOrderForm from '@/components/StickyOrderForm';
 import WhatsAppButton from '@/components/WhatsAppButton';
@@ -18,6 +11,14 @@ import { motion } from 'framer-motion';
 import { useAntiScraping } from '@/hooks/useAntiScraping';
 import { addSecurityHeaders } from '@/lib/security';
 import type { Database } from '@/integrations/supabase/types';
+
+// Lazy load below-fold components
+const FeatureList = lazy(() => import('@/components/FeatureList'));
+const VideoSection = lazy(() => import('@/components/VideoSection'));
+const ReviewGallery = lazy(() => import('@/components/ReviewGallery'));
+const CollectionGrid = lazy(() => import('@/components/CollectionGrid'));
+const OrderModal = lazy(() => import('@/components/OrderModal'));
+const DeliveryChecker = lazy(() => import('@/components/DeliveryChecker'));
 
 type Product = Database['public']['Tables']['products']['Row'];
 
@@ -130,22 +131,30 @@ const Index = () => {
           price={currentProduct.price}
           discountPercent={currentProduct.discount_percent}
         />
-        <FeatureList
-          features={features}
-          sectionTitle={settings?.features_section_title}
-        />
-        <VideoSection
-          videoId={currentProduct.video_url || undefined}
-          sectionTitle={settings?.video_section_title}
-        />
+        <Suspense fallback={null}>
+          <FeatureList
+            features={features}
+            sectionTitle={settings?.features_section_title}
+          />
+        </Suspense>
+        <Suspense fallback={null}>
+          <VideoSection
+            videoId={currentProduct.video_url || undefined}
+            sectionTitle={settings?.video_section_title}
+          />
+        </Suspense>
       </motion.div>
 
-      <ReviewGallery />
-      <CollectionGrid
-        currentProductId={currentProduct.id}
-        onSelectProduct={handleSelectProduct}
-        sectionTitle={settings?.collection_section_title}
-      />
+      <Suspense fallback={null}>
+        <ReviewGallery />
+      </Suspense>
+      <Suspense fallback={null}>
+        <CollectionGrid
+          currentProductId={currentProduct.id}
+          onSelectProduct={handleSelectProduct}
+          sectionTitle={settings?.collection_section_title}
+        />
+      </Suspense>
 
       <section className="bg-ink py-12 px-4">
         <motion.div
@@ -199,19 +208,21 @@ const Index = () => {
         </div>
       </footer>
 
-      <OrderModal
-        isOpen={orderOpen}
-        onClose={() => setOrderOpen(false)}
-        unitPrice={currentProduct.price}
-        watchName={currentProduct.name}
-        deliveryChargeInside={settings?.delivery_charge_inside}
-        deliveryChargeOutside={settings?.delivery_charge_outside}
-        onlinePaymentEnabled={settings?.online_payment_enabled}
-        bkashNumber={settings?.bkash_number}
-        nagadNumber={settings?.nagad_number}
-        rocketNumber={settings?.rocket_number}
-        availableColors={(currentProduct as any).available_colors || []}
-      />
+      <Suspense fallback={null}>
+        <OrderModal
+          isOpen={orderOpen}
+          onClose={() => setOrderOpen(false)}
+          unitPrice={currentProduct.price}
+          watchName={currentProduct.name}
+          deliveryChargeInside={settings?.delivery_charge_inside}
+          deliveryChargeOutside={settings?.delivery_charge_outside}
+          onlinePaymentEnabled={settings?.online_payment_enabled}
+          bkashNumber={settings?.bkash_number}
+          nagadNumber={settings?.nagad_number}
+          rocketNumber={settings?.rocket_number}
+          availableColors={(currentProduct as any).available_colors || []}
+        />
+      </Suspense>
       
       <WhatsAppButton />
     </div>

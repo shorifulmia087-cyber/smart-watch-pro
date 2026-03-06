@@ -73,6 +73,10 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
               src={images[current]?.src}
               alt={images[current]?.label}
               className="absolute inset-0 w-full h-full object-cover"
+              loading={current === 0 ? 'eager' : 'lazy'}
+              decoding="async"
+              width={1200}
+              height={675}
               initial={{ opacity: 0, x: direction > 0 ? '30%' : '-30%' }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: direction > 0 ? '-15%' : '15%' }}
