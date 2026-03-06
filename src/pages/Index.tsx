@@ -6,7 +6,7 @@ import VideoSection from '@/components/VideoSection';
 import ReviewGallery from '@/components/ReviewGallery';
 import DeliveryChecker from '@/components/DeliveryChecker';
 import OrderModal from '@/components/OrderModal';
-import FloatingNotification from '@/components/FloatingNotification';
+
 import CollectionGrid from '@/components/CollectionGrid';
 import LoadingOverlay from '@/components/LoadingOverlay';
 import StickyOrderForm from '@/components/StickyOrderForm';
