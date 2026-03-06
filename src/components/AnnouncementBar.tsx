@@ -51,7 +51,7 @@ const AnnouncementBar = ({
   const fallbackTarget = useRef(Date.now() + countdownHours * 3600_000);
   const [time, setTime] = useState<TimeParts>({ d: 0, h: countdownHours, m: 0, s: 0 });
   const [timerLabel, setTimerLabel] = useState('অফার শেষ হতে বাকি:');
-  const [expired, setExpired] = useState(!hasSchedule);
+  const [expired, setExpired] = useState(true);
   const rafId = useRef(0);
 
   // Reset fallback target when countdownHours changes and no schedule
