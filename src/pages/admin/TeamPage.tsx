@@ -53,7 +53,7 @@ const TeamPage = () => {
         });
         setNewEmail('');
         // Refetch team members
-        window.location.reload();
+        queryClient.invalidateQueries({ queryKey: ['team-members'] });
       } else if (result.error === 'user_not_found') {
         toast({
           title: '❌ ইউজার পাওয়া যায়নি',
