@@ -605,13 +605,14 @@ const OrdersPage = () => {
             </Table>
           </div>
 
-          {/* Pagination */}
+           {/* Pagination */}
           <AdminPagination
             currentPage={page}
             totalPages={totalPages}
             totalItems={filtered.length}
             pageSize={pageSize}
             onPageChange={setPage}
+            onPageSizeChange={s => { setPageSize(s); setPage(0); }}
           />
         </div>
       )}
