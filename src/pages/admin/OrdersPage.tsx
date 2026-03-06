@@ -402,208 +402,196 @@ const OrdersPage = () => {
         </div>
       ) : (
         <div className="bg-surface dark:bg-card rounded-sm border border-border/30 overflow-hidden shadow-sm">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-muted/30 hover:bg-muted/30 border-b border-border/40">
-                  <TableHead className="w-[40px]">
-                    <Checkbox
-                      checked={allPageSelected}
-                      onCheckedChange={toggleSelectAll}
-                      className="border-muted-foreground/40"
-                    />
-                  </TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 w-[50px]">#</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">কাস্টমার</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">ফোন</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">মডেল</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 text-center">পরিমাণ</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">মোট</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">TrxID</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">পেমেন্ট</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">ট্র্যাকিং</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">ট্র্যাক স্ট্যাটাস</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">এলাকা</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">তারিখ</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">স্ট্যাটাস</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 text-right">অ্যাকশন</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {paged.map((o, index) => {
-                  const serial = page * pageSize + index + 1;
-                  const courierBooked = (o as any).courier_booked === true;
-                    return (
-                    <React.Fragment key={o.id}>
-                    <TableRow className={`group hover:bg-gold/[0.03] transition-colors duration-200 border-b border-border/20 ${selectedIds.has(o.id) ? 'bg-gold/5' : ''}`}>
-                      <TableCell>
-                        <Checkbox
-                          checked={selectedIds.has(o.id)}
-                          onCheckedChange={() => toggleSelect(o.id)}
-                          className="border-muted-foreground/40"
-                        />
-                      </TableCell>
-                      <TableCell className="font-inter text-xs font-semibold text-muted-foreground tabular-nums">
-                        {toBengaliNum(serial)}
-                      </TableCell>
-                      <TableCell>
-                        <div>
-                          <p className="font-medium text-sm text-foreground">{o.customer_name}</p>
-                          <p className="text-[11px] text-muted-foreground truncate max-w-[200px]">{o.address}</p>
-                        </div>
-                      </TableCell>
-                      <TableCell className="font-inter text-sm tabular-nums text-foreground">{o.phone}</TableCell>
-                      <TableCell className="text-sm text-foreground">
-                        <div>
-                          <span>{o.watch_model}</span>
-                          {(o as any).selected_color && (
-                            <span className="block text-[11px] text-gold font-medium mt-0.5">🎨 {(o as any).selected_color}</span>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-center font-inter text-sm text-foreground">{toBengaliNum(o.quantity)}</TableCell>
-                      <TableCell className="font-semibold text-gold font-inter text-sm">
-                        ৳{formatBengaliPrice(o.total_price)}
-                      </TableCell>
-                      <TableCell>
-                        {o.trx_id ? (
-                          <span className="bg-gold/10 text-gold px-2 py-1 rounded-sm text-[11px] font-mono font-semibold border border-gold/15">
-                            {o.trx_id}
-                          </span>
-                        ) : (
-                          <span className="text-muted-foreground text-[11px]">COD</span>
-                        )}
-                      </TableCell>
-                      {/* Payment Status */}
-                      <TableCell>
-                        {o.payment_method === 'cod' ? (
-                          <span className="text-[10px] font-semibold px-2 py-1 rounded-sm border bg-muted/20 text-muted-foreground border-border/20">ক্যাশ অন ডেলিভারি</span>
-                        ) : (o as any).payment_type === 'full_payment' ? (
-                          <div>
-                            <span className="text-[10px] font-semibold px-2 py-1 rounded-sm border bg-success/10 text-success border-success/20">পেমেন্ট সম্পন্ন ✓</span>
-                            <p className="text-[10px] text-success/70 mt-0.5 font-inter">৳{formatBengaliPrice((o as any).advance_amount || 0)}</p>
-                          </div>
-                        ) : (o as any).payment_type === 'delivery_charge_only' ? (
-                          <div>
-                            <span className="text-[10px] font-semibold px-2 py-1 rounded-sm border bg-warning/10 text-warning border-warning/20">ডেলিভারি চার্জ দেওয়া</span>
-                            <p className="text-[10px] text-warning/70 mt-0.5 font-inter">বাকি: ৳{formatBengaliPrice(o.total_price - ((o as any).advance_amount || 0))}</p>
-                          </div>
-                        ) : (
-                          <span className="text-[10px] font-semibold px-2 py-1 rounded-sm border bg-info/10 text-info border-info/20">অনলাইন</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {(o as any).tracking_id ? (
-                          <div className="flex flex-col gap-0.5">
-                            <span className="bg-success/10 text-success px-2 py-1 rounded-sm text-[11px] font-mono font-semibold border border-success/15">
-                              {(o as any).tracking_id}
-                            </span>
-                            <span className="text-[10px] text-muted-foreground">
-                              {(o as any).courier_provider === 'pathao' ? 'Pathao' : (o as any).courier_provider === 'steadfast' ? 'Steadfast' : 'RedX'}
-                            </span>
-                          </div>
-                        ) : (
-                          <span className="text-muted-foreground text-[11px]">—</span>
-                        )}
-                      </TableCell>
-                      {/* Tracking Status Badge */}
-                      <TableCell>
-                        {courierBooked ? (
-                          <button
-                            onClick={() => setExpandedOrderId(expandedOrderId === o.id ? null : o.id)}
-                            className={`inline-flex items-center gap-1 px-2 py-1 rounded-sm text-[10px] font-semibold border transition-colors cursor-pointer ${
-                              o.status === 'completed'
-                                ? 'bg-success/10 text-success border-success/20'
-                                : o.status === 'shipped'
-                                ? 'bg-info/10 text-info border-info/20'
-                                : o.status === 'returned'
-                                ? 'bg-destructive/10 text-destructive border-destructive/20'
-                                : 'bg-warning/10 text-warning border-warning/20'
-                            }`}
-                          >
-                            <Eye className="h-2.5 w-2.5" />
-                            {o.status === 'completed' ? 'ডেলিভারড' : o.status === 'shipped' ? 'ট্রানজিট' : o.status === 'returned' ? 'রিটার্ন' : 'পেন্ডিং'}
-                          </button>
-                        ) : (
-                          <span className="text-muted-foreground text-[10px]">—</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-[11px] text-foreground">
-                        {o.delivery_location === 'dhaka' ? 'ঢাকা' : 'ঢাকার বাইরে'}
-                      </TableCell>
-                      <TableCell className="text-[11px] text-muted-foreground font-inter tabular-nums">
-                        {new Date(o.created_at).toLocaleDateString('bn-BD')}
-                      </TableCell>
-                      <TableCell>
-                        <select
-                          value={o.status}
-                          onChange={(e) => updateStatus.mutate({ id: o.id, status: e.target.value as OrderStatus })}
-                          className={`text-[11px] font-semibold px-3 py-1.5 rounded-sm border cursor-pointer appearance-none transition-colors ${statusStyles[o.status]}`}
-                        >
-                          {Object.entries(statusLabels).map(([k, v]) => (
-                            <option key={k} value={k}>{v}</option>
-                          ))}
-                        </select>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center justify-end gap-1.5">
-                          {courierBooked ? (
-                            <span 
-                              className="p-1.5 rounded-sm text-success cursor-help" 
-                              title={`✅ কুরিয়ার: ${(o as any).courier_provider || 'N/A'} | ট্র্যাকিং: ${(o as any).tracking_id || 'N/A'}`}
-                            >
-                              <CheckCircle2 className="h-4 w-4" />
-                            </span>
-                          ) : (
-                            <button
-                              onClick={() => bookCourier(o.id, o.customer_name)}
-                              disabled={bookingInProgress === o.id || bookingInProgress === 'bulk'}
-                              className="p-1.5 rounded-sm text-gold/70 hover:text-gold hover:bg-gold/10 transition-all disabled:opacity-50"
-                              title="কুরিয়ার বুক"
-                            >
-                              {bookingInProgress === o.id ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                              ) : (
-                                <Truck className="h-4 w-4" />
-                              )}
-                            </button>
-                          )}
-                          <button
-                            onClick={() => downloadInvoice(o)}
-                            className="p-1.5 rounded-sm text-gold/70 hover:text-gold hover:bg-gold/10 transition-all"
-                            title="ইনভয়েস ডাউনলোড"
-                          >
-                            <FileText className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                    {/* Expandable Live Tracking Row */}
-                    {expandedOrderId === o.id && (
-                      <TableRow className="bg-muted/10 hover:bg-muted/10">
-                        <TableCell colSpan={15} className="py-4 px-6">
-                          <div className="flex items-start justify-between">
-                            <LiveTracking
-                              orderId={o.id}
-                              trackingId={(o as any).tracking_id}
-                              courierProvider={(o as any).courier_provider}
-                            />
-                            <button
-                              onClick={() => setExpandedOrderId(null)}
-                              className="p-1.5 rounded-sm hover:bg-muted text-muted-foreground"
-                            >
-                              <X className="h-4 w-4" />
-                            </button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </React.Fragment>
-                );
-                })}
-              </TableBody>
-            </Table>
-          </div>
+           <div className="overflow-x-auto">
+             <Table>
+               <TableHeader>
+                 <TableRow className="bg-muted/20 hover:bg-muted/20 border-b border-border/30">
+                   <TableHead className="w-10 pl-4">
+                     <Checkbox
+                       checked={allPageSelected}
+                       onCheckedChange={toggleSelectAll}
+                       className="border-muted-foreground/30"
+                     />
+                   </TableHead>
+                   <TableHead className="text-[11px] font-semibold text-muted-foreground w-12">#</TableHead>
+                   <TableHead className="text-[11px] font-semibold text-muted-foreground min-w-[180px]">কাস্টমার ইনফো</TableHead>
+                   <TableHead className="text-[11px] font-semibold text-muted-foreground">প্রোডাক্ট</TableHead>
+                   <TableHead className="text-[11px] font-semibold text-muted-foreground text-right">মোট মূল্য</TableHead>
+                   <TableHead className="text-[11px] font-semibold text-muted-foreground">পেমেন্ট</TableHead>
+                   <TableHead className="text-[11px] font-semibold text-muted-foreground">কুরিয়ার</TableHead>
+                   <TableHead className="text-[11px] font-semibold text-muted-foreground">তারিখ</TableHead>
+                   <TableHead className="text-[11px] font-semibold text-muted-foreground">স্ট্যাটাস</TableHead>
+                   <TableHead className="text-[11px] font-semibold text-muted-foreground text-right pr-4">অ্যাকশন</TableHead>
+                 </TableRow>
+               </TableHeader>
+               <TableBody>
+                 {paged.map((o, index) => {
+                   const serial = page * pageSize + index + 1;
+                   const courierBooked = (o as any).courier_booked === true;
+                   return (
+                     <React.Fragment key={o.id}>
+                       <TableRow className={`group transition-colors duration-150 border-b border-border/15 ${selectedIds.has(o.id) ? 'bg-primary/[0.03]' : 'hover:bg-muted/30'}`}>
+                         {/* Checkbox */}
+                         <TableCell className="pl-4">
+                           <Checkbox
+                             checked={selectedIds.has(o.id)}
+                             onCheckedChange={() => toggleSelect(o.id)}
+                             className="border-muted-foreground/30"
+                           />
+                         </TableCell>
+
+                         {/* Serial */}
+                         <TableCell className="font-inter text-xs text-muted-foreground tabular-nums">
+                           {toBengaliNum(serial)}
+                         </TableCell>
+
+                         {/* Customer Info — merged: name, phone, address, area */}
+                         <TableCell>
+                           <div className="space-y-0.5">
+                             <p className="font-semibold text-[13px] text-foreground leading-tight">{o.customer_name}</p>
+                             <p className="text-[12px] text-muted-foreground font-inter tabular-nums">{o.phone}</p>
+                             <p className="text-[11px] text-muted-foreground/70 truncate max-w-[220px] leading-tight">{o.address}</p>
+                             <span className="inline-block text-[10px] text-muted-foreground/60 mt-0.5">
+                               {o.delivery_location === 'dhaka' ? '📍 ঢাকা' : '📍 ঢাকার বাইরে'}
+                             </span>
+                           </div>
+                         </TableCell>
+
+                         {/* Product — merged: model, color, qty */}
+                         <TableCell>
+                           <div className="space-y-0.5">
+                             <p className="text-[13px] font-medium text-foreground">{o.watch_model}</p>
+                             {(o as any).selected_color && (
+                               <span className="text-[11px] text-gold font-medium">🎨 {(o as any).selected_color}</span>
+                             )}
+                             <p className="text-[11px] text-muted-foreground">পরিমাণ: {toBengaliNum(o.quantity)}</p>
+                           </div>
+                         </TableCell>
+
+                         {/* Total Price */}
+                         <TableCell className="text-right">
+                           <span className="font-bold text-[14px] text-foreground font-inter tabular-nums">
+                             ৳{formatBengaliPrice(o.total_price)}
+                           </span>
+                         </TableCell>
+
+                         {/* Payment — merged: method, trxId, advance info */}
+                         <TableCell>
+                           <div className="space-y-1">
+                             {o.payment_method === 'cod' ? (
+                               <span className="inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-sm bg-muted/30 text-muted-foreground border border-border/20">COD</span>
+                             ) : (o as any).payment_type === 'full_payment' ? (
+                               <>
+                                 <span className="inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-sm bg-success/10 text-success border border-success/20">সম্পূর্ণ পেইড ✓</span>
+                                 <p className="text-[10px] text-success/70 font-inter">৳{formatBengaliPrice((o as any).advance_amount || 0)}</p>
+                               </>
+                             ) : (o as any).payment_type === 'delivery_charge_only' ? (
+                               <>
+                                 <span className="inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-sm bg-warning/10 text-warning border border-warning/20">আংশিক</span>
+                                 <p className="text-[10px] text-warning/70 font-inter">বাকি: ৳{formatBengaliPrice(o.total_price - ((o as any).advance_amount || 0))}</p>
+                               </>
+                             ) : (
+                               <span className="inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-sm bg-info/10 text-info border border-info/20">অনলাইন</span>
+                             )}
+                             {o.trx_id && (
+                               <p className="text-[10px] font-mono text-gold/80 bg-gold/5 px-1.5 py-0.5 rounded-sm inline-block border border-gold/10">{o.trx_id}</p>
+                             )}
+                           </div>
+                         </TableCell>
+
+                         {/* Courier — merged: tracking id, provider, live status */}
+                         <TableCell>
+                           {courierBooked ? (
+                             <div className="space-y-1">
+                               <span className="text-[11px] font-mono font-semibold text-success bg-success/5 px-1.5 py-0.5 rounded-sm border border-success/10 inline-block">
+                                 {(o as any).tracking_id}
+                               </span>
+                               <p className="text-[10px] text-muted-foreground">
+                                 {(o as any).courier_provider === 'pathao' ? 'Pathao' : (o as any).courier_provider === 'steadfast' ? 'Steadfast' : 'RedX'}
+                               </p>
+                               <button
+                                 onClick={() => setExpandedOrderId(expandedOrderId === o.id ? null : o.id)}
+                                 className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-sm text-[10px] font-semibold border transition-colors cursor-pointer ${
+                                   o.status === 'completed' ? 'bg-success/10 text-success border-success/15'
+                                   : o.status === 'shipped' ? 'bg-info/10 text-info border-info/15'
+                                   : o.status === 'returned' ? 'bg-destructive/10 text-destructive border-destructive/15'
+                                   : 'bg-warning/10 text-warning border-warning/15'
+                                 }`}
+                               >
+                                 <Eye className="h-2.5 w-2.5" />
+                                 {o.status === 'completed' ? 'ডেলিভারড' : o.status === 'shipped' ? 'ট্রানজিট' : o.status === 'returned' ? 'রিটার্ন' : 'পেন্ডিং'}
+                               </button>
+                             </div>
+                           ) : (
+                             <span className="text-[11px] text-muted-foreground/40">—</span>
+                           )}
+                         </TableCell>
+
+                         {/* Date */}
+                         <TableCell className="text-[11px] text-muted-foreground font-inter tabular-nums whitespace-nowrap">
+                           {new Date(o.created_at).toLocaleDateString('bn-BD')}
+                         </TableCell>
+
+                         {/* Status */}
+                         <TableCell>
+                           <select
+                             value={o.status}
+                             onChange={(e) => updateStatus.mutate({ id: o.id, status: e.target.value as OrderStatus })}
+                             className={`text-[11px] font-semibold px-2.5 py-1.5 rounded-sm border cursor-pointer appearance-none transition-colors ${statusStyles[o.status]}`}
+                           >
+                             {Object.entries(statusLabels).map(([k, v]) => (
+                               <option key={k} value={k}>{v}</option>
+                             ))}
+                           </select>
+                         </TableCell>
+
+                         {/* Actions */}
+                         <TableCell className="pr-4">
+                           <div className="flex items-center justify-end gap-1">
+                             {courierBooked ? (
+                               <span className="p-1.5 rounded-sm text-success" title={`✅ ${(o as any).courier_provider} | ${(o as any).tracking_id}`}>
+                                 <CheckCircle2 className="h-4 w-4" />
+                               </span>
+                             ) : (
+                               <button
+                                 onClick={() => bookCourier(o.id, o.customer_name)}
+                                 disabled={bookingInProgress === o.id || bookingInProgress === 'bulk'}
+                                 className="p-1.5 rounded-sm text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all disabled:opacity-50"
+                                 title="কুরিয়ার বুক"
+                               >
+                                 {bookingInProgress === o.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Truck className="h-4 w-4" />}
+                               </button>
+                             )}
+                             <button
+                               onClick={() => downloadInvoice(o)}
+                               className="p-1.5 rounded-sm text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all"
+                               title="ইনভয়েস"
+                             >
+                               <FileText className="h-4 w-4" />
+                             </button>
+                           </div>
+                         </TableCell>
+                       </TableRow>
+
+                       {/* Expandable Live Tracking */}
+                       {expandedOrderId === o.id && (
+                         <TableRow className="bg-muted/5 hover:bg-muted/5">
+                           <TableCell colSpan={10} className="py-4 px-6">
+                             <div className="flex items-start justify-between">
+                               <LiveTracking orderId={o.id} trackingId={(o as any).tracking_id} courierProvider={(o as any).courier_provider} />
+                               <button onClick={() => setExpandedOrderId(null)} className="p-1.5 rounded-sm hover:bg-muted text-muted-foreground">
+                                 <X className="h-4 w-4" />
+                               </button>
+                             </div>
+                           </TableCell>
+                         </TableRow>
+                       )}
+                     </React.Fragment>
+                   );
+                 })}
+               </TableBody>
+             </Table>
+           </div>
 
            {/* Pagination */}
           <AdminPagination
