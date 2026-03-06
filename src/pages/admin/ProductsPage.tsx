@@ -199,6 +199,7 @@ const ProductsPage = () => {
             <Plus className="h-4 w-4" /> নতুন প্রোডাক্ট
           </button>
         </div>
+        </div>
       </div>
 
       {isLoading ? (
