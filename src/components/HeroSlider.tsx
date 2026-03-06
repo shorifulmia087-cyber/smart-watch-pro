@@ -66,7 +66,7 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
       </div>
 
       <div className="relative max-w-6xl mx-auto px-4 pb-6">
-        <div className="relative aspect-[4/3] md:aspect-[16/9] rounded-sm overflow-hidden bg-muted border border-border/30 shadow-sm">
+        <div className="relative aspect-[4/3] md:aspect-[16/9] rounded-xl overflow-hidden bg-muted border border-border/40 shadow-lg">
           <AnimatePresence mode="wait" initial={false}>
             <motion.img
               key={`${images[current]?.src}-${current}`}
@@ -85,7 +85,7 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
               key={`label-${current}`}
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              className="inline-block bg-ink/80 backdrop-blur-sm text-surface text-xs md:text-sm px-3 py-1.5 rounded-sm font-medium"
+              className="inline-block bg-ink/80 backdrop-blur-sm text-surface text-xs md:text-sm px-3 py-1.5 rounded-lg font-medium"
             >
               {images[current]?.label}
             </motion.span>
@@ -93,13 +93,13 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
 
           <button
             onClick={prev}
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-sm bg-surface/80 backdrop-blur-sm flex items-center justify-center hover:bg-surface transition-colors border border-border/30"
+            className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-surface/80 backdrop-blur-sm flex items-center justify-center hover:bg-surface transition-colors border border-border/30 shadow-md"
           >
             <ChevronLeft className="w-5 h-5 text-ink" />
           </button>
           <button
             onClick={next}
-            className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-sm bg-surface/80 backdrop-blur-sm flex items-center justify-center hover:bg-surface transition-colors border border-border/30"
+            className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-surface/80 backdrop-blur-sm flex items-center justify-center hover:bg-surface transition-colors border border-border/30 shadow-md"
           >
             <ChevronRight className="w-5 h-5 text-ink" />
           </button>
@@ -110,7 +110,7 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
             <button
               key={i}
               onClick={() => setCurrent(i)}
-              className={`h-1.5 rounded-sm transition-all duration-300 ${
+              className={`h-1.5 rounded-full transition-all duration-300 ${
                 i === current ? 'bg-gold w-6' : 'bg-border w-2'
               }`}
             />
@@ -122,7 +122,7 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
         <div className="relative w-full sm:w-auto">
             <motion.button
               onClick={onOrderClick}
-              className="gradient-gold text-surface font-semibold px-8 py-3.5 rounded-sm text-base hover:opacity-90 transition-opacity w-full sm:w-auto"
+              className="gradient-gold text-surface font-semibold px-8 py-3.5 rounded-xl text-base hover:opacity-90 transition-opacity w-full sm:w-auto"
               style={{ boxShadow: '0 4px 16px -4px hsl(var(--gold) / 0.4)' }}
               initial={{ scale: 1, rotateZ: 0 }}
               animate={{ 
@@ -136,12 +136,12 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
         </div>
         {discountPercent > 0 ? (
           <motion.div
-            className="relative flex flex-col items-center gap-2 px-8 py-4 rounded-sm border border-gold/30 bg-gradient-to-br from-gold/10 via-accent/5 to-transparent shadow-sm w-full sm:w-auto overflow-hidden"
+            className="relative flex flex-col items-center gap-2 px-8 py-4 rounded-xl border border-gold/30 bg-gradient-to-br from-gold/10 via-accent/5 to-transparent shadow-md w-full sm:w-auto overflow-hidden"
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.3 }}
           >
-            <div className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs font-bold px-3 py-1 rounded-bl-sm rounded-tr-sm shadow-sm">
+            <div className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs font-bold px-3 py-1 rounded-bl-xl rounded-tr-xl shadow-sm">
               -{discountPercent}% ছাড়
             </div>
             <span className="line-through text-muted-foreground text-lg sm:text-xl">মূল্য: ৳{formatBengaliPrice(originalPrice)}</span>
@@ -151,7 +151,7 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
             <span className="text-xs text-muted-foreground font-medium">সীমিত সময়ের জন্য</span>
           </motion.div>
         ) : (
-          <div className="flex flex-col items-center gap-1 px-6 py-3 rounded-sm bg-muted border border-border/30 w-full sm:w-auto">
+          <div className="flex flex-col items-center gap-1 px-6 py-3 rounded-xl bg-muted border border-border/40 w-full sm:w-auto">
             <span className="text-foreground font-bold text-base">মূল্য: ৳{formatBengaliPrice(price)}</span>
           </div>
         )}

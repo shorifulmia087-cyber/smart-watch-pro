@@ -65,7 +65,7 @@ const ReviewGallery = () => {
               transition={{ delay: i * 0.06, duration: 0.4 }}
               whileHover={{ y: -4, boxShadow: '0 8px 24px -8px hsl(var(--gold) / 0.12)' }}
               onClick={() => setLightboxIdx(i)}
-              className="group relative min-w-[200px] md:min-w-[240px] aspect-[9/16] rounded-sm overflow-hidden cursor-pointer snap-center border border-border/30 shadow-sm hover:shadow-md transition-shadow"
+              className="group relative min-w-[200px] md:min-w-[240px] aspect-[9/16] rounded-xl overflow-hidden cursor-pointer snap-center border border-border/40 shadow-sm hover:shadow-lg transition-shadow"
             >
               <img
                 src={img.image_url}
@@ -75,11 +75,10 @@ const ReviewGallery = () => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-ink/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="absolute bottom-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <div className="w-8 h-8 rounded-sm bg-surface/90 backdrop-blur-sm flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-surface/90 backdrop-blur-sm flex items-center justify-center">
                   <Quote className="w-3.5 h-3.5 text-gold" />
                 </div>
               </div>
-              <div className="absolute inset-0 ring-0 group-hover:ring-1 ring-gold/20 transition-all duration-300" />
             </motion.div>
           ))}
         </div>
@@ -110,7 +109,7 @@ const ReviewGallery = () => {
               exit={{ scale: 0.85, opacity: 0 }}
               transition={{ type: 'spring', stiffness: 300, damping: 25 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-sm aspect-[9/16] rounded-sm overflow-hidden relative border border-gold/15"
+              className="w-full max-w-sm aspect-[9/16] rounded-xl overflow-hidden relative border border-gold/15"
               style={{
                 boxShadow: '0 25px 60px -12px hsl(var(--ink) / 0.5)',
               }}
@@ -123,24 +122,24 @@ const ReviewGallery = () => {
               <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-ink/50 to-transparent" />
               <button
                 onClick={() => setLightboxIdx(null)}
-                className="absolute top-4 right-4 w-9 h-9 rounded-sm bg-surface/90 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-surface transition-colors"
+                className="absolute top-4 right-4 w-9 h-9 rounded-full bg-surface/90 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-surface transition-colors"
               >
                 <X className="w-4 h-4 text-foreground" />
               </button>
-              <div className="absolute top-4 left-4 px-3 py-1 rounded-sm bg-surface/90 backdrop-blur-sm text-xs font-medium text-foreground shadow-sm">
+              <div className="absolute top-4 left-4 px-3 py-1 rounded-lg bg-surface/90 backdrop-blur-sm text-xs font-medium text-foreground shadow-sm">
                 {lightboxIdx + 1} / {images.length}
               </div>
               <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-ink/60 to-transparent" />
               <div className="absolute bottom-5 left-0 right-0 flex justify-center gap-3">
                 <button
                   onClick={(e) => { e.stopPropagation(); setLightboxIdx((lightboxIdx - 1 + images.length) % images.length); }}
-                  className="w-10 h-10 rounded-sm bg-surface/90 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-surface transition-colors"
+                  className="w-10 h-10 rounded-full bg-surface/90 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-surface transition-colors"
                 >
                   <ChevronLeft className="w-5 h-5 text-foreground" />
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); setLightboxIdx((lightboxIdx + 1) % images.length); }}
-                  className="w-10 h-10 rounded-sm bg-surface/90 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-surface transition-colors"
+                  className="w-10 h-10 rounded-full bg-surface/90 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-surface transition-colors"
                 >
                   <ChevronRight className="w-5 h-5 text-foreground" />
                 </button>

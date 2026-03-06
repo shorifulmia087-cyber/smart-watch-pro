@@ -62,7 +62,7 @@ const CollectionGrid = ({ currentProductId, onSelectProduct, sectionTitle = 'আ
               transition={{ delay: i * 0.08, duration: 0.4 }}
               whileHover={{ y: -4, boxShadow: '0 8px 30px -8px hsl(var(--gold) / 0.12)' }}
               onClick={() => onSelectProduct(product)}
-              className="group text-left rounded-sm overflow-hidden bg-surface border border-border/30 shadow-sm hover:shadow-md transition-shadow"
+              className="group text-left rounded-xl overflow-hidden bg-surface border border-border/40 shadow-sm hover:shadow-lg transition-shadow"
             >
               <div className="aspect-square overflow-hidden bg-muted relative">
                 {product.thumbnail_url ? (
@@ -78,11 +78,10 @@ const CollectionGrid = ({ currentProductId, onSelectProduct, sectionTitle = 'আ
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-ink/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 {product.discount_percent > 0 && (
-                  <div className="absolute top-3 right-3 px-2.5 py-1 rounded-sm text-xs font-bold gradient-gold text-surface shadow-sm">
+                  <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-bold gradient-gold text-surface shadow-sm">
                     -{product.discount_percent}%
                   </div>
                 )}
-                <div className="absolute inset-0 ring-0 group-hover:ring-1 ring-gold/20 transition-all duration-300" />
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-foreground text-lg group-hover:text-gold transition-colors duration-200">{product.name}</h3>
