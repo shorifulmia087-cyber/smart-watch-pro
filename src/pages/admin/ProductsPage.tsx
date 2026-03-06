@@ -176,7 +176,7 @@ const ProductsPage = () => {
   ) || [];
 
   return (
-    <div className="space-y-5 max-w-[1400px]">
+    <div className="space-y-5 w-full">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold">প্রোডাক্ট ক্যাটালগ</h2>
