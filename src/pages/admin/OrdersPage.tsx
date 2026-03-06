@@ -447,20 +447,18 @@ const OrdersPage = () => {
                       <TableCell className="font-inter text-xs font-semibold text-muted-foreground tabular-nums">
                         {toBengaliNum(serial)}
                       </TableCell>
-                      <TableCell>
-                        <div>
-                          <p className="font-medium text-sm text-foreground">{o.customer_name}</p>
-                          <p className="text-[11px] text-muted-foreground truncate max-w-[200px]">{o.address}</p>
-                        </div>
+                      <TableCell className="whitespace-nowrap">
+                        <p className="font-medium text-sm text-foreground">{o.customer_name}</p>
                       </TableCell>
-                      <TableCell className="font-inter text-sm tabular-nums text-foreground">{o.phone}</TableCell>
-                      <TableCell className="text-sm text-foreground">
-                        <div>
-                          <span>{o.watch_model}</span>
-                          {(o as any).selected_color && (
-                            <span className="block text-[11px] text-gold font-medium mt-0.5">🎨 {(o as any).selected_color}</span>
-                          )}
-                        </div>
+                      <TableCell className="whitespace-nowrap text-sm text-muted-foreground max-w-[250px]">
+                        <p className="truncate">{o.address}</p>
+                      </TableCell>
+                      <TableCell className="font-inter text-sm tabular-nums text-foreground whitespace-nowrap">{o.phone}</TableCell>
+                      <TableCell className="text-sm text-foreground whitespace-nowrap">
+                        <span>{o.watch_model}</span>
+                        {(o as any).selected_color && (
+                          <span className="ml-2 text-[11px] text-gold font-medium">🎨 {(o as any).selected_color}</span>
+                        )}
                       </TableCell>
                       <TableCell className="text-center font-inter text-sm text-foreground">{toBengaliNum(o.quantity)}</TableCell>
                       <TableCell className="font-semibold text-gold font-inter text-sm">
