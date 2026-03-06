@@ -213,7 +213,7 @@ const ProductsPage = () => {
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="bg-muted/40 hover:bg-muted/40 border-b border-border/60">
+                <TableRow className="bg-muted/30 hover:bg-muted/30 border-b border-border/40">
                   <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 w-[70px]">ছবি</TableHead>
                   <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">নাম</TableHead>
                   <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">টাইপ</TableHead>
