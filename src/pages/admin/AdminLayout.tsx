@@ -62,7 +62,7 @@ const AdminLayoutInner = () => {
             )}
 
             <main className="flex-1 p-4 md:p-6 overflow-auto">
-              <div className="max-w-7xl mx-auto">
+              <div className="max-w-[90rem] mx-auto">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={location.pathname}
