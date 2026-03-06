@@ -3,7 +3,7 @@ import { useSettings, useUpdateSettings } from '@/hooks/useSupabaseData';
 import { useAuth } from '@/hooks/useAuth';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
-  Globe, Megaphone, Type, FileText, Save, Loader2, CheckCircle2, MessageCircle, Upload, X, Lock,
+  Globe, Megaphone, Type, FileText, Save, Loader2, CheckCircle2, MessageCircle, Upload, X, Lock, ShieldCheck,
 } from 'lucide-react';
 import type { Database } from '@/integrations/supabase/types';
 import { supabase } from '@/integrations/supabase/client';
@@ -182,6 +182,20 @@ const SiteControlPage = () => {
             value={(form as any).whatsapp_number || ''}
             onChange={v => setForm({ ...form, whatsapp_number: v } as any)}
           />
+        </Section>
+
+        <Section title="ফ্রড ডিটেকশন" icon={<ShieldCheck className="h-4 w-4 text-destructive" />}>
+          <div className="space-y-3">
+            <Field
+              label="মিনিমাম সাকসেস রেট (%)"
+              type="number"
+              value={String((form as any).min_success_rate ?? 60)}
+              onChange={v => setForm({ ...form, min_success_rate: Number(v) } as any)}
+            />
+            <p className="text-xs text-muted-foreground">
+              এই হারের নিচে থাকলে ক্যাশ অন ডেলিভারি ব্লক হবে এবং কাস্টমারকে অগ্রিম পেমেন্ট করতে বলা হবে। ডিফল্ট: ৬০%
+            </p>
+          </div>
         </Section>
       </div>
     </div>

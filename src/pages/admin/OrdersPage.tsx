@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { useOrders, useUpdateOrderStatus, useSettings } from '@/hooks/useSupabaseData';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
-import { Search, Filter, ChevronLeft, ChevronRight, Truck, FileText, CheckCircle2, Package, Loader2, Eye, X, MapPin, CreditCard } from 'lucide-react';
+import { Search, Filter, ChevronLeft, ChevronRight, Truck, FileText, CheckCircle2, Package, Loader2, Eye, X, MapPin, CreditCard, ShieldAlert, ShieldCheck, AlertTriangle } from 'lucide-react';
 import AdminPagination from '@/components/admin/AdminPagination';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -462,7 +462,25 @@ const OrdersPage = () => {
                       <TableCell className="whitespace-nowrap text-sm text-muted-foreground max-w-[250px]">
                         <p className="truncate">{o.address}</p>
                       </TableCell>
-                      <TableCell className="font-inter text-sm tabular-nums text-foreground whitespace-nowrap">{o.phone}</TableCell>
+                      <TableCell className="font-inter text-sm tabular-nums text-foreground whitespace-nowrap">
+                        <div className="flex items-center gap-1.5">
+                          {o.phone}
+                          {(o as any).fraud_success_rate !== null && (o as any).fraud_success_rate !== undefined ? (
+                            <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-sm text-[9px] font-bold border ${
+                              (o as any).fraud_success_rate >= 60
+                                ? 'bg-success/10 text-success border-success/20'
+                                : 'bg-destructive/10 text-destructive border-destructive/20'
+                            }`}>
+                              {Math.round((o as any).fraud_success_rate)}%
+                            </span>
+                          ) : (o as any).fraud_flag === 'new_customer' ? (
+                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-sm text-[9px] font-bold border bg-warning/10 text-warning border-warning/20">
+                              <AlertTriangle className="w-2.5 h-2.5" />
+                              নতুন
+                            </span>
+                          ) : null}
+                        </div>
+                      </TableCell>
                       <TableCell className="text-sm text-foreground whitespace-nowrap">
                         <span>{o.watch_model}</span>
                         {(o as any).selected_color && (

@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Minus, Plus, Loader2, Check, Copy, AlertCircle } from 'lucide-react';
+import { X, Minus, Plus, Loader2, Check, Copy, AlertCircle, ShieldAlert } from 'lucide-react';
 import { toBengaliNum, formatBengaliPrice } from '@/lib/bengali';
 import { useSecureOrder } from '@/hooks/useSecureOrder';
 import { useRateLimit } from '@/hooks/useRateLimit';
 import { sanitizeForDisplay, isValidPhone, isBot } from '@/lib/security';
 import { useToast } from '@/hooks/use-toast';
 import { useTurnstile } from '@/hooks/useTurnstile';
+import { useFraudCheck, type FraudResult } from '@/hooks/useFraudCheck';
 
 interface OrderModalProps {
   isOpen: boolean;
@@ -52,10 +53,13 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
   const { toast } = useToast();
   const { checkLimit } = useRateLimit({ maxAttempts: 10, windowMs: 60_000 });
   const { containerRef: turnstileRef, token: turnstileToken, reset: resetTurnstile, isEnabled: turnstileEnabled } = useTurnstile();
+  const { checkPhone, loading: fraudLoading, result: fraudResult, reset: resetFraud } = useFraudCheck();
+  const fraudCheckedRef = useRef('');
 
   useEffect(() => {
     if (!isOpen) {
       setQty(1); setTab('cod'); setPaymentType('delivery_charge_only'); setName(''); setEmail(''); setPhone(''); setAddress(''); setTxnId(''); setLoading(false); setSuccess(false); setLocation('dhaka'); setHoneypot(''); setHoneypot2(''); setSelectedColor(''); setErrors({}); setTouched(false);
+      resetFraud(); fraudCheckedRef.current = '';
     }
   }, [isOpen]);
 
@@ -97,6 +101,22 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
       setErrors(validate());
     }
   }, [touched, validate]);
+
+  // Fraud check on phone blur
+  const handlePhoneBlur = useCallback(async () => {
+    const clean = phone.replace(/[\s-]/g, '');
+    if (isValidPhone(clean) && fraudCheckedRef.current !== clean) {
+      fraudCheckedRef.current = clean;
+      await checkPhone(clean);
+    }
+  }, [phone, checkPhone]);
+
+  // If fraud blocks COD, force online tab
+  useEffect(() => {
+    if (fraudResult && fraudResult.flag === 'low_success' && tab === 'cod') {
+      setTab('online');
+    }
+  }, [fraudResult, tab]);
 
   const handleSubmit = async () => {
     if (isBot(honeypot) || isBot(honeypot2)) {
@@ -148,6 +168,11 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
         turnstile_token: turnstileToken,
         payment_type: tab === 'cod' ? 'cod' : paymentType,
         advance_amount: advanceAmount,
+        fraud_total_parcels: fraudResult?.total_parcels ?? undefined,
+        fraud_total_delivered: fraudResult?.total_delivered ?? undefined,
+        fraud_total_cancel: fraudResult?.total_cancel ?? undefined,
+        fraud_success_rate: fraudResult?.success_rate ?? undefined,
+        fraud_flag: fraudResult?.flag ?? undefined,
       });
       setLoading(false);
       setSuccess(true);
@@ -336,8 +361,28 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
               </div>
               <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ইমেইল (ঐচ্ছিক)" className="w-full bg-transparent border border-border/60 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/20 focus:border-gold/40 transition-all" maxLength={255} />
               <div>
-                <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="মোবাইল নম্বর *" className={`w-full bg-transparent border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/20 focus:border-gold/40 transition-all ${touched && errors.phone ? 'border-destructive/60 bg-destructive/5' : 'border-border/60'}`} maxLength={15} />
+                <div className="relative">
+                  <input value={phone} onChange={(e) => setPhone(e.target.value)} onBlur={handlePhoneBlur} placeholder="মোবাইল নম্বর *" className={`w-full bg-transparent border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/20 focus:border-gold/40 transition-all ${touched && errors.phone ? 'border-destructive/60 bg-destructive/5' : 'border-border/60'}`} maxLength={15} />
+                  {fraudLoading && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      <Loader2 className="w-4 h-4 animate-spin text-gold" />
+                    </div>
+                  )}
+                </div>
                 <ErrorMessage error={errors.phone} />
+                {fraudResult?.flag === 'low_success' && (
+                  <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="mt-2 p-3 rounded-lg bg-destructive/5 border border-destructive/15">
+                    <div className="flex items-start gap-2">
+                      <ShieldAlert className="w-4 h-4 text-destructive flex-shrink-0 mt-0.5" />
+                      <p className="text-xs text-destructive leading-relaxed">{fraudResult.message}</p>
+                    </div>
+                  </motion.div>
+                )}
+                {fraudResult?.flag === 'new_customer' && (
+                  <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-[11px] text-warning mt-1.5 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3" /> নতুন কাস্টমার
+                  </motion.p>
+                )}
               </div>
               <div>
                 <textarea value={address} onChange={(e) => setAddress(e.target.value)} placeholder="সম্পূর্ণ ঠিকানা *" rows={2} className={`w-full bg-transparent border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/20 focus:border-gold/40 transition-all resize-none ${touched && errors.address ? 'border-destructive/60 bg-destructive/5' : 'border-border/60'}`} maxLength={500} />
@@ -377,7 +422,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
             {/* Payment Tabs */}
             <div>
               <div className="flex rounded-xl bg-muted/50 p-1 gap-1 border border-border/40">
-                <button onClick={() => setTab('cod')} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${tab === 'cod' ? 'bg-surface shadow-sm text-foreground border border-border/30' : 'text-muted-foreground hover:text-foreground'}`}>
+                <button onClick={() => { if (fraudResult?.flag !== 'low_success') setTab('cod'); }} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${tab === 'cod' ? 'bg-surface shadow-sm text-foreground border border-border/30' : 'text-muted-foreground hover:text-foreground'} ${fraudResult?.flag === 'low_success' ? 'opacity-40 cursor-not-allowed' : ''}`}>
                   ক্যাশ অন ডেলিভারি
                 </button>
                 {onlinePaymentEnabled && (
@@ -499,7 +544,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
             {/* Submit Button */}
             <motion.button
               onClick={handleSubmit}
-              disabled={loading}
+              disabled={loading || fraudLoading}
               whileHover={{ scale: loading ? 1 : 1.01 }}
               whileTap={{ scale: loading ? 1 : 0.98 }}
               className={`w-full gradient-gold text-surface font-semibold py-3.5 rounded-xl text-base disabled:opacity-70 flex items-center justify-center gap-2 ${touched && !isFormValid ? 'opacity-80' : ''}`}

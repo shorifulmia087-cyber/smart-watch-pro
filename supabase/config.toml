@@ -23,3 +23,6 @@ verify_jwt = false
 
 [functions.create-order]
 verify_jwt = false
+
+[functions.check-fraud]
+verify_jwt = false
