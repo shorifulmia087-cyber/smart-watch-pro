@@ -83,7 +83,28 @@ const TeamPage = () => {
     }
   };
 
-  return (
+  const handleRemove = async (targetUserId: string) => {
+    if (!confirm('আপনি কি নিশ্চিত এই সদস্যকে রিমুভ করতে চান?')) return;
+    setRemovingId(targetUserId);
+    try {
+      const { data, error } = await supabase.rpc('remove_team_member', { _user_id: targetUserId });
+      if (error) throw error;
+      const result = data as { success: boolean; error?: string };
+      if (result.success) {
+        toast({ title: '✅ সফলভাবে রিমুভ করা হয়েছে' });
+        queryClient.invalidateQueries({ queryKey: ['team-members'] });
+      } else if (result.error === 'cannot_remove_self') {
+        toast({ title: '❌ নিজেকে রিমুভ করা যাবে না', variant: 'destructive' });
+      } else {
+        toast({ title: '❌ ত্রুটি', description: result.error, variant: 'destructive' });
+      }
+    } catch (err: any) {
+      toast({ title: 'ত্রুটি', description: err.message, variant: 'destructive' });
+    } finally {
+      setRemovingId(null);
+    }
+  };
+
     <div className="space-y-5 w-full max-w-[1000px]">
       {/* Bento Header */}
       <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-4 md:p-5">
