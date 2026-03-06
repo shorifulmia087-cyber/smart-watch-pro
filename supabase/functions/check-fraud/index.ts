@@ -58,7 +58,7 @@ Deno.serve(async (req) => {
           'Content-Type': 'application/json',
           'Authorization': `Token ${FRAUD_API_KEY}`,
         },
-        body: JSON.stringify({ phone: cleanPhone, api_key: FRAUD_API_KEY }),
+        body: JSON.stringify({ phone: cleanPhone }),
       })
     } catch (networkErr) {
       console.error('FraudChecker network error:', networkErr)
