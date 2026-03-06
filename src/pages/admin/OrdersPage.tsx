@@ -32,11 +32,12 @@ const statusStyles: Record<OrderStatus, string> = {
 
 const OrdersPage = () => {
   const [filter, setFilter] = useState<OrderStatus | undefined>();
+  const [paymentFilter, setPaymentFilter] = useState<string | undefined>();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(15);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
-  const pageSize = 15;
   const { data: orders, isLoading } = useOrders(filter);
   const { data: settings } = useSettings();
   const updateStatus = useUpdateOrderStatus();
