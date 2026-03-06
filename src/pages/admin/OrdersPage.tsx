@@ -296,16 +296,17 @@ const OrdersPage = () => {
   return (
     <div className="space-y-5 w-full">
       {/* ─── Bento Filter/Search Header ─── */}
-      <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-4 md:p-5">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="bg-white dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6">
+        {/* Title & Search Row */}
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-5">
           <div>
-            <h2 className="text-lg font-bold text-foreground">সকল অর্ডার</h2>
-            <p className="text-[11px] text-muted-foreground mt-0.5">মোট {toBengaliNum(filtered.length)} টি অর্ডার পাওয়া গেছে</p>
+            <h2 className="text-xl font-bold text-foreground tracking-tight">সকল অর্ডার</h2>
+            <p className="text-xs text-muted-foreground mt-1">মোট {toBengaliNum(filtered.length)} টি অর্ডার পাওয়া গেছে</p>
           </div>
-          <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-3 flex-wrap w-full lg:w-auto">
             {/* Courier Provider */}
-            <div className="flex items-center gap-2 bg-muted/30 border border-border/40 rounded-sm px-3 py-2">
-              <Truck className="h-4 w-4 text-gold" />
+            <div className="flex items-center gap-2 bg-muted/20 dark:bg-muted/10 border border-border/30 rounded-lg px-3.5 py-2.5">
+              <Truck className="h-4 w-4 text-gold shrink-0" />
               <select
                 value={courierProvider}
                 onChange={e => setCourierProvider(e.target.value as 'redx' | 'pathao' | 'steadfast')}
@@ -317,52 +318,60 @@ const OrdersPage = () => {
               </select>
             </div>
             {/* Search */}
-            <div className="flex items-center gap-2 bg-muted/30 border border-border/40 rounded-sm px-3 py-2 min-w-[240px]">
+            <div className="flex items-center gap-2.5 bg-muted/20 dark:bg-muted/10 border border-border/30 rounded-lg px-3.5 py-2.5 flex-1 lg:min-w-[280px]">
               <Search className="h-4 w-4 text-muted-foreground shrink-0" />
               <input
                 type="text" value={search} onChange={e => { setSearch(e.target.value); setPage(0); }}
                 placeholder="নাম, ফোন বা TrxID দিয়ে খুঁজুন..."
-                className="bg-transparent border-none outline-none w-full text-sm text-foreground placeholder:text-muted-foreground"
+                className="bg-transparent border-none outline-none w-full text-sm text-foreground placeholder:text-muted-foreground/60"
               />
             </div>
           </div>
         </div>
 
-        {/* Filter Pills */}
-        <div className="flex items-center gap-2 flex-wrap mt-4 pt-4 border-t border-border/20">
-          <Filter className="h-4 w-4 text-muted-foreground" />
-          {[undefined, 'pending', 'processing', 'shipped', 'completed', 'returned'].map((s) => (
-            <button
-              key={s ?? 'all'}
-              onClick={() => { setFilter(s as OrderStatus | undefined); setPage(0); }}
-              className={`px-3.5 py-1.5 rounded-sm text-xs font-medium transition-all duration-200 border ${
-                filter === s
-                  ? 'gradient-gold text-white border-transparent shadow-sm'
-                  : 'bg-transparent text-muted-foreground border-border/40 hover:border-gold/30 hover:text-gold'
-              }`}
-            >
-              {s ? statusLabels[s as OrderStatus] : 'সব'}
-            </button>
-          ))}
-        </div>
+        {/* Filters Section */}
+        <div className="space-y-3 pt-4 border-t border-border/15">
+          {/* Status Filter */}
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <div className="flex items-center gap-1.5 mr-1">
+              <Filter className="h-3.5 w-3.5 text-muted-foreground/50" />
+              <span className="text-[10px] text-muted-foreground/50 uppercase tracking-widest font-semibold">স্ট্যাটাস:</span>
+            </div>
+            {[undefined, 'pending', 'processing', 'shipped', 'completed', 'returned'].map((s) => (
+              <button
+                key={s ?? 'all'}
+                onClick={() => { setFilter(s as OrderStatus | undefined); setPage(0); }}
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 border ${
+                  filter === s
+                    ? 'gradient-gold text-white border-transparent shadow-sm'
+                    : 'bg-muted/15 dark:bg-muted/10 text-muted-foreground border-border/30 hover:border-gold/30 hover:text-gold'
+                }`}
+              >
+                {s ? statusLabels[s as OrderStatus] : 'সব'}
+              </button>
+            ))}
+          </div>
 
-        {/* Payment Type Filter */}
-        <div className="flex items-center gap-2 flex-wrap mt-3 pt-3 border-t border-border/10">
-          <CreditCard className="h-4 w-4 text-muted-foreground" />
-          <span className="text-[10px] text-muted-foreground/60 uppercase tracking-wider font-semibold mr-1">পেমেন্ট:</span>
-          {[undefined, 'cod', 'online'].map(f => (
-            <button
-              key={f ?? 'all'}
-              onClick={() => { setPaymentFilter(f); setPage(0); }}
-              className={`px-3 py-1.5 rounded-sm text-xs font-medium transition-all duration-200 border ${
-                paymentFilter === f
-                  ? 'gradient-gold text-white border-transparent shadow-sm'
-                  : 'bg-transparent text-muted-foreground border-border/40 hover:border-gold/30 hover:text-gold'
-              }`}
-            >
-              {f === 'cod' ? 'ক্যাশ অন ডেলিভারি' : f === 'online' ? 'অনলাইন পেমেন্ট' : 'সব'}
-            </button>
-          ))}
+          {/* Payment Type Filter */}
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <div className="flex items-center gap-1.5 mr-1">
+              <CreditCard className="h-3.5 w-3.5 text-muted-foreground/50" />
+              <span className="text-[10px] text-muted-foreground/50 uppercase tracking-widest font-semibold">পেমেন্ট:</span>
+            </div>
+            {[undefined, 'cod', 'online'].map(f => (
+              <button
+                key={f ?? 'all'}
+                onClick={() => { setPaymentFilter(f); setPage(0); }}
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 border ${
+                  paymentFilter === f
+                    ? 'gradient-gold text-white border-transparent shadow-sm'
+                    : 'bg-muted/15 dark:bg-muted/10 text-muted-foreground border-border/30 hover:border-gold/30 hover:text-gold'
+                }`}
+              >
+                {f === 'cod' ? 'ক্যাশ অন ডেলিভারি' : f === 'online' ? 'অনলাইন পেমেন্ট' : 'সব'}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
