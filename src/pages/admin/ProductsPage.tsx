@@ -94,15 +94,26 @@ const ProductsPage = () => {
     setUploading(true);
     const urls: string[] = [];
     for (const file of Array.from(files)) {
-      const ext = file.name.split('.').pop();
-      const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-      const { error } = await supabase.storage.from(BUCKET).upload(path, file);
-      if (error) {
-        toast({ title: 'আপলোড ত্রুটি', description: error.message, variant: 'destructive' });
-        continue;
+      try {
+        // Compress to WebP before uploading
+        const compressed = await compressImage(file);
+        const ext = compressed.name.split('.').pop() || 'webp';
+        const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const { error } = await supabase.storage.from(BUCKET).upload(path, compressed);
+        if (error) {
+          toast({ title: 'আপলোড ত্রুটি', description: error.message, variant: 'destructive' });
+          continue;
+        }
+        const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(path);
+        urls.push(urlData.publicUrl);
+
+        // Also generate & upload a thumbnail
+        const thumb = await generateThumbnail(file);
+        const thumbPath = `thumbs/${path}`;
+        await supabase.storage.from(BUCKET).upload(thumbPath, thumb);
+      } catch {
+        toast({ title: 'কম্প্রেশন ত্রুটি', description: file.name, variant: 'destructive' });
       }
-      const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(path);
-      urls.push(urlData.publicUrl);
     }
     setForm(prev => ({ ...prev, image_urls: [...prev.image_urls, ...urls] }));
     setUploading(false);
