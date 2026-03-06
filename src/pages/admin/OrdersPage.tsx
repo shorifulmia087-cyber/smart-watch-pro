@@ -401,7 +401,7 @@ const OrdersPage = () => {
           কোনো অর্ডার পাওয়া যায়নি।
         </div>
       ) : (
-        <div className="bg-surface dark:bg-card rounded-sm border border-border/30 overflow-hidden shadow-sm">
+        <div className="bg-white dark:bg-card rounded-sm border border-border/30 overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
