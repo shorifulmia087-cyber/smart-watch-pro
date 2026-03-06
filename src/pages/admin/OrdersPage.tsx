@@ -525,7 +525,7 @@ const OrdersPage = () => {
           </div>
           <div className="flex items-center gap-3 flex-wrap w-full lg:w-auto">
             {/* Courier Provider */}
-            <div className="flex items-center gap-2 bg-muted/20 dark:bg-muted/10 border border-border/30 rounded-lg px-3.5 py-2.5">
+            <div className="flex items-center gap-2 bg-muted/30 border border-border/40 rounded-sm px-3 py-2.5">
               <Truck className="h-4 w-4 text-gold shrink-0" />
               <select
                 value={courierProvider}
