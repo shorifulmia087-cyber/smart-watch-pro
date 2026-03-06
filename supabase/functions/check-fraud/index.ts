@@ -42,7 +42,7 @@ Deno.serve(async (req) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Token ${FRAUD_API_KEY}`,
+          'Authorization': `Bearer ${FRAUD_API_KEY}`,
         },
         body: JSON.stringify({ phone: cleanPhone }),
       })
