@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Minus, Plus, Loader2, Check, Copy, AlertCircle } from 'lucide-react';
+import { X, Minus, Plus, Loader2, Check, Copy, AlertCircle, ShieldAlert } from 'lucide-react';
 import { toBengaliNum, formatBengaliPrice } from '@/lib/bengali';
 import { useSecureOrder } from '@/hooks/useSecureOrder';
 import { useRateLimit } from '@/hooks/useRateLimit';
 import { sanitizeForDisplay, isValidPhone, isBot } from '@/lib/security';
 import { useToast } from '@/hooks/use-toast';
 import { useTurnstile } from '@/hooks/useTurnstile';
+import { useFraudCheck, type FraudResult } from '@/hooks/useFraudCheck';
 
 interface OrderModalProps {
   isOpen: boolean;
