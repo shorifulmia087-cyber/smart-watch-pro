@@ -47,12 +47,14 @@ const statusIndex: Record<OrderStatus, number> = {
 };
 
 const TrackOrder = () => {
+  const [searchParams] = useSearchParams();
   const [query, setQuery] = useState('');
   const [order, setOrder] = useState<OrderInfo | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [liveTracking, setLiveTracking] = useState<LiveTrackingData | null>(null);
   const [trackingLoading, setTrackingLoading] = useState(false);
+  const [autoSearched, setAutoSearched] = useState(false);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
