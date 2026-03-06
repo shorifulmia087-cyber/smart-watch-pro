@@ -183,10 +183,10 @@ const TeamPage = () => {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/30 hover:bg-muted/30 border-b border-border/40">
-                <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">User ID</TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">রোল</TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground text-center">স্ট্যাটাস</TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground text-center">অ্যাকশন</TableHead>
+                <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">User ID</TableHead>
+                <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">রোল</TableHead>
+                <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 text-center">স্ট্যাটাস</TableHead>
+                <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 text-center">অ্যাকশন</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
