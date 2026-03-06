@@ -192,7 +192,7 @@ const AdminSidebar = () => {
                   <p className="text-[11px] font-semibold text-foreground truncate leading-tight">
                     {user?.email}
                   </p>
-                  <p className="text-[9px] font-medium text-accent leading-tight mt-0.5">অ্যাডমিন</p>
+                  <p className="text-[9px] font-medium text-accent leading-tight mt-0.5">{isOrderManager ? 'অর্ডার ম্যানেজার' : 'অ্যাডমিন'}</p>
                 </div>
               </div>
               <button
