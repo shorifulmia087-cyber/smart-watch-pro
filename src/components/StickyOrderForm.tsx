@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toBengaliNum, formatBengaliPrice } from '@/lib/bengali';
-import { useCreateOrder, useSettings, useFeaturedProduct } from '@/hooks/useSupabaseData';
+import { useSettings, useFeaturedProduct } from '@/hooks/useSupabaseData';
+import { useSecureOrder } from '@/hooks/useSecureOrder';
 import { useRateLimit } from '@/hooks/useRateLimit';
 import { sanitizeForDisplay, isValidPhone, isBot } from '@/lib/security';
+import { useTurnstile } from '@/hooks/useTurnstile';
 import { Loader2, Check } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 

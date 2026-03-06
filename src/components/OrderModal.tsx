@@ -444,6 +444,11 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
               )}
             </div>
 
+            {/* Turnstile Widget */}
+            {turnstileEnabled && (
+              <div ref={turnstileRef} className="flex justify-center" />
+            )}
+
             {/* Submit Button */}
             <motion.button
               onClick={handleSubmit}
