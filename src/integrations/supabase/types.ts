@@ -94,6 +94,7 @@ export type Database = {
           customer_name: string
           delivery_charge: number
           delivery_location: string
+          fraud_error_message: string | null
           fraud_flag: string | null
           fraud_success_rate: number | null
           fraud_total_cancel: number | null
@@ -121,6 +122,7 @@ export type Database = {
           customer_name: string
           delivery_charge?: number
           delivery_location?: string
+          fraud_error_message?: string | null
           fraud_flag?: string | null
           fraud_success_rate?: number | null
           fraud_total_cancel?: number | null
@@ -148,6 +150,7 @@ export type Database = {
           customer_name?: string
           delivery_charge?: number
           delivery_location?: string
+          fraud_error_message?: string | null
           fraud_flag?: string | null
           fraud_success_rate?: number | null
           fraud_total_cancel?: number | null

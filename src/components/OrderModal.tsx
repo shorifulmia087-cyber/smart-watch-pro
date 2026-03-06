@@ -173,6 +173,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
         fraud_total_cancel: fraudResult?.total_cancel ?? undefined,
         fraud_success_rate: fraudResult?.success_rate ?? undefined,
         fraud_flag: fraudResult?.flag ?? undefined,
+        fraud_error_message: fraudResult?.error_message ?? undefined,
       });
       setLoading(false);
       setSuccess(true);

@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { useOrders, useUpdateOrderStatus, useSettings } from '@/hooks/useSupabaseData';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
-import { Search, Filter, ChevronLeft, ChevronRight, Truck, FileText, CheckCircle2, Package, Loader2, Eye, X, MapPin, CreditCard, ShieldAlert, ShieldCheck, AlertTriangle } from 'lucide-react';
+import { Search, Filter, Truck, FileText, CheckCircle2, Package, Loader2, Eye, X, CreditCard, AlertTriangle, ShieldCheck, ShieldX, ShieldQuestion, RefreshCw } from 'lucide-react';
 import AdminPagination from '@/components/admin/AdminPagination';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -30,6 +30,141 @@ const statusStyles: Record<OrderStatus, string> = {
   returned: 'bg-orange-500/10 text-orange-600 border-orange-500/20',
 };
 
+// Manual Fraud Check Modal
+const FraudCheckModal = ({ phone, onClose }: { phone: string; onClose: () => void }) => {
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const runCheck = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { data, error: invokeErr } = await supabase.functions.invoke('check-fraud', {
+        body: { phone: phone.replace(/[\s-]/g, '') },
+      });
+      if (invokeErr) {
+        setError('API কল ব্যর্থ হয়েছে');
+        return;
+      }
+      if (data?.flag === 'check_failed') {
+        setError(data.error_message || 'API চেক ব্যর্থ');
+      }
+      setResult(data);
+    } catch {
+      setError('নেটওয়ার্ক ত্রুটি');
+    } finally {
+      setLoading(false);
+    }
+  }, [phone]);
+
+  // Auto-run on mount
+  React.useEffect(() => { runCheck(); }, [runCheck]);
+
+  return (
+    <div className="fixed inset-0 z-[100] bg-ink/50 backdrop-blur-sm flex items-center justify-center p-4" onClick={onClose}>
+      <div className="bg-white dark:bg-card rounded-sm border border-border/30 shadow-lg w-full max-w-md" onClick={e => e.stopPropagation()}>
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b border-border/20">
+          <div>
+            <h3 className="font-bold text-sm text-foreground">ম্যানুয়াল ফ্রড চেক</h3>
+            <p className="text-xs text-muted-foreground font-inter mt-0.5">{phone}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button onClick={runCheck} disabled={loading} className="p-1.5 rounded-sm hover:bg-muted transition-colors text-muted-foreground disabled:opacity-50">
+              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            </button>
+            <button onClick={onClose} className="p-1.5 rounded-sm hover:bg-muted transition-colors text-muted-foreground">
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+
+        {/* Body */}
+        <div className="p-4">
+          {loading && !result && (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-gold" />
+              <span className="ml-2 text-sm text-muted-foreground">চেক হচ্ছে...</span>
+            </div>
+          )}
+
+          {error && (
+            <div className="p-3 rounded-sm bg-destructive/5 border border-destructive/15 mb-3">
+              <p className="text-xs text-destructive font-medium flex items-center gap-1.5">
+                <ShieldX className="h-3.5 w-3.5" />
+                {error}
+              </p>
+            </div>
+          )}
+
+          {result && (
+            <div className="space-y-3">
+              {/* Risk Badge */}
+              <div className="flex items-center gap-2">
+                {result.flag === 'good' && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-semibold border bg-success/10 text-success border-success/20">
+                    <ShieldCheck className="h-3.5 w-3.5" /> নিরাপদ কাস্টমার
+                  </span>
+                )}
+                {result.flag === 'low_success' && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-semibold border bg-destructive/10 text-destructive border-destructive/20">
+                    <ShieldX className="h-3.5 w-3.5" /> ঝুঁকিপূর্ণ কাস্টমার
+                  </span>
+                )}
+                {result.flag === 'new_customer' && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-semibold border bg-warning/10 text-warning border-warning/20">
+                    <AlertTriangle className="h-3.5 w-3.5" /> নতুন কাস্টমার
+                  </span>
+                )}
+                {result.flag === 'check_failed' && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-semibold border bg-destructive/10 text-destructive border-destructive/20">
+                    <ShieldX className="h-3.5 w-3.5" /> চেক ব্যর্থ
+                  </span>
+                )}
+              </div>
+
+              {/* Stats Grid */}
+              <div className="grid grid-cols-3 gap-2">
+                <div className="bg-muted/20 rounded-sm border border-border/20 p-3 text-center">
+                  <p className="text-lg font-bold text-foreground font-inter">{toBengaliNum(result.total_parcels || 0)}</p>
+                  <p className="text-[10px] text-muted-foreground font-medium mt-0.5">মোট পার্সেল</p>
+                </div>
+                <div className="bg-success/5 rounded-sm border border-success/15 p-3 text-center">
+                  <p className="text-lg font-bold text-success font-inter">{toBengaliNum(result.total_delivered || 0)}</p>
+                  <p className="text-[10px] text-muted-foreground font-medium mt-0.5">ডেলিভারড</p>
+                </div>
+                <div className="bg-destructive/5 rounded-sm border border-destructive/15 p-3 text-center">
+                  <p className="text-lg font-bold text-destructive font-inter">{toBengaliNum(result.total_cancel || 0)}</p>
+                  <p className="text-[10px] text-muted-foreground font-medium mt-0.5">ক্যানসেলড</p>
+                </div>
+              </div>
+
+              {/* Success Rate Bar */}
+              {result.success_rate !== null && (
+                <div className="bg-muted/10 rounded-sm border border-border/20 p-3">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[11px] font-medium text-muted-foreground">সাকসেস রেট</span>
+                    <span className={`text-sm font-bold font-inter ${result.success_rate >= 60 ? 'text-success' : 'text-destructive'}`}>
+                      {Math.round(result.success_rate)}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-muted/30 rounded-full h-1.5">
+                    <div
+                      className={`h-1.5 rounded-full transition-all ${result.success_rate >= 60 ? 'bg-success' : 'bg-destructive'}`}
+                      style={{ width: `${Math.min(100, result.success_rate)}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const OrdersPage = () => {
   const [filter, setFilter] = useState<OrderStatus | undefined>();
   const [paymentFilter, setPaymentFilter] = useState<string | undefined>();
@@ -38,6 +173,7 @@ const OrdersPage = () => {
   const [pageSize, setPageSize] = useState(15);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
+  const [fraudCheckPhone, setFraudCheckPhone] = useState<string | null>(null);
   const { data: orders, isLoading } = useOrders(filter);
   const { data: settings } = useSettings();
   const updateStatus = useUpdateOrderStatus();
@@ -89,7 +225,6 @@ const OrdersPage = () => {
 
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       const modeLabel = result.mode === 'sandbox' ? ' (🧪 TEST)' : '';
-      // Show the raw API response message from the courier
       const apiMessage = result?.redx_response?.message 
         || result?.pathao_response?.message 
         || result?.steadfast_response?.message 
@@ -293,8 +428,53 @@ const OrdersPage = () => {
     setSelectedIds(newSet);
   };
 
+  // Helper to get risk level info
+  const getRiskBadge = (o: any) => {
+    const flag = o.fraud_flag;
+    const rate = o.fraud_success_rate;
+    const errorMsg = o.fraud_error_message;
+
+    if (flag === 'check_failed') {
+      return (
+        <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-sm text-[9px] font-bold border bg-destructive/10 text-destructive border-destructive/20 cursor-help" title={errorMsg || 'চেক ব্যর্থ'}>
+          <ShieldX className="w-2.5 h-2.5" />
+          ব্যর্থ
+        </span>
+      );
+    }
+    if (flag === 'new_customer') {
+      return (
+        <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-sm text-[9px] font-bold border bg-warning/10 text-warning border-warning/20">
+          <AlertTriangle className="w-2.5 h-2.5" />
+          নতুন
+        </span>
+      );
+    }
+    if (flag === 'low_success' && rate !== null && rate !== undefined) {
+      return (
+        <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-sm text-[9px] font-bold border bg-destructive/10 text-destructive border-destructive/20">
+          {Math.round(rate)}%
+        </span>
+      );
+    }
+    if (flag === 'good' && rate !== null && rate !== undefined) {
+      return (
+        <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-sm text-[9px] font-bold border bg-success/10 text-success border-success/20">
+          {Math.round(rate)}%
+        </span>
+      );
+    }
+    // No fraud data
+    return <span className="text-muted-foreground text-[10px]">—</span>;
+  };
+
   return (
     <div className="space-y-5 w-full">
+      {/* Manual Fraud Check Modal */}
+      {fraudCheckPhone && (
+        <FraudCheckModal phone={fraudCheckPhone} onClose={() => setFraudCheckPhone(null)} />
+      )}
+
       {/* ─── Bento Filter/Search Header ─── */}
       <div className="bg-white dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6">
         {/* Title & Search Row */}
@@ -426,6 +606,7 @@ const OrdersPage = () => {
                   <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">কাস্টমার</TableHead>
                   <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">ঠিকানা</TableHead>
                   <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">ফোন</TableHead>
+                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">রিস্ক</TableHead>
                   <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">মডেল</TableHead>
                   <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 text-center whitespace-nowrap">পরিমাণ</TableHead>
                   <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">মোট</TableHead>
@@ -464,22 +645,19 @@ const OrdersPage = () => {
                       </TableCell>
                       <TableCell className="font-inter text-sm tabular-nums text-foreground whitespace-nowrap">
                         <div className="flex items-center gap-1.5">
-                          {o.phone}
-                          {(o as any).fraud_success_rate !== null && (o as any).fraud_success_rate !== undefined ? (
-                            <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-sm text-[9px] font-bold border ${
-                              (o as any).fraud_success_rate >= 60
-                                ? 'bg-success/10 text-success border-success/20'
-                                : 'bg-destructive/10 text-destructive border-destructive/20'
-                            }`}>
-                              {Math.round((o as any).fraud_success_rate)}%
-                            </span>
-                          ) : (o as any).fraud_flag === 'new_customer' ? (
-                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-sm text-[9px] font-bold border bg-warning/10 text-warning border-warning/20">
-                              <AlertTriangle className="w-2.5 h-2.5" />
-                              নতুন
-                            </span>
-                          ) : null}
+                          <span>{o.phone}</span>
+                          <button
+                            onClick={() => setFraudCheckPhone(o.phone)}
+                            className="p-0.5 rounded-sm hover:bg-muted transition-colors text-muted-foreground/50 hover:text-gold"
+                            title="ম্যানুয়াল ফ্রড চেক"
+                          >
+                            <ShieldQuestion className="w-3 h-3" />
+                          </button>
                         </div>
+                      </TableCell>
+                      {/* Risk Level */}
+                      <TableCell className="whitespace-nowrap">
+                        {getRiskBadge(o)}
                       </TableCell>
                       <TableCell className="text-sm text-foreground whitespace-nowrap">
                         <span>{o.watch_model}</span>
@@ -607,7 +785,7 @@ const OrdersPage = () => {
                     {/* Expandable Live Tracking Row */}
                     {expandedOrderId === o.id && (
                       <TableRow className="bg-muted/10 hover:bg-muted/10">
-                        <TableCell colSpan={15} className="py-4 px-6">
+                        <TableCell colSpan={17} className="py-4 px-6">
                           <div className="flex items-start justify-between">
                             <LiveTracking
                               orderId={o.id}

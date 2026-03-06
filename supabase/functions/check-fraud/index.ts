@@ -36,30 +36,74 @@ Deno.serve(async (req) => {
     const minSuccessRate = settings?.min_success_rate ?? 60
 
     // Call FraudChecker API
-    const fraudRes = await fetch('https://fraudchecker.link/api/v1/qc/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Token ${FRAUD_API_KEY}`,
-      },
-      body: JSON.stringify({ phone: cleanPhone }),
-    })
-
-    if (!fraudRes.ok) {
-      console.error('FraudChecker API error:', fraudRes.status)
-      // If API fails, allow order (don't block customers due to API issues)
+    let fraudRes: Response
+    try {
+      fraudRes = await fetch('https://fraudchecker.link/api/v1/qc/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Token ${FRAUD_API_KEY}`,
+        },
+        body: JSON.stringify({ phone: cleanPhone }),
+      })
+    } catch (networkErr) {
+      // Network error - allow order, report error
+      console.error('FraudChecker network error:', networkErr)
       return new Response(JSON.stringify({
         allowed: true,
-        flag: null,
+        flag: 'check_failed',
         total_parcels: 0,
         total_delivered: 0,
         total_cancel: 0,
         success_rate: null,
         message: null,
+        error_message: 'API সার্ভারে সংযোগ করা যায়নি',
+      }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+    }
+
+    // Handle non-OK responses (out of credit, invalid key, server errors)
+    if (!fraudRes.ok) {
+      let errorDetail = `API Error (HTTP ${fraudRes.status})`
+      try {
+        const errBody = await fraudRes.json()
+        if (errBody?.detail) errorDetail = errBody.detail
+        else if (errBody?.error) errorDetail = errBody.error
+        else if (errBody?.message) errorDetail = errBody.message
+      } catch { /* ignore parse errors */ }
+
+      console.error('FraudChecker API error:', fraudRes.status, errorDetail)
+      
+      // ALLOW order but flag as check_failed
+      return new Response(JSON.stringify({
+        allowed: true,
+        flag: 'check_failed',
+        total_parcels: 0,
+        total_delivered: 0,
+        total_cancel: 0,
+        success_rate: null,
+        message: null,
+        error_message: errorDetail,
       }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 
     const fraudData = await fraudRes.json()
+
+    // Check if API returned an error in the response body (e.g., credit exhausted)
+    if (fraudData?.error || fraudData?.detail) {
+      const errorMsg = fraudData.error || fraudData.detail || 'Unknown API error'
+      console.error('FraudChecker API body error:', errorMsg)
+      return new Response(JSON.stringify({
+        allowed: true,
+        flag: 'check_failed',
+        total_parcels: 0,
+        total_delivered: 0,
+        total_cancel: 0,
+        success_rate: null,
+        message: null,
+        error_message: errorMsg,
+      }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+    }
+
     const totalParcels = fraudData.total_parcels ?? 0
     const totalDelivered = fraudData.total_delivered ?? 0
     const totalCancel = fraudData.total_cancel ?? 0
@@ -70,19 +114,19 @@ Deno.serve(async (req) => {
     let message: string | null = null
 
     if (totalParcels === 0) {
-      // Case B: New number, no history
+      // New number, no history
       flag = 'new_customer'
       allowed = true
     } else {
       successRate = (totalDelivered / totalParcels) * 100
 
       if (successRate < minSuccessRate) {
-        // Case A: Low success rate
+        // Low success rate - block COD
         flag = 'low_success'
         allowed = false
         message = 'আপনার নম্বরে ক্যানসেলড অর্ডারের সংখ্যা বেশি হওয়ায় ক্যাশ অন ডেলিভারি পাওয়া যাচ্ছে না। দয়া করে অর্ডার কনফার্ম করতে অগ্রিম পেমেন্ট করুন।'
       } else {
-        // Case C: Good history
+        // Good history
         flag = 'good'
         allowed = true
       }
@@ -96,21 +140,22 @@ Deno.serve(async (req) => {
       total_cancel: totalCancel,
       success_rate: successRate !== null ? Math.round(successRate * 100) / 100 : null,
       message,
+      error_message: null,
     }), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   } catch (err) {
     console.error('Fraud check error:', err)
-    // On error, allow order
     return new Response(JSON.stringify({
       allowed: true,
-      flag: null,
+      flag: 'check_failed',
       total_parcels: 0,
       total_delivered: 0,
       total_cancel: 0,
       success_rate: null,
       message: null,
+      error_message: 'অভ্যন্তরীণ সার্ভার ত্রুটি',
     }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
   }
 })

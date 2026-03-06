@@ -17,7 +17,7 @@ Deno.serve(async (req) => {
       quantity, payment_method, trx_id, delivery_location,
       selected_color, turnstile_token, payment_type, advance_amount,
       fraud_total_parcels, fraud_total_delivered, fraud_total_cancel,
-      fraud_success_rate, fraud_flag,
+      fraud_success_rate, fraud_flag, fraud_error_message,
     } = body
 
     // === Input validation ===
@@ -143,6 +143,7 @@ Deno.serve(async (req) => {
       fraud_total_cancel: typeof fraud_total_cancel === 'number' ? fraud_total_cancel : null,
       fraud_success_rate: typeof fraud_success_rate === 'number' ? fraud_success_rate : null,
       fraud_flag: typeof fraud_flag === 'string' ? fraud_flag : null,
+      fraud_error_message: typeof fraud_error_message === 'string' ? fraud_error_message : null,
     }
 
     const { data: order, error: insertErr } = await supabase
