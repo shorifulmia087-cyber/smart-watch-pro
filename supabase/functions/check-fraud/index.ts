@@ -38,16 +38,34 @@ Deno.serve(async (req) => {
     // Call FraudChecker API
     let fraudRes: Response
     try {
-      fraudRes = await fetch(`https://fraudchecker.link/api/v1/qc/?api_key=${FRAUD_API_KEY}`, {
+      // Log what we're sending for debugging
+      const reqHeaders = {
+        'Content-Type': 'application/json',
+        'Authorization': `Token ${FRAUD_API_KEY}`,
+      }
+      console.log('Sending to FraudChecker with headers:', JSON.stringify(reqHeaders))
+      
+      fraudRes = await fetch('https://fraudchecker.link/api/v1/qc/', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Token ${FRAUD_API_KEY}`,
-        },
+        headers: reqHeaders,
         body: JSON.stringify({ phone: cleanPhone }),
+        redirect: 'manual',
       })
-      console.log('FraudChecker response status:', fraudRes.status)
-      console.log('FraudChecker response headers:', Object.fromEntries(fraudRes.headers.entries()))
+      console.log('FraudChecker response status:', fraudRes.status, fraudRes.type)
+      
+      // If redirected, follow manually with headers
+      if (fraudRes.status >= 300 && fraudRes.status < 400) {
+        const location = fraudRes.headers.get('location')
+        console.log('Redirect detected to:', location)
+        if (location) {
+          fraudRes = await fetch(location, {
+            method: 'POST',
+            headers: reqHeaders,
+            body: JSON.stringify({ phone: cleanPhone }),
+          })
+          console.log('Redirect response status:', fraudRes.status)
+        }
+      }
     } catch (networkErr) {
       // Network error - allow order, report error
       console.error('FraudChecker network error:', networkErr)
