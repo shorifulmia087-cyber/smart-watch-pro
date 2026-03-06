@@ -83,38 +83,75 @@ const Index = () => {
     : [];
 
   if (!currentProduct) {
+    const logoUrl = (settings as any)?.logo_url;
+    const initial = (settings?.brand_name || 'K').charAt(0);
     return (
-      <div className="min-h-screen bg-ink flex items-center justify-center">
+      <div className="min-h-screen bg-ink flex items-center justify-center overflow-hidden relative">
+        {/* Subtle radial glow */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,hsl(var(--gold)/0.06)_0%,transparent_70%)]" />
+        
         <motion.div
-          className="flex flex-col items-center gap-6"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
+          className="relative flex flex-col items-center gap-8"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
         >
-          {/* Animated logo spinner */}
-          <div className="relative w-16 h-16">
+          {/* Pulsing ring + logo */}
+          <div className="relative w-24 h-24">
+            {/* Outer pulse ring */}
             <motion.div
-              className="absolute inset-0 rounded-full border-[3px] border-gold/20"
+              className="absolute inset-0 rounded-full border border-gold/15"
+              animate={{ scale: [1, 1.3, 1.3], opacity: [0.5, 0, 0] }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'easeOut' }}
             />
-            <motion.div
-              className="absolute inset-0 rounded-full border-[3px] border-transparent border-t-gold"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-            />
+            {/* Spinning arc */}
+            <motion.svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full">
+              <motion.circle
+                cx="50" cy="50" r="46"
+                fill="none"
+                stroke="hsl(var(--gold))"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeDasharray="72 217"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
+                style={{ transformOrigin: 'center' }}
+              />
+            </motion.svg>
+            {/* Center logo */}
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-gold font-bold text-lg">{(settings?.brand_name || 'K').charAt(0)}</span>
+              {logoUrl ? (
+                <motion.img
+                  src={logoUrl}
+                  alt=""
+                  className="h-10 w-auto object-contain"
+                  initial={{ scale: 0.8 }}
+                  animate={{ scale: [0.8, 1, 0.8] }}
+                  transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+                />
+              ) : (
+                <motion.span
+                  className="text-gold font-bold text-2xl tracking-tight"
+                  animate={{ opacity: [0.6, 1, 0.6] }}
+                  transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  {initial}
+                </motion.span>
+              )}
             </div>
           </div>
-          <motion.div
-            className="h-1 w-32 rounded-full bg-surface/10 overflow-hidden"
-          >
-            <motion.div
-              className="h-full rounded-full bg-gradient-to-r from-gold/60 to-gold"
-              initial={{ x: '-100%' }}
-              animate={{ x: '100%' }}
-              transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
-            />
-          </motion.div>
+
+          {/* Three dots loader */}
+          <div className="flex items-center gap-1.5">
+            {[0, 1, 2].map(i => (
+              <motion.div
+                key={i}
+                className="w-1.5 h-1.5 rounded-full bg-gold/70"
+                animate={{ y: [0, -6, 0] }}
+                transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15, ease: 'easeInOut' }}
+              />
+            ))}
+          </div>
         </motion.div>
       </div>
     );
