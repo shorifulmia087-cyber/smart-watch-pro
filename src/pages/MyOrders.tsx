@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
-import { Package, ArrowLeft, Clock, Truck, CheckCircle2, XCircle, RotateCcw, Loader2 } from 'lucide-react';
+import { Package, Clock, Truck, CheckCircle2, XCircle, RotateCcw, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
 import Navbar from '@/components/Navbar';
@@ -63,14 +63,9 @@ const MyOrders = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         >
-          <div className="flex items-center gap-3 mb-8">
-            <Link to="/" className="p-2 rounded-lg hover:bg-muted transition-colors">
-              <ArrowLeft className="h-5 w-5 text-muted-foreground" />
-            </Link>
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">মাই অর্ডার</h1>
-              <p className="text-sm text-muted-foreground">আপনার সকল অর্ডারের তালিকা</p>
-            </div>
+          <div className="mb-8">
+            <h1 className="text-2xl font-bold text-foreground">মাই অর্ডার</h1>
+            <p className="text-sm text-muted-foreground">আপনার সকল অর্ডারের তালিকা</p>
           </div>
 
           {isLoading ? (

@@ -45,27 +45,30 @@ const AnnouncementBar = ({
   offerStartAt,
   offerEndAt,
 }: AnnouncementBarProps) => {
+  const hasSchedule = !!(offerStartAt && offerEndAt);
+  
   // For non-scheduled mode, store the absolute target time
   const fallbackTarget = useRef(Date.now() + countdownHours * 3600_000);
   const [time, setTime] = useState<TimeParts>({ d: 0, h: countdownHours, m: 0, s: 0 });
   const [timerLabel, setTimerLabel] = useState('অফার শেষ হতে বাকি:');
-  const [expired, setExpired] = useState(false);
+  const [expired, setExpired] = useState(!hasSchedule);
   const rafId = useRef(0);
 
   // Reset fallback target when countdownHours changes and no schedule
   useEffect(() => {
-    if (!offerStartAt || !offerEndAt) {
-      fallbackTarget.current = Date.now() + countdownHours * 3600_000;
+    if (!hasSchedule) {
+      // No schedule set by admin — don't show fallback timer at all
+      setExpired(true);
     }
-  }, [countdownHours, offerStartAt, offerEndAt]);
+  }, [hasSchedule]);
 
   const tick = useCallback(() => {
     const start = offerStartAt ? new Date(offerStartAt).getTime() : NaN;
     const end = offerEndAt ? new Date(offerEndAt).getTime() : NaN;
-    const hasSchedule = Number.isFinite(start) && Number.isFinite(end) && end > start;
+    const validSchedule = Number.isFinite(start) && Number.isFinite(end) && end > start;
     const now = Date.now();
 
-    if (hasSchedule) {
+    if (validSchedule) {
       if (now < start) {
         setTimerLabel('অফার শুরু হতে বাকি:');
         setTime(toTimeParts(Math.floor((start - now) / 1000)));
@@ -78,14 +81,8 @@ const AnnouncementBar = ({
         setExpired(true);
       }
     } else {
-      const remaining = Math.max(0, Math.floor((fallbackTarget.current - now) / 1000));
-      if (remaining <= 0) {
-        setExpired(true);
-      } else {
-        setTimerLabel('অফার শেষ হতে বাকি:');
-        setTime(toTimeParts(remaining));
-        setExpired(false);
-      }
+      // No valid schedule — hide the bar
+      setExpired(true);
     }
   }, [offerStartAt, offerEndAt]);
 

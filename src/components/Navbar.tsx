@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Package, Menu, X, User, ShoppingBag, LogIn, UserPlus, ChevronRight } from 'lucide-react';
+import { Package, Menu, X, Bell, ShoppingBag, LogIn, UserPlus, ChevronRight } from 'lucide-react';
 import { useSettings } from '@/hooks/useSupabaseData';
 import { useAuth } from '@/hooks/useAuth';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -130,35 +130,26 @@ const Navbar = () => {
           )}
         </Link>
 
-        {/* Right: Auth */}
-        <div className="hidden md:flex items-center">
+        {/* Right: Notification icon */}
+        <div className="flex items-center gap-2">
           {!user ? (
             <Link
               to="/login"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold bg-accent text-accent-foreground hover:opacity-90 transition-opacity"
+              className="hidden md:inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold bg-accent text-accent-foreground hover:opacity-90 transition-opacity"
             >
               <LogIn className="h-3.5 w-3.5" />
               লগইন
             </Link>
-          ) : (
-            <Link
-              to="/my-orders"
-              className="w-8 h-8 rounded-full bg-accent/15 flex items-center justify-center text-accent hover:bg-accent/25 transition-colors"
-            >
-              <User className="h-4 w-4" />
-            </Link>
-          )}
-        </div>
-
-        {/* Mobile: Auth icon */}
-        <div className="md:hidden">
-          {!user ? (
-            <Link to="/login" className="p-2 rounded-lg hover:bg-muted transition-colors">
+          ) : null}
+          <button
+            className="relative w-8 h-8 rounded-full bg-muted/50 flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors"
+          >
+            <Bell className="h-4 w-4" />
+          </button>
+          {/* Mobile login */}
+          {!user && (
+            <Link to="/login" className="md:hidden p-2 rounded-lg hover:bg-muted transition-colors">
               <LogIn className="h-5 w-5 text-muted-foreground" />
-            </Link>
-          ) : (
-            <Link to="/my-orders" className="p-2 rounded-lg hover:bg-muted transition-colors">
-              <User className="h-5 w-5 text-accent" />
             </Link>
           )}
         </div>
@@ -245,7 +236,7 @@ const Navbar = () => {
                 ) : (
                   <div className="flex items-center gap-3 px-3 py-2">
                     <div className="w-8 h-8 rounded-full bg-accent/15 flex items-center justify-center text-accent">
-                      <User className="h-4 w-4" />
+                      <Bell className="h-4 w-4" />
                     </div>
                     <span className="text-sm text-muted-foreground truncate">
                       {user.email}
