@@ -82,7 +82,7 @@ const AdminSidebar = () => {
                 >
                   <item.icon className={`h-[18px] w-[18px] shrink-0 transition-colors ${active ? 'text-white' : 'text-sidebar-foreground/50 group-hover:text-accent'}`} />
                   {!collapsed && (
-                    <span className="text-[13px] font-medium truncate">{item.title}</span>
+                    <span className="text-sm font-medium truncate">{item.title}</span>
                   )}
                   {active && !collapsed && (
                     <motion.div
