@@ -40,7 +40,7 @@ const systemNav = [
 const AdminSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
+  const { user, signOut, isAdmin, isOrderManager } = useAuth();
   const { state, setOpenMobile } = useSidebar();
   const collapsed = state === 'collapsed';
   const { data: settings } = useSettings();
@@ -159,12 +159,24 @@ const AdminSidebar = () => {
         {/* Thin separator */}
         <div className="mx-4 h-px bg-border/30" />
 
-        {/* Nav Groups */}
-        {renderNavGroup('প্রধান', mainNav)}
-        <div className="mx-4 h-px bg-border/20" />
-        {renderNavGroup('ম্যানেজমেন্ট', managementNav)}
-        <div className="mx-4 h-px bg-border/20" />
-        {renderNavGroup('সিস্টেম', systemNav)}
+        {/* Nav Groups — role-based */}
+        {isOrderManager ? (
+          <>
+            {renderNavGroup('অর্ডার ম্যানেজমেন্ট', [
+              { title: 'অর্ডার', url: '/admin/orders', icon: ShoppingCart },
+              { title: 'ট্র্যাকিং', url: '/admin/tracking', icon: Route },
+              { title: 'প্রোফাইল', url: '/admin/profile', icon: UserCog },
+            ])}
+          </>
+        ) : (
+          <>
+            {renderNavGroup('প্রধান', mainNav)}
+            <div className="mx-4 h-px bg-border/20" />
+            {renderNavGroup('ম্যানেজমেন্ট', managementNav)}
+            <div className="mx-4 h-px bg-border/20" />
+            {renderNavGroup('সিস্টেম', systemNav)}
+          </>
+        )}
       </SidebarContent>
 
       {/* Profile Footer — Bento Card */}
@@ -180,7 +192,7 @@ const AdminSidebar = () => {
                   <p className="text-[11px] font-semibold text-foreground truncate leading-tight">
                     {user?.email}
                   </p>
-                  <p className="text-[9px] font-medium text-accent leading-tight mt-0.5">অ্যাডমিন</p>
+                  <p className="text-[9px] font-medium text-accent leading-tight mt-0.5">{isOrderManager ? 'অর্ডার ম্যানেজার' : 'অ্যাডমিন'}</p>
                 </div>
               </div>
               <button

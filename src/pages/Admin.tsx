@@ -17,10 +17,10 @@ import FacebookPixelPage from './admin/FacebookPixelPage';
 import SmsSettingsPage from './admin/SmsSettingsPage';
 import TeamPage from './admin/TeamPage';
 import { Loader2 } from 'lucide-react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 
 const Admin = () => {
-  const { user, isAdmin, loading } = useAuth();
+  const { user, hasAdminAccess, isOrderManager, loading } = useAuth();
 
   if (loading) {
     return (
@@ -32,7 +32,7 @@ const Admin = () => {
 
   if (!user) return <AdminLogin />;
 
-  if (!isAdmin) {
+  if (!hasAdminAccess) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="text-center">
@@ -40,6 +40,21 @@ const Admin = () => {
           <p className="text-muted-foreground text-sm">আপনার অ্যাডমিন অ্যাক্সেস নেই।</p>
         </div>
       </div>
+    );
+  }
+
+  // Order manager: only orders, tracking, and profile
+  if (isOrderManager) {
+    return (
+      <Routes>
+        <Route element={<AdminLayout />}>
+          <Route index element={<Navigate to="/admin/orders" replace />} />
+          <Route path="orders" element={<OrdersPage />} />
+          <Route path="tracking" element={<TrackingDashboardPage />} />
+          <Route path="profile" element={<ProfileSettingsPage />} />
+          <Route path="*" element={<Navigate to="/admin/orders" replace />} />
+        </Route>
+      </Routes>
     );
   }
 
