@@ -152,6 +152,7 @@ Deno.serve(async (req) => {
       success_rate: successRate !== null ? Math.round(successRate * 100) / 100 : null,
       message,
       error_message: null,
+      apis: fraudData.apis || null,
     }), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
