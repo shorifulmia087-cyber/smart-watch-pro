@@ -124,7 +124,7 @@ const FraudCheckModal = ({ phone, onClose }: { phone: string; onClose: () => voi
                 )}
               </div>
 
-              {/* Stats Grid */}
+              {/* Overview Stats */}
               <div className="grid grid-cols-3 gap-2">
                 <div className="bg-muted/20 rounded-sm border border-border/20 p-3 text-center">
                   <p className="text-lg font-bold text-foreground font-inter">{toBengaliNum(result.total_parcels || 0)}</p>
@@ -155,6 +155,46 @@ const FraudCheckModal = ({ phone, onClose }: { phone: string; onClose: () => voi
                       style={{ width: `${Math.min(100, result.success_rate)}%` }}
                     />
                   </div>
+                </div>
+              )}
+
+              {/* Courier-wise Breakdown */}
+              {result.apis && Object.keys(result.apis).length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground/50 font-semibold">কুরিয়ার ভিত্তিক বিবরণ</p>
+                  {Object.entries(result.apis).map(([courier, stats]: [string, any]) => {
+                    const courierRate = stats.total_parcels > 0 ? Math.round((stats.total_delivered_parcels / stats.total_parcels) * 100) : 0;
+                    return (
+                      <div key={courier} className="bg-muted/10 rounded-sm border border-border/20 p-3">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs font-semibold text-foreground">{courier}</span>
+                          <span className={`text-xs font-bold font-inter ${courierRate >= 60 ? 'text-success' : 'text-destructive'}`}>
+                            {courierRate}%
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-1.5 text-center">
+                          <div>
+                            <p className="text-sm font-bold text-foreground font-inter">{toBengaliNum(stats.total_parcels || 0)}</p>
+                            <p className="text-[9px] text-muted-foreground">পার্সেল</p>
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-success font-inter">{toBengaliNum(stats.total_delivered_parcels || 0)}</p>
+                            <p className="text-[9px] text-muted-foreground">ডেলিভারড</p>
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-destructive font-inter">{toBengaliNum(stats.total_cancelled_parcels || 0)}</p>
+                            <p className="text-[9px] text-muted-foreground">ক্যানসেলড</p>
+                          </div>
+                        </div>
+                        <div className="w-full bg-muted/30 rounded-full h-1 mt-2">
+                          <div
+                            className={`h-1 rounded-full transition-all ${courierRate >= 60 ? 'bg-success' : 'bg-destructive'}`}
+                            style={{ width: `${Math.min(100, courierRate)}%` }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
