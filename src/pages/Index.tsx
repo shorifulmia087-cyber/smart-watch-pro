@@ -19,7 +19,6 @@ const ReviewGallery = lazy(() => import('@/components/ReviewGallery'));
 const CollectionGrid = lazy(() => import('@/components/CollectionGrid'));
 const OrderModal = lazy(() => import('@/components/OrderModal'));
 const DeliveryChecker = lazy(() => import('@/components/DeliveryChecker'));
-import type { Database } from '@/integrations/supabase/types';
 
 type Product = Database['public']['Tables']['products']['Row'];
 
