@@ -191,7 +191,7 @@ const Index = () => {
         rocketNumber={settings?.rocket_number}
         availableColors={(currentProduct as any).available_colors || []}
       />
-      <FloatingNotification />
+      
       <WhatsAppButton />
     </div>
   );
