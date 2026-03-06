@@ -193,7 +193,7 @@ const ProductsPage = () => {
           </div>
           <button
             onClick={openNew}
-            className="gradient-gold text-white font-semibold px-5 py-2.5 rounded-xl text-sm hover:opacity-90 flex items-center gap-2 shrink-0 transition-all duration-200 shadow-sm"
+            className="gradient-gold text-white font-semibold px-5 py-2.5 rounded-sm text-sm hover:opacity-90 flex items-center gap-2 shrink-0 transition-all duration-200 shadow-sm"
           >
             <Plus className="h-4 w-4" /> নতুন প্রোডাক্ট
           </button>
