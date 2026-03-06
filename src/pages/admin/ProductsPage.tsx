@@ -202,7 +202,7 @@ const ProductsPage = () => {
 
       {isLoading ? (
         <div className="space-y-2">
-          {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)}
+          {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-sm" />)}
         </div>
       ) : !filtered.length ? (
         <div className="glass-card rounded-2xl p-16 text-center text-muted-foreground">
