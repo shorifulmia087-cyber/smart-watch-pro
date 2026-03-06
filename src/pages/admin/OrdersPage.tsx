@@ -345,6 +345,25 @@ const OrdersPage = () => {
             </button>
           ))}
         </div>
+
+        {/* Payment Type Filter */}
+        <div className="flex items-center gap-2 flex-wrap mt-3 pt-3 border-t border-border/10">
+          <CreditCard className="h-4 w-4 text-muted-foreground" />
+          <span className="text-[10px] text-muted-foreground/60 uppercase tracking-wider font-semibold mr-1">পেমেন্ট:</span>
+          {[undefined, 'cod', 'online'].map(f => (
+            <button
+              key={f ?? 'all'}
+              onClick={() => { setPaymentFilter(f); setPage(0); }}
+              className={`px-3 py-1.5 rounded-sm text-xs font-medium transition-all duration-200 border ${
+                paymentFilter === f
+                  ? 'gradient-gold text-white border-transparent shadow-sm'
+                  : 'bg-transparent text-muted-foreground border-border/40 hover:border-gold/30 hover:text-gold'
+              }`}
+            >
+              {f === 'cod' ? 'ক্যাশ অন ডেলিভারি' : f === 'online' ? 'অনলাইন পেমেন্ট' : 'সব'}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* ─── Bulk Actions Bar ─── */}
