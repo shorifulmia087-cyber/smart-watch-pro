@@ -544,7 +544,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
             {/* Submit Button */}
             <motion.button
               onClick={handleSubmit}
-              disabled={loading}
+              disabled={loading || fraudLoading}
               whileHover={{ scale: loading ? 1 : 1.01 }}
               whileTap={{ scale: loading ? 1 : 0.98 }}
               className={`w-full gradient-gold text-surface font-semibold py-3.5 rounded-xl text-base disabled:opacity-70 flex items-center justify-center gap-2 ${touched && !isFormValid ? 'opacity-80' : ''}`}
