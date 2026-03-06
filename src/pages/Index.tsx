@@ -83,76 +83,20 @@ const Index = () => {
     : [];
 
   if (!currentProduct) {
-    const logoUrl = (settings as any)?.logo_url;
-    const initial = (settings?.brand_name || 'K').charAt(0);
     return (
-      <div className="min-h-screen bg-ink flex items-center justify-center overflow-hidden relative">
-        {/* Subtle radial glow */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,hsl(var(--gold)/0.06)_0%,transparent_70%)]" />
-        
-        <motion.div
-          className="relative flex flex-col items-center gap-8"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6 }}
-        >
-          {/* Pulsing ring + logo */}
-          <div className="relative w-24 h-24">
-            {/* Outer pulse ring */}
-            <motion.div
-              className="absolute inset-0 rounded-full border border-gold/15"
-              animate={{ scale: [1, 1.3, 1.3], opacity: [0.5, 0, 0] }}
-              transition={{ duration: 2, repeat: Infinity, ease: 'easeOut' }}
-            />
-            {/* Spinning arc */}
-            <motion.svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full">
-              <motion.circle
-                cx="50" cy="50" r="46"
-                fill="none"
-                stroke="hsl(var(--gold))"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeDasharray="72 217"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
-                style={{ transformOrigin: 'center' }}
-              />
-            </motion.svg>
-            {/* Center logo */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              {logoUrl ? (
-                <motion.img
-                  src={logoUrl}
-                  alt=""
-                  className="h-10 w-auto object-contain"
-                  initial={{ scale: 0.8 }}
-                  animate={{ scale: [0.8, 1, 0.8] }}
-                  transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-                />
-              ) : (
-                <motion.span
-                  className="text-gold font-bold text-2xl tracking-tight"
-                  animate={{ opacity: [0.6, 1, 0.6] }}
-                  transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-                >
-                  {initial}
-                </motion.span>
-              )}
-            </div>
-          </div>
-
-          {/* Three dots loader */}
-          <div className="flex items-center gap-1.5">
-            {[0, 1, 2].map(i => (
-              <motion.div
-                key={i}
-                className="w-1.5 h-1.5 rounded-full bg-gold/70"
-                animate={{ y: [0, -6, 0] }}
-                transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15, ease: 'easeInOut' }}
-              />
-            ))}
-          </div>
-        </motion.div>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="flex items-center gap-2">
+          <motion.div
+            className="w-5 h-5 rounded-full bg-accent"
+            animate={{ x: [0, 24, 0], scale: [1, 0.85, 1] }}
+            transition={{ duration: 0.8, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          <motion.div
+            className="w-5 h-5 rounded-full bg-accent/25"
+            animate={{ x: [0, -24, 0], scale: [0.85, 1, 0.85] }}
+            transition={{ duration: 0.8, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        </div>
       </div>
     );
   }
