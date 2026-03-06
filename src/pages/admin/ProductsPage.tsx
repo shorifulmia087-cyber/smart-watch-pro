@@ -36,6 +36,8 @@ const ProductsPage = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
+  const [page, setPage] = useState(0);
+  const pageSize = 15;
 
   const [form, setForm] = useState({
     name: '', price: 0, subtitle: '', video_url: '', stock_status: 'in_stock',
