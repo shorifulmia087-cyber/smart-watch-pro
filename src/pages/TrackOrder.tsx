@@ -130,6 +130,53 @@ const TrackOrder = () => {
     }
   };
 
+  // Auto-search from URL param
+  useEffect(() => {
+    const idParam = searchParams.get('id');
+    if (idParam && !autoSearched) {
+      setQuery(idParam);
+      setAutoSearched(true);
+      // Trigger search programmatically
+      const doSearch = async () => {
+        setLoading(true);
+        setError('');
+        setOrder(null);
+        setLiveTracking(null);
+        const cleanQuery = idParam.trim();
+        let result: any = null;
+
+        const { data: byTracking } = await supabase
+          .from('orders')
+          .select('id, customer_name, watch_model, status, tracking_id, courier_provider, created_at, delivery_location')
+          .eq('tracking_id', cleanQuery)
+          .limit(1);
+
+        if (byTracking && byTracking.length > 0) {
+          result = byTracking[0];
+        } else {
+          const { data: byPhone } = await supabase
+            .from('orders')
+            .select('id, customer_name, watch_model, status, tracking_id, courier_provider, created_at, delivery_location')
+            .eq('phone', cleanQuery)
+            .order('created_at', { ascending: false })
+            .limit(1);
+          if (byPhone && byPhone.length > 0) result = byPhone[0];
+        }
+
+        setLoading(false);
+        if (result) {
+          setOrder(result as OrderInfo);
+          if (result.tracking_id && result.courier_provider) {
+            fetchLiveTracking(result.tracking_id, result.courier_provider);
+          }
+        } else {
+          setError('এই তথ্য দিয়ে কোনো অর্ডার পাওয়া যায়নি।');
+        }
+      };
+      doSearch();
+    }
+  }, [searchParams, autoSearched]);
+
   const currentStep = order ? statusIndex[order.status] : -1;
   const isCancelled = order?.status === 'cancelled';
   const isReturned = order?.status === 'returned';
