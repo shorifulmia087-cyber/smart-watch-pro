@@ -236,7 +236,7 @@ const Navbar = () => {
                 ) : (
                   <div className="flex items-center gap-3 px-3 py-2">
                     <div className="w-8 h-8 rounded-full bg-accent/15 flex items-center justify-center text-accent">
-                      <User className="h-4 w-4" />
+                      <Bell className="h-4 w-4" />
                     </div>
                     <span className="text-sm text-muted-foreground truncate">
                       {user.email}
