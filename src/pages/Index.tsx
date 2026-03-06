@@ -57,6 +57,17 @@ const Index = () => {
   }, []);
 
   const brandName = settings?.brand_name || 'Kronos Premium Watch';
+  const offerStartAt = (settings as any)?.offer_start_at ?? null;
+  const offerEndAt = (settings as any)?.offer_end_at ?? null;
+  const offerStartMs = offerStartAt ? new Date(offerStartAt).getTime() : NaN;
+  const offerEndMs = offerEndAt ? new Date(offerEndAt).getTime() : NaN;
+  const shouldShowAnnouncement = Boolean(
+    settings?.timer_enabled &&
+    Number.isFinite(offerStartMs) &&
+    Number.isFinite(offerEndMs) &&
+    offerEndMs > offerStartMs &&
+    Date.now() <= offerEndMs
+  );
 
   const heroImages = (currentProduct?.image_urls || []).map((url, i) => ({
     src: url,
