@@ -105,6 +105,7 @@ const TeamPage = () => {
     }
   };
 
+  return (
     <div className="space-y-5 w-full max-w-[1000px]">
       {/* Bento Header */}
       <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-4 md:p-5">
