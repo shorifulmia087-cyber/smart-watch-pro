@@ -37,7 +37,16 @@ const SiteControlPage = () => {
   }
 
   const save = () => {
-    updateSettings.mutate(form as any, {
+    // Sanitize all text fields before saving
+    const sanitizedForm: Partial<SettingsRow> = {};
+    for (const [key, value] of Object.entries(form)) {
+      if (typeof value === 'string' && !key.includes('url') && !key.includes('color')) {
+        sanitizedForm[key as keyof SettingsRow] = sanitizeForDisplay(value) as any;
+      } else {
+        sanitizedForm[key as keyof SettingsRow] = value as any;
+      }
+    }
+    updateSettings.mutate(sanitizedForm as any, {
       onSuccess: () => {
         setSaved(true);
         setTimeout(() => setSaved(false), 2000);
