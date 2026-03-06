@@ -183,7 +183,7 @@ const ProductsPage = () => {
           <p className="text-[11px] text-muted-foreground">মোট {toBengaliNum(products?.length ?? 0)} টি প্রোডাক্ট</p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 glass-card rounded-xl px-3 py-2 min-w-[200px]">
+          <div className="flex items-center gap-2 bg-muted/30 border border-border/40 rounded-sm px-3 py-2 min-w-[200px]">
             <Search className="h-4 w-4 text-muted-foreground shrink-0" />
             <input
               type="text" value={search} onChange={e => { setSearch(e.target.value); setPage(0); }}
