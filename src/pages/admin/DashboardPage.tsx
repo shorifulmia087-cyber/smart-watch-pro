@@ -184,7 +184,7 @@ const DashboardPage = () => {
                   className={cn(
                     "h-8 gap-2 rounded-sm text-xs font-semibold transition-all duration-200",
                     activePreset === -1
-                      ? "bg-foreground text-background shadow-md hover:bg-foreground/90"
+                      ? "gradient-gold text-white shadow-[0_2px_8px_hsl(var(--gold)/0.3)] hover:opacity-90"
                       : "border-dashed border-border/50 hover:border-solid hover:bg-muted/60"
                   )}
                 >
