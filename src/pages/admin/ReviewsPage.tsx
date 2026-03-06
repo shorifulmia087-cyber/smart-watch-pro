@@ -18,13 +18,14 @@ const ReviewsPage = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-[900px]">
-      <div>
-        <h2 className="text-lg font-semibold">রিভিউ গ্যালারি</h2>
-        <p className="text-[11px] text-muted-foreground">গ্রাহকদের রিভিউ স্ক্রিনশট আপলোড ও ম্যানেজ করুন</p>
+    <div className="space-y-5 w-full max-w-[1400px]">
+      {/* Bento Header */}
+      <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-4 md:p-5">
+        <h2 className="text-lg font-bold text-foreground">রিভিউ গ্যালারি</h2>
+        <p className="text-[11px] text-muted-foreground mt-0.5">গ্রাহকদের রিভিউ স্ক্রিনশট আপলোড ও ম্যানেজ করুন</p>
       </div>
 
-      <div className="glass-card rounded-2xl p-5 md:p-6 space-y-5">
+      <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6 space-y-5">
         <input
           ref={fileInputRef}
           type="file"
@@ -36,7 +37,7 @@ const ReviewsPage = () => {
         <button
           onClick={() => fileInputRef.current?.click()}
           disabled={uploadReviewImage.isPending}
-          className="w-full border-2 border-dashed border-border rounded-xl py-8 flex flex-col items-center gap-3 text-muted-foreground hover:border-accent/50 hover:text-accent transition-colors cursor-pointer"
+          className="w-full border-2 border-dashed border-border/40 rounded-sm py-8 flex flex-col items-center gap-3 text-muted-foreground hover:border-gold/50 hover:text-gold transition-colors cursor-pointer"
         >
           {uploadReviewImage.isPending ? (
             <Loader2 className="h-8 w-8 animate-spin" />
@@ -62,11 +63,11 @@ const ReviewsPage = () => {
             <p className="text-xs text-muted-foreground mb-3">মোট {reviewImages.length}টি ছবি</p>
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
               {reviewImages.map((img) => (
-                <div key={img.id} className="relative group rounded-xl overflow-hidden aspect-[9/16] bg-muted">
+                <div key={img.id} className="relative group rounded-sm overflow-hidden aspect-[9/16] bg-muted border border-border/30">
                   <img src={img.image_url} alt="রিভিউ" className="w-full h-full object-cover" />
                   <button
                     onClick={() => deleteReviewImage.mutate(img.id)}
-                    className="absolute top-1.5 right-1.5 w-7 h-7 rounded-full bg-destructive/90 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute top-1.5 right-1.5 w-7 h-7 rounded-sm bg-destructive/90 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
