@@ -213,7 +213,7 @@ const ProductsPage = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filtered.map((p) => (
+                {filtered.slice(page * pageSize, (page + 1) * pageSize).map((p) => (
                   <TableRow key={p.id} className="group hover:bg-muted/20 transition-colors cursor-pointer border-b border-border/30" onClick={() => openEdit(p)}>
                     <TableCell className="py-3">
                       {p.thumbnail_url ? (
