@@ -34,6 +34,11 @@ const TeamPage = () => {
     },
   });
 
+  // Super admin = first admin by created_at
+  const superAdminId = members
+    ?.filter(m => m.role === 'admin')
+    .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())[0]?.user_id;
+
   const handleInvite = async () => {
     if (!newEmail.trim()) return;
     setAdding(true);
