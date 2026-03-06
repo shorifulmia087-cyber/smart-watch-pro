@@ -48,7 +48,7 @@ const VideoSection = ({ videoId = 'dQw4w9WgXcQ', sectionTitle = 'Kronos — ক�
           viewport={{ once: true }}
           whileHover={{ scale: 1.01 }}
           transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-          className="relative aspect-video rounded-sm overflow-hidden border border-border/30 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+          className="relative aspect-video rounded-xl overflow-hidden border border-border/40 shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
           style={{
             boxShadow: '0 0 40px -10px hsl(var(--gold) / 0.1)',
           }}
@@ -62,7 +62,7 @@ const VideoSection = ({ videoId = 'dQw4w9WgXcQ', sectionTitle = 'Kronos — ক�
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-ink/30 flex items-center justify-center">
-                <div className="w-16 h-16 md:w-20 md:h-20 rounded-sm bg-surface/90 backdrop-blur-sm flex items-center justify-center shadow-lg border border-border/30">
+                <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-surface/90 backdrop-blur-sm flex items-center justify-center shadow-lg border border-border/30">
                   <svg viewBox="0 0 24 24" className="w-8 h-8 md:w-10 md:h-10 fill-gold ml-1">
                     <path d="M8 5v14l11-7z" />
                   </svg>

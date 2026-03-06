@@ -73,9 +73,9 @@ const StickyOrderForm = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
-              className="text-center p-8 bg-surface border border-border/30 rounded-sm shadow-sm"
+              className="text-center p-8 bg-surface border border-border/40 rounded-xl shadow-md"
             >
-              <div className="w-14 h-14 rounded-sm bg-success/10 flex items-center justify-center mx-auto mb-3">
+              <div className="w-14 h-14 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-3">
                 <Check className="w-7 h-7 text-success" />
               </div>
               <p className="text-lg font-bold text-foreground">অর্ডার সফল! 🎉</p>
@@ -87,9 +87,9 @@ const StickyOrderForm = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               onSubmit={handleSubmit}
-              className="bg-surface border border-border/30 rounded-sm p-5 md:p-6 space-y-4 shadow-sm"
+              className="bg-surface border border-border/40 rounded-xl p-5 md:p-6 space-y-4 shadow-md"
             >
-              <div className="flex items-center justify-between p-3 bg-gold/5 rounded-sm border border-gold/15">
+              <div className="flex items-center justify-between p-3 bg-gold/5 rounded-lg border border-gold/15">
                 <div>
                   <p className="text-sm font-semibold text-foreground">{product.name}</p>
                   <p className="text-[11px] text-muted-foreground">ক্যাশ অন ডেলিভারি</p>
@@ -101,18 +101,18 @@ const StickyOrderForm = () => {
                 <input
                   value={name} onChange={e => setName(e.target.value)} required
                   placeholder="আপনার নাম *" maxLength={100}
-                  className="w-full bg-transparent border border-border/60 rounded-sm px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/20 focus:border-gold/40 transition-all placeholder:text-muted-foreground"
+                  className="w-full bg-transparent border border-border/60 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/20 focus:border-gold/40 transition-all placeholder:text-muted-foreground"
                 />
                 <input
                   value={phone} onChange={e => setPhone(e.target.value)} required
                   placeholder="মোবাইল নম্বর *" maxLength={15}
-                  className="w-full bg-transparent border border-border/60 rounded-sm px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/20 focus:border-gold/40 transition-all placeholder:text-muted-foreground"
+                  className="w-full bg-transparent border border-border/60 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/20 focus:border-gold/40 transition-all placeholder:text-muted-foreground"
                 />
               </div>
               <textarea
                 value={address} onChange={e => setAddress(e.target.value)} required
                 placeholder="সম্পূর্ণ ঠিকানা (বাড়ি, এলাকা, জেলা) *" rows={2} maxLength={500}
-                className="w-full bg-transparent border border-border/60 rounded-sm px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/20 focus:border-gold/40 transition-all resize-none placeholder:text-muted-foreground"
+                className="w-full bg-transparent border border-border/60 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/20 focus:border-gold/40 transition-all resize-none placeholder:text-muted-foreground"
               />
               
               {/* Honeypot */}
@@ -122,17 +122,17 @@ const StickyOrderForm = () => {
 
               <div className="flex gap-2">
                 <button type="button" onClick={() => setLocation('dhaka')}
-                  className={`flex-1 py-2.5 rounded-sm border text-sm font-medium transition-all ${location === 'dhaka' ? 'border-gold bg-gold/10 text-gold' : 'border-border/60 text-muted-foreground hover:border-border'}`}>
+                  className={`flex-1 py-2.5 rounded-xl border text-sm font-medium transition-all ${location === 'dhaka' ? 'border-gold bg-gold/10 text-gold' : 'border-border/60 text-muted-foreground hover:border-border'}`}>
                   ঢাকা (৳{toBengaliNum(settings?.delivery_charge_inside ?? 70)})
                 </button>
                 <button type="button" onClick={() => setLocation('outside')}
-                  className={`flex-1 py-2.5 rounded-sm border text-sm font-medium transition-all ${location === 'outside' ? 'border-gold bg-gold/10 text-gold' : 'border-border/60 text-muted-foreground hover:border-border'}`}>
+                  className={`flex-1 py-2.5 rounded-xl border text-sm font-medium transition-all ${location === 'outside' ? 'border-gold bg-gold/10 text-gold' : 'border-border/60 text-muted-foreground hover:border-border'}`}>
                   বাইরে (৳{toBengaliNum(settings?.delivery_charge_outside ?? 150)})
                 </button>
               </div>
               <button
                 type="submit" disabled={loading}
-                className="w-full gradient-gold text-surface font-semibold py-3.5 rounded-sm text-base hover:opacity-90 transition-opacity disabled:opacity-70 flex items-center justify-center gap-2"
+                className="w-full gradient-gold text-surface font-semibold py-3.5 rounded-xl text-base hover:opacity-90 transition-opacity disabled:opacity-70 flex items-center justify-center gap-2"
                 style={{ boxShadow: '0 4px 16px -4px hsl(var(--gold) / 0.4)' }}
               >
                 {loading ? <><Loader2 className="w-5 h-5 animate-spin" /> প্রসেসিং...</> : `অর্ডার নিশ্চিত করুন — ৳${formatBengaliPrice(total)}`}
