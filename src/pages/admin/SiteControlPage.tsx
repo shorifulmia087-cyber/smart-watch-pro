@@ -42,6 +42,10 @@ const SiteControlPage = () => {
     // Sanitize all text fields before saving
     const sanitizedForm: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(form)) {
+      // Non-super-admins can't change developer fields
+      if (!isSuperAdmin && (key === 'developer_name' || key === 'developer_url')) {
+        continue;
+      }
       if (typeof value === 'string' && !key.includes('url') && !key.includes('color')) {
         sanitizedForm[key] = sanitizeForDisplay(value);
       } else {
