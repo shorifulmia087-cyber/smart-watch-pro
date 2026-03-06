@@ -54,6 +54,8 @@ const StickyOrderForm = () => {
         watch_model: product.name, quantity: 1, payment_method: 'cod',
         delivery_location: location,
         turnstile_token: turnstileToken,
+        payment_type: 'cod',
+        advance_amount: 0,
       });
       setSuccess(true);
       setName(''); setPhone(''); setAddress(''); setHoneypot('');
