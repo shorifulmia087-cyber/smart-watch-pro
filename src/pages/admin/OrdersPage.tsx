@@ -250,15 +250,23 @@ const OrdersPage = () => {
 
   const filtered = useMemo(() => {
     if (!orders) return [];
-    if (!search.trim()) return orders;
+    let list = orders;
+    if (paymentFilter) {
+      if (paymentFilter === 'cod') {
+        list = list.filter(o => o.payment_method === 'cod');
+      } else {
+        list = list.filter(o => o.payment_method !== 'cod');
+      }
+    }
+    if (!search.trim()) return list;
     const q = search.toLowerCase();
-    return orders.filter(o =>
+    return list.filter(o =>
       o.customer_name.toLowerCase().includes(q) ||
       o.phone.includes(q) ||
       o.watch_model.toLowerCase().includes(q) ||
       (o.trx_id && o.trx_id.toLowerCase().includes(q))
     );
-  }, [orders, search]);
+  }, [orders, search, paymentFilter]);
 
   const paged = filtered.slice(page * pageSize, (page + 1) * pageSize);
   const totalPages = Math.ceil(filtered.length / pageSize);
