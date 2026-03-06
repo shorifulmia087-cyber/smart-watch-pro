@@ -17,6 +17,7 @@ import TrackingDashboardPage from './admin/TrackingDashboardPage';
 import FacebookPixelPage from './admin/FacebookPixelPage';
 import SmsSettingsPage from './admin/SmsSettingsPage';
 import TeamPage from './admin/TeamPage';
+import FraudCheckerPage from './admin/FraudCheckerPage';
 import { Loader2 } from 'lucide-react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 
