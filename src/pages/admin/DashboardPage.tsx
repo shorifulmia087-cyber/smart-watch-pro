@@ -26,7 +26,7 @@ const presets = [
 const DashboardPage = () => {
   const { data: orders, isLoading: ordersLoading } = useOrders();
   const { data: products, isLoading: productsLoading } = useProducts();
-  const [activePreset, setActivePreset] = useState(1); // default 7 days
+  const [activePreset, setActivePreset] = useState(1);
   const [dateRange, setDateRange] = useState<DateRange>({
     from: subDays(new Date(), 7),
     to: new Date(),
@@ -72,7 +72,6 @@ const DashboardPage = () => {
       }, 0);
     const grossProfit = totalRevenue - totalSourcingCost;
     const returnRate = filteredOrders.length > 0 ? Math.round((returned / filteredOrders.length) * 100) : 0;
-    // Daily profit: today's revenue - today's sourcing - estimated delivery & return cost
     const todaySourcing = todayOrders
       .filter(o => o.status !== 'cancelled' && o.status !== 'returned')
       .reduce((s, o) => {
@@ -140,10 +139,10 @@ const DashboardPage = () => {
   }, [products]);
 
   return (
-    <div className="space-y-6 max-w-[1400px]">
+    <div className="space-y-5 w-full">
       {/* Inventory Alert */}
       {outOfStockProducts.length > 0 && (
-        <div className="flex items-start gap-3 p-4 rounded-2xl bg-destructive/10 border border-destructive/20">
+        <div className="flex items-start gap-3 p-4 rounded-sm bg-destructive/10 border border-destructive/20">
           <AlertTriangle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
           <div>
             <p className="text-sm font-semibold text-destructive">ইনভেন্টরি এলার্ট!</p>
@@ -153,193 +152,133 @@ const DashboardPage = () => {
           </div>
         </div>
       )}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-lg font-semibold text-foreground">ড্যাশবোর্ড</h2>
-          <p className="text-[11px] text-muted-foreground mt-0.5">
-            {format(dateRange.from, 'd MMM', { locale: bn })} — {format(dateRange.to, 'd MMM, yyyy', { locale: bn })}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="flex gap-0.5 glass-card rounded-xl p-1">
-            {presets.map((p, i) => (
-              <button
-                key={p.label}
-                onClick={() => handlePreset(i)}
-                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                  activePreset === i ? 'bg-foreground text-background shadow-sm' : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                {p.label}
-              </button>
-            ))}
+
+      {/* Header with Date Filter */}
+      <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-4 md:p-5">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-lg font-bold text-foreground">ড্যাশবোর্ড</h2>
+            <p className="text-[11px] text-muted-foreground mt-0.5">
+              {format(dateRange.from, 'd MMM', { locale: bn })} — {format(dateRange.to, 'd MMM, yyyy', { locale: bn })}
+            </p>
           </div>
-          <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant={activePreset === -1 ? "default" : "outline"}
-                size="sm"
-                className={cn(
-                  "h-9 gap-2 rounded-xl text-xs font-semibold transition-all duration-200",
-                  activePreset === -1
-                    ? "bg-foreground text-background shadow-md hover:bg-foreground/90"
-                    : "border-dashed hover:border-solid hover:bg-muted/60"
-                )}
-              >
-                <CalendarIcon className="h-3.5 w-3.5" />
-                {activePreset === -1 ? (
-                  <span>
-                    {format(dateRange.from, 'd MMM', { locale: bn })} - {format(dateRange.to, 'd MMM', { locale: bn })}
-                  </span>
-                ) : (
-                  'কাস্টম'
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 rounded-2xl border border-border/60 shadow-xl" align="end" sideOffset={8}>
-              <div className="p-4 pb-2 border-b border-border/40">
-                <h4 className="text-sm font-semibold text-foreground">তারিখ নির্বাচন করুন</h4>
-                <p className="text-[11px] text-muted-foreground mt-0.5">শুরু ও শেষ তারিখ সিলেক্ট করুন</p>
-              </div>
-              <Calendar
-                mode="range"
-                selected={{ from: dateRange.from, to: dateRange.to }}
-                onSelect={(range) => {
-                  if (range?.from) {
-                    setDateRange({ from: range.from, to: range.to || range.from });
-                    setActivePreset(-1);
-                    if (range.to) setCalendarOpen(false);
-                  }
-                }}
-                numberOfMonths={2}
-                disabled={(date) => date > new Date()}
-                initialFocus
-                className={cn("p-3 pointer-events-auto")}
-              />
-              {activePreset === -1 && (
-                <div className="px-4 py-2.5 border-t border-border/40 bg-muted/30 rounded-b-2xl">
-                  <p className="text-[11px] text-muted-foreground text-center">
-                    📅 {format(dateRange.from, 'd MMMM yyyy', { locale: bn })} — {format(dateRange.to, 'd MMMM yyyy', { locale: bn })}
-                  </p>
+          <div className="flex items-center gap-2">
+            <div className="flex gap-0.5 bg-muted/30 rounded-sm p-1 border border-border/30">
+              {presets.map((p, i) => (
+                <button
+                  key={p.label}
+                  onClick={() => handlePreset(i)}
+                  className={`px-3 py-1.5 rounded-sm text-xs font-semibold transition-all duration-200 ${
+                    activePreset === i ? 'bg-foreground text-background shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+            <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant={activePreset === -1 ? "default" : "outline"}
+                  size="sm"
+                  className={cn(
+                    "h-8 gap-2 rounded-sm text-xs font-semibold transition-all duration-200",
+                    activePreset === -1
+                      ? "bg-foreground text-background shadow-md hover:bg-foreground/90"
+                      : "border-dashed border-border/50 hover:border-solid hover:bg-muted/60"
+                  )}
+                >
+                  <CalendarIcon className="h-3.5 w-3.5" />
+                  {activePreset === -1 ? (
+                    <span>
+                      {format(dateRange.from, 'd MMM', { locale: bn })} - {format(dateRange.to, 'd MMM', { locale: bn })}
+                    </span>
+                  ) : (
+                    'কাস্টম'
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0 rounded-sm border border-border/30 shadow-xl" align="end" sideOffset={8}>
+                <div className="p-4 pb-2 border-b border-border/30">
+                  <h4 className="text-sm font-semibold text-foreground">তারিখ নির্বাচন করুন</h4>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">শুরু ও শেষ তারিখ সিলেক্ট করুন</p>
                 </div>
-              )}
-            </PopoverContent>
-          </Popover>
+                <Calendar
+                  mode="range"
+                  selected={{ from: dateRange.from, to: dateRange.to }}
+                  onSelect={(range) => {
+                    if (range?.from) {
+                      setDateRange({ from: range.from, to: range.to || range.from });
+                      setActivePreset(-1);
+                      if (range.to) setCalendarOpen(false);
+                    }
+                  }}
+                  numberOfMonths={2}
+                  disabled={(date) => date > new Date()}
+                  initialFocus
+                  className={cn("p-3 pointer-events-auto")}
+                />
+                {activePreset === -1 && (
+                  <div className="px-4 py-2.5 border-t border-border/30 bg-muted/30 rounded-b-sm">
+                    <p className="text-[11px] text-muted-foreground text-center">
+                      📅 {format(dateRange.from, 'd MMMM yyyy', { locale: bn })} — {format(dateRange.to, 'd MMMM yyyy', { locale: bn })}
+                    </p>
+                  </div>
+                )}
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-10 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-10 gap-3">
         {isLoading ? (
           Array.from({ length: 9 }).map((_, i) => (
-            <Skeleton key={i} className="h-[130px] rounded-2xl" />
+            <Skeleton key={i} className="h-[120px] rounded-sm" />
           ))
         ) : (
           <>
-            <StatCard
-              icon={ShoppingCart} label="মোট অর্ডার"
-              value={toBengaliNum(stats.total)}
-              sub={`আজ +${toBengaliNum(stats.todayOrders)}`}
-              variant="info"
-              sparkData={sparkData.orders}
-            />
-            <StatCard
-              icon={Clock} label="পেন্ডিং"
-              value={toBengaliNum(stats.pending)}
-              sub="অপেক্ষমাণ"
-              variant="warning"
-              sparkData={[]}
-            />
-            <StatCard
-              icon={Truck} label="ডেলিভারিতে"
-              value={toBengaliNum(stats.shipped)}
-              sub="In Transit"
-              variant="accent"
-              sparkData={[]}
-            />
-            <StatCard
-              icon={CheckCircle2} label="সম্পন্ন"
-              value={toBengaliNum(stats.completed)}
-              sub="কমপ্লিট"
-              variant="success"
-              sparkData={[]}
-            />
-            <StatCard
-              icon={XCircle} label="ক্যানসেল"
-              value={toBengaliNum(stats.cancelled)}
-              sub="বাতিল"
-              variant="warning"
-              sparkData={[]}
-            />
-            <StatCard
-              icon={RotateCcw} label="রিটার্ন"
-              value={toBengaliNum(stats.returned)}
-              sub={`${toBengaliNum(stats.returnRate)}% রেট`}
-              variant="warning"
-              sparkData={[]}
-            />
-            <StatCard
-              icon={DollarSign} label="আজকের আয়"
-              value={`৳${formatBengaliPrice(stats.todayRevenue)}`}
-              sub="আজকের মোট"
-              variant="success"
-              sparkData={sparkData.revenue}
-            />
-            <StatCard
-              icon={Package} label="মোট আয়"
-              value={`৳${formatBengaliPrice(stats.totalRevenue)}`}
-              sub={`${toBengaliNum(dayCount)} দিনের`}
-              variant="accent"
-              sparkData={sparkData.revenue}
-            />
-            <StatCard
-              icon={Box} label="মোট প্রোডাক্ট"
-              value={toBengaliNum(stats.totalProducts)}
-              sub="সকল প্রোডাক্ট"
-              variant="info"
-              sparkData={[]}
-            />
-            <StatCard
-              icon={TrendingUp} label="গ্রস প্রফিট"
-              value={`৳${formatBengaliPrice(stats.grossProfit)}`}
-              sub="আয় - সোর্সিং"
-              variant="success"
-              sparkData={[]}
-            />
-            <StatCard
-              icon={Package} label="স্টকে আছে"
-              value={toBengaliNum(stats.inStockProducts)}
-              sub={`${toBengaliNum(stats.totalProducts - stats.inStockProducts)} আউট`}
-              variant={stats.inStockProducts < stats.totalProducts ? 'warning' : 'success'}
-              sparkData={[]}
-            />
+            <StatCard icon={ShoppingCart} label="মোট অর্ডার" value={toBengaliNum(stats.total)} sub={`আজ +${toBengaliNum(stats.todayOrders)}`} variant="info" sparkData={sparkData.orders} />
+            <StatCard icon={Clock} label="পেন্ডিং" value={toBengaliNum(stats.pending)} sub="অপেক্ষমাণ" variant="warning" sparkData={[]} />
+            <StatCard icon={Truck} label="ডেলিভারিতে" value={toBengaliNum(stats.shipped)} sub="In Transit" variant="accent" sparkData={[]} />
+            <StatCard icon={CheckCircle2} label="সম্পন্ন" value={toBengaliNum(stats.completed)} sub="কমপ্লিট" variant="success" sparkData={[]} />
+            <StatCard icon={XCircle} label="ক্যানসেল" value={toBengaliNum(stats.cancelled)} sub="বাতিল" variant="warning" sparkData={[]} />
+            <StatCard icon={RotateCcw} label="রিটার্ন" value={toBengaliNum(stats.returned)} sub={`${toBengaliNum(stats.returnRate)}% রেট`} variant="warning" sparkData={[]} />
+            <StatCard icon={DollarSign} label="আজকের আয়" value={`৳${formatBengaliPrice(stats.todayRevenue)}`} sub="আজকের মোট" variant="success" sparkData={sparkData.revenue} />
+            <StatCard icon={Package} label="মোট আয়" value={`৳${formatBengaliPrice(stats.totalRevenue)}`} sub={`${toBengaliNum(dayCount)} দিনের`} variant="accent" sparkData={sparkData.revenue} />
+            <StatCard icon={Box} label="মোট প্রোডাক্ট" value={toBengaliNum(stats.totalProducts)} sub="সকল প্রোডাক্ট" variant="info" sparkData={[]} />
+            <StatCard icon={TrendingUp} label="গ্রস প্রফিট" value={`৳${formatBengaliPrice(stats.grossProfit)}`} sub="আয় - সোর্সিং" variant="success" sparkData={[]} />
+            <StatCard icon={Package} label="স্টকে আছে" value={toBengaliNum(stats.inStockProducts)} sub={`${toBengaliNum(stats.totalProducts - stats.inStockProducts)} আউট`} variant={stats.inStockProducts < stats.totalProducts ? 'warning' : 'success'} sparkData={[]} />
           </>
         )}
       </div>
 
       {/* Daily Profit Summary */}
-      <div className="glass-card rounded-2xl p-5 md:p-6">
+      <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-5">
         <div className="flex items-center gap-2 mb-4">
-          <Calculator className="h-5 w-5 text-accent" />
+          <div className="w-8 h-8 rounded-sm bg-accent/10 flex items-center justify-center">
+            <Calculator className="h-4 w-4 text-accent" />
+          </div>
           <h3 className="font-semibold text-sm text-foreground">আজকের আনুমানিক প্রফিট</h3>
         </div>
         {isLoading ? (
-          <Skeleton className="h-20 rounded-xl" />
+          <Skeleton className="h-20 rounded-sm" />
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div className="text-center p-3 bg-success/5 rounded-xl border border-success/10">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="text-center p-3 bg-success/5 rounded-sm border border-success/10">
               <p className="text-[11px] text-muted-foreground">আজকের আয়</p>
               <p className="text-lg font-bold font-inter text-success">৳{formatBengaliPrice(stats.todayRevenue)}</p>
             </div>
-            <div className="text-center p-3 bg-destructive/5 rounded-xl border border-destructive/10">
+            <div className="text-center p-3 bg-destructive/5 rounded-sm border border-destructive/10">
               <p className="text-[11px] text-muted-foreground">সোর্সিং + ডেলিভারি</p>
               <p className="text-lg font-bold font-inter text-destructive">−৳{formatBengaliPrice(stats.todayRevenue - stats.estimatedDailyProfit)}</p>
             </div>
-            <div className="text-center p-3 bg-warning/5 rounded-xl border border-warning/10">
+            <div className="text-center p-3 bg-warning/5 rounded-sm border border-warning/10">
               <p className="text-[11px] text-muted-foreground">রিটার্ন রেট</p>
               <p className="text-lg font-bold font-inter text-warning">{toBengaliNum(stats.returnRate)}%</p>
             </div>
-            <div className="text-center p-3 bg-accent/5 rounded-xl border border-accent/10">
+            <div className="text-center p-3 bg-accent/5 rounded-sm border border-accent/10">
               <p className="text-[11px] text-muted-foreground">আনুমানিক প্রফিট</p>
               <p className={`text-lg font-bold font-inter ${stats.estimatedDailyProfit >= 0 ? 'text-accent' : 'text-destructive'}`}>
                 ৳{formatBengaliPrice(Math.abs(stats.estimatedDailyProfit))}
@@ -351,26 +290,26 @@ const DashboardPage = () => {
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2 glass-card rounded-2xl p-5 md:p-6">
+        <div className="lg:col-span-2 bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-5">
           <div className="flex items-center justify-between mb-5">
             <div>
               <h3 className="font-semibold text-sm text-foreground">আয়ের ট্রেন্ড</h3>
               <p className="text-[11px] text-muted-foreground">নির্বাচিত সময়ের আয়</p>
             </div>
-            <div className="flex items-center gap-1.5 text-[11px] text-success font-medium">
+            <div className="flex items-center gap-1.5 text-[11px] text-success font-medium bg-success/10 px-2.5 py-1 rounded-sm border border-success/20">
               <ArrowUpRight className="h-3.5 w-3.5" />
               <span className="font-inter">{toBengaliNum(stats.total)} অর্ডার</span>
             </div>
           </div>
           {isLoading ? (
-            <Skeleton className="h-[250px] rounded-xl" />
+            <Skeleton className="h-[250px] rounded-sm" />
           ) : (
             <ResponsiveContainer width="100%" height={250}>
               <AreaChart data={chartData}>
                 <defs>
                   <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(var(--accent))" stopOpacity={0.25} />
-                    <stop offset="95%" stopColor="hsl(var(--accent))" stopOpacity={0} />
+                    <stop offset="5%" stopColor="hsl(var(--gold))" stopOpacity={0.25} />
+                    <stop offset="95%" stopColor="hsl(var(--gold))" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
@@ -380,7 +319,7 @@ const DashboardPage = () => {
                   contentStyle={{
                     background: 'hsl(var(--card))',
                     border: '1px solid hsl(var(--border))',
-                    borderRadius: '12px',
+                    borderRadius: '4px',
                     fontSize: '12px',
                     boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
                   }}
@@ -388,7 +327,7 @@ const DashboardPage = () => {
                 />
                 <Area
                   type="monotone" dataKey="revenue"
-                  stroke="hsl(var(--accent))" strokeWidth={2.5}
+                  stroke="hsl(var(--gold))" strokeWidth={2}
                   fill="url(#colorRevenue)"
                 />
               </AreaChart>
@@ -396,13 +335,13 @@ const DashboardPage = () => {
           )}
         </div>
 
-        <div className="glass-card rounded-2xl p-5 md:p-6">
+        <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-5">
           <div className="mb-5">
             <h3 className="font-semibold text-sm text-foreground">অর্ডার স্ট্যাটাস</h3>
             <p className="text-[11px] text-muted-foreground">স্ট্যাটাস অনুযায়ী বিভাজন</p>
           </div>
           {isLoading ? (
-            <Skeleton className="h-[250px] rounded-xl" />
+            <Skeleton className="h-[250px] rounded-sm" />
           ) : (
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={statusData} layout="vertical">
@@ -418,12 +357,12 @@ const DashboardPage = () => {
                   contentStyle={{
                     background: 'hsl(var(--card))',
                     border: '1px solid hsl(var(--border))',
-                    borderRadius: '12px',
+                    borderRadius: '4px',
                     fontSize: '12px',
                     boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
                   }}
                 />
-                <Bar dataKey="count" radius={[0, 6, 6, 0]} barSize={20} fill="hsl(var(--accent))" />
+                <Bar dataKey="count" radius={[0, 4, 4, 0]} barSize={20} fill="hsl(var(--gold))" />
               </BarChart>
             </ResponsiveContainer>
           )}
@@ -431,22 +370,24 @@ const DashboardPage = () => {
       </div>
 
       {/* Recent Orders */}
-      <div className="glass-card rounded-2xl p-5 md:p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold text-sm text-foreground">সাম্প্রতিক অর্ডার</h3>
-          <span className="text-[11px] text-muted-foreground">সর্বশেষ ৫টি</span>
+      <div className="bg-surface dark:bg-card rounded-sm border border-border/30 overflow-hidden shadow-sm">
+        <div className="px-5 py-4 border-b border-border/30 flex items-center justify-between">
+          <div>
+            <h3 className="font-semibold text-sm text-foreground">সাম্প্রতিক অর্ডার</h3>
+            <p className="text-[10px] text-muted-foreground">সর্বশেষ ৫টি</p>
+          </div>
         </div>
         {isLoading ? (
-          <div className="space-y-3">
-            {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-14 rounded-xl" />)}
+          <div className="p-5 space-y-3">
+            {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-14 rounded-sm" />)}
           </div>
         ) : (
-          <div className="space-y-1">
+          <div className="divide-y divide-border/30">
             {filteredOrders.slice(0, 5).map(o => (
-              <div key={o.id} className="flex items-center justify-between p-3 rounded-xl hover:bg-muted/50 transition-colors duration-200">
+              <div key={o.id} className="flex items-center justify-between px-5 py-3 hover:bg-gold/[0.03] transition-colors duration-200">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
-                    <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+                  <div className="w-8 h-8 rounded-sm bg-muted/50 flex items-center justify-center shrink-0">
+                    <ShoppingCart className="h-3.5 w-3.5 text-muted-foreground" />
                   </div>
                   <div className="min-w-0">
                     <p className="text-sm font-medium truncate text-foreground">{o.customer_name}</p>
@@ -481,13 +422,13 @@ const StatCard = ({ icon: Icon, label, value, sub, variant, sparkData }: {
 }) => {
   const v = variantStyles[variant];
   return (
-    <div className="glass-card rounded-2xl p-5 group hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">
+    <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-4 hover:shadow-md transition-all duration-300">
       <div className="flex items-start justify-between">
-        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${v.iconBg}`}>
-          <Icon className={`h-5 w-5 ${v.iconColor}`} />
+        <div className={`w-8 h-8 rounded-sm flex items-center justify-center ${v.iconBg}`}>
+          <Icon className={`h-4 w-4 ${v.iconColor}`} />
         </div>
         {sparkData.length > 0 && (
-          <div className="w-20 h-8">
+          <div className="w-16 h-7">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={sparkData}>
                 <Line type="monotone" dataKey="v" stroke={v.sparkColor} strokeWidth={1.5} dot={false} />
@@ -496,8 +437,8 @@ const StatCard = ({ icon: Icon, label, value, sub, variant, sparkData }: {
           </div>
         )}
       </div>
-      <p className="mt-3 text-2xl font-bold font-inter tracking-tight text-foreground">{value}</p>
-      <p className="text-[11px] text-muted-foreground mt-0.5">{label} · {sub}</p>
+      <p className="mt-2.5 text-2xl font-bold font-inter tracking-tight text-foreground">{value}</p>
+      <p className="text-[10px] text-muted-foreground mt-0.5">{label} · {sub}</p>
     </div>
   );
 };
@@ -515,7 +456,7 @@ const StatusBadge = ({ status }: { status: string }) => {
     pending: 'পেন্ডিং', processing: 'প্রসেসিং', shipped: 'শিপড', completed: 'সম্পন্ন', cancelled: 'ক্যানসেল', returned: 'রিটার্ন',
   };
   return (
-    <span className={`text-[10px] font-medium px-2.5 py-1 rounded-full border ${styles[status] || 'bg-muted text-muted-foreground'}`}>
+    <span className={`text-[10px] font-medium px-2.5 py-1 rounded-sm border ${styles[status] || 'bg-muted text-muted-foreground'}`}>
       {labels[status] || status}
     </span>
   );
