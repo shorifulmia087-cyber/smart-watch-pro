@@ -131,6 +131,10 @@ const SiteControlPage = () => {
             <Field label="CTA সাবটাইটেল" value={form.footer_cta_subtitle || ''} onChange={v => setForm({ ...form, footer_cta_subtitle: v })} />
           </div>
           <Field label="ফুটার টেক্সট" value={form.footer_text || ''} onChange={v => setForm({ ...form, footer_text: v })} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+            <Field label="ডেভেলপার নাম" value={(form as any).developer_name || ''} onChange={v => setForm({ ...form, developer_name: v } as any)} />
+            <Field label="ডেভেলপার লিংক (URL)" value={(form as any).developer_url || ''} onChange={v => setForm({ ...form, developer_url: v } as any)} />
+          </div>
         </Section>
 
         <Section title="WhatsApp" icon={<MessageCircle className="h-4 w-4 text-success" />}>

@@ -222,6 +222,8 @@ export type Database = {
           countdown_hours: number
           delivery_charge_inside: number
           delivery_charge_outside: number
+          developer_name: string | null
+          developer_url: string | null
           discount_percent: number
           features_section_title: string
           footer_cta_subtitle: string
@@ -251,6 +253,8 @@ export type Database = {
           countdown_hours?: number
           delivery_charge_inside?: number
           delivery_charge_outside?: number
+          developer_name?: string | null
+          developer_url?: string | null
           discount_percent?: number
           features_section_title?: string
           footer_cta_subtitle?: string
@@ -280,6 +284,8 @@ export type Database = {
           countdown_hours?: number
           delivery_charge_inside?: number
           delivery_charge_outside?: number
+          developer_name?: string | null
+          developer_url?: string | null
           discount_percent?: number
           features_section_title?: string
           footer_cta_subtitle?: string
