@@ -42,15 +42,22 @@ const StickyOrderForm = () => {
     if (!cleanName || !cleanPhone || !cleanAddress || !product) return;
     if (!isValidPhone(cleanPhone)) { toast({ title: 'সঠিক মোবাইল নম্বর দিন', variant: 'destructive' }); return; }
 
+    if (turnstileEnabled && !turnstileToken) {
+      toast({ title: 'ভেরিফিকেশন প্রয়োজন', description: '"আমি রোবট নই" চেকবক্স ক্লিক করুন।', variant: 'destructive' });
+      return;
+    }
+
     setLoading(true);
     try {
       await createOrder.mutateAsync({
         customer_name: cleanName, phone: cleanPhone, address: cleanAddress,
         watch_model: product.name, quantity: 1, payment_method: 'cod',
-        delivery_location: location, delivery_charge: deliveryCharge, total_price: total,
+        delivery_location: location,
+        turnstile_token: turnstileToken,
       });
       setSuccess(true);
       setName(''); setPhone(''); setAddress(''); setHoneypot('');
+      resetTurnstile();
       setTimeout(() => setSuccess(false), 3000);
     } catch {
       toast({ title: 'ত্রুটি হয়েছে', variant: 'destructive' });
