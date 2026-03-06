@@ -130,6 +130,10 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
     setLoading(true);
 
     try {
+      const advanceAmount = tab === 'online'
+        ? (paymentType === 'full_payment' ? grandTotal : deliveryCharge)
+        : 0;
+
       await createOrder.mutateAsync({
         customer_name: cleanName,
         customer_email: email ? sanitizeForDisplay(email) : null,
@@ -142,6 +146,8 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
         delivery_location: location,
         selected_color: selectedColor || null,
         turnstile_token: turnstileToken,
+        payment_type: tab === 'cod' ? 'cod' : paymentType,
+        advance_amount: advanceAmount,
       });
       setLoading(false);
       setSuccess(true);
