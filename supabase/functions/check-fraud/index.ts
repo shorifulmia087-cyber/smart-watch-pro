@@ -5,8 +5,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 }
 
-const FRAUD_API_KEY = '2cf139298bee59b3c78added618309e1'
-
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
@@ -20,6 +18,22 @@ Deno.serve(async (req) => {
     }
 
     const cleanPhone = phone.replace(/[\s-]/g, '')
+
+    // Get API key from secrets
+    const FRAUD_API_KEY = Deno.env.get('FRAUD_CHECKER_API_KEY')
+    if (!FRAUD_API_KEY) {
+      console.error('FRAUD_CHECKER_API_KEY secret not configured')
+      return new Response(JSON.stringify({
+        allowed: true,
+        flag: 'check_failed',
+        total_parcels: 0,
+        total_delivered: 0,
+        total_cancel: 0,
+        success_rate: null,
+        message: null,
+        error_message: 'API Key কনফিগার করা হয়নি',
+      }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+    }
 
     // Fetch min_success_rate from settings
     const supabase = createClient(
@@ -38,45 +52,15 @@ Deno.serve(async (req) => {
     // Call FraudChecker API
     let fraudRes: Response
     try {
-      // Try multiple auth approaches
-      const attempts = [
-        { url: 'https://fraudchecker.link/api/v1/qc/', headers: { 'Content-Type': 'application/json', 'Authorization': `Token ${FRAUD_API_KEY}` } },
-        { url: 'https://fraudchecker.link/api/v1/qc', headers: { 'Content-Type': 'application/json', 'Authorization': `Token ${FRAUD_API_KEY}` } },
-        { url: 'https://fraudchecker.link/api/v1/qc/', headers: { 'Content-Type': 'application/json', 'Authorization': FRAUD_API_KEY } },
-      ]
-      
-      for (const attempt of attempts) {
-        console.log('Trying:', attempt.url, JSON.stringify(attempt.headers))
-        const res = await fetch(attempt.url, {
-          method: 'POST',
-          headers: attempt.headers,
-          body: JSON.stringify({ phone: cleanPhone }),
-        })
-        console.log('Response status:', res.status)
-        if (res.ok) {
-          fraudRes = res
-          break
-        }
-        const body = await res.text()
-        console.log('Response body:', body)
-        fraudRes = null as any
-      }
-      
-      if (!fraudRes || !fraudRes.ok) {
-        // None worked
-        return new Response(JSON.stringify({
-          allowed: true,
-          flag: 'check_failed',
-          total_parcels: 0,
-          total_delivered: 0,
-          total_cancel: 0,
-          success_rate: null,
-          message: null,
-          error_message: 'API Authentication failed - all methods tried',
-        }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
-      }
+      fraudRes = await fetch('https://fraudchecker.link/api/v1/qc/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Token ${FRAUD_API_KEY}`,
+        },
+        body: JSON.stringify({ phone: cleanPhone }),
+      })
     } catch (networkErr) {
-      // Network error - allow order, report error
       console.error('FraudChecker network error:', networkErr)
       return new Response(JSON.stringify({
         allowed: true,
@@ -90,7 +74,7 @@ Deno.serve(async (req) => {
       }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 
-    // Handle non-OK responses (out of credit, invalid key, server errors)
+    // Handle non-OK responses
     if (!fraudRes.ok) {
       let errorDetail = `API Error (HTTP ${fraudRes.status})`
       try {
@@ -102,7 +86,6 @@ Deno.serve(async (req) => {
 
       console.error('FraudChecker API error:', fraudRes.status, errorDetail)
       
-      // ALLOW order but flag as check_failed
       return new Response(JSON.stringify({
         allowed: true,
         flag: 'check_failed',
@@ -117,7 +100,7 @@ Deno.serve(async (req) => {
 
     const fraudData = await fraudRes.json()
 
-    // Check if API returned an error in the response body (e.g., credit exhausted)
+    // Check if API returned an error in the response body
     if (fraudData?.error || fraudData?.detail) {
       const errorMsg = fraudData.error || fraudData.detail || 'Unknown API error'
       console.error('FraudChecker API body error:', errorMsg)
@@ -143,19 +126,16 @@ Deno.serve(async (req) => {
     let message: string | null = null
 
     if (totalParcels === 0) {
-      // New number, no history
       flag = 'new_customer'
       allowed = true
     } else {
       successRate = (totalDelivered / totalParcels) * 100
 
       if (successRate < minSuccessRate) {
-        // Low success rate - block COD
         flag = 'low_success'
         allowed = false
         message = 'আপনার নম্বরে ক্যানসেলড অর্ডারের সংখ্যা বেশি হওয়ায় ক্যাশ অন ডেলিভারি পাওয়া যাচ্ছে না। দয়া করে অর্ডার কনফার্ম করতে অগ্রিম পেমেন্ট করুন।'
       } else {
-        // Good history
         flag = 'good'
         allowed = true
       }
