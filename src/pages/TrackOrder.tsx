@@ -4,7 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Package, Search, Truck, CheckCircle2, Clock, MapPin, ArrowLeft, Box, XCircle, Loader2, ExternalLink } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import Navbar from '@/components/Navbar';
+
 
 type OrderStatus = 'pending' | 'processing' | 'shipped' | 'completed' | 'cancelled' | 'returned';
 
@@ -185,7 +185,7 @@ const TrackOrder = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/30">
-      <Navbar />
+      
 
       <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
         {/* Page Header */}

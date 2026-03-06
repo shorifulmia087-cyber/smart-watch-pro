@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Package, Clock, Truck, CheckCircle2, XCircle, RotateCcw, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
-import Navbar from '@/components/Navbar';
+
 
 
 
@@ -55,7 +55,7 @@ const MyOrders = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
+      
 
       <div className="max-w-3xl mx-auto px-4 py-8">
         <motion.div
