@@ -104,7 +104,7 @@ const FraudCheckerPage = () => {
       </div>
 
       {/* Search Box */}
-      <div className="bg-card border border-border/40 rounded-sm p-5">
+      <div className="bg-surface dark:bg-card border border-border/30 rounded-sm shadow-sm p-5">
         <label className="text-[10px] font-semibold text-muted-foreground/60 uppercase tracking-wider mb-2 block">
           ফোন নম্বর
         </label>

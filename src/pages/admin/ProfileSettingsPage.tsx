@@ -31,7 +31,7 @@ const ProfileSettingsPage = () => {
   };
 
   return (
-    <div className="space-y-5 w-full max-w-[700px]">
+    <div className="space-y-5 w-full">
       {/* Bento Header */}
       <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-4 md:p-5">
         <h2 className="text-lg font-bold text-foreground">প্রোফাইল সেটিংস</h2>
