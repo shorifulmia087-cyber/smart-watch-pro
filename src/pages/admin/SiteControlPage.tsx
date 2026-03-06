@@ -144,8 +144,31 @@ const SiteControlPage = () => {
           </div>
           <Field label="ফুটার টেক্সট" value={form.footer_text || ''} onChange={v => setForm({ ...form, footer_text: v })} />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
-            <Field label="ডেভেলপার নাম" value={(form as any).developer_name || ''} onChange={v => setForm({ ...form, developer_name: v } as any)} />
-            <Field label="ডেভেলপার লিংক (URL)" value={(form as any).developer_url || ''} onChange={v => setForm({ ...form, developer_url: v } as any)} />
+            {isSuperAdmin ? (
+              <>
+                <Field label="ডেভেলপার নাম" value={(form as any).developer_name || ''} onChange={v => setForm({ ...form, developer_name: v } as any)} />
+                <Field label="ডেভেলপার লিংক (URL)" value={(form as any).developer_url || ''} onChange={v => setForm({ ...form, developer_url: v } as any)} />
+              </>
+            ) : (
+              <>
+                <div>
+                  <label className="text-[11px] font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
+                    <Lock className="h-3 w-3" /> ডেভেলপার নাম
+                  </label>
+                  <div className="w-full bg-muted/20 border border-border/30 rounded-sm px-3 py-2.5 text-sm text-muted-foreground cursor-not-allowed select-none">
+                    {(form as any).developer_name || '—'}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[11px] font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
+                    <Lock className="h-3 w-3" /> ডেভেলপার লিংক (URL)
+                  </label>
+                  <div className="w-full bg-muted/20 border border-border/30 rounded-sm px-3 py-2.5 text-sm text-muted-foreground cursor-not-allowed select-none truncate">
+                    {(form as any).developer_url || '—'}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </Section>
 
