@@ -520,8 +520,8 @@ const OrdersPage = () => {
         {/* Title & Search Row */}
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-5">
           <div>
-            <h2 className="text-xl font-bold text-foreground tracking-tight">সকল অর্ডার</h2>
-            <p className="text-xs text-muted-foreground mt-1">মোট {toBengaliNum(filtered.length)} টি অর্ডার পাওয়া গেছে</p>
+            <h2 className="text-lg font-bold text-foreground">সকল অর্ডার</h2>
+            <p className="text-[11px] text-muted-foreground mt-0.5">মোট {toBengaliNum(filtered.length)} টি অর্ডার পাওয়া গেছে</p>
           </div>
           <div className="flex items-center gap-3 flex-wrap w-full lg:w-auto">
             {/* Courier Provider */}
