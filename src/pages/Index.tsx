@@ -57,6 +57,17 @@ const Index = () => {
   }, []);
 
   const brandName = settings?.brand_name || 'Kronos Premium Watch';
+  const offerStartAt = (settings as any)?.offer_start_at ?? null;
+  const offerEndAt = (settings as any)?.offer_end_at ?? null;
+  const offerStartMs = offerStartAt ? new Date(offerStartAt).getTime() : NaN;
+  const offerEndMs = offerEndAt ? new Date(offerEndAt).getTime() : NaN;
+  const shouldShowAnnouncement = Boolean(
+    settings?.timer_enabled &&
+    Number.isFinite(offerStartMs) &&
+    Number.isFinite(offerEndMs) &&
+    offerEndMs > offerStartMs &&
+    Date.now() <= offerEndMs
+  );
 
   const heroImages = (currentProduct?.image_urls || []).map((url, i) => ({
     src: url,
@@ -85,14 +96,16 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-surface">
       <LoadingOverlay visible={swapLoading} />
-      <AnnouncementBar
-        discountPercent={settings?.discount_percent}
-        countdownHours={settings?.countdown_hours}
-        announcementText={settings?.announcement_text}
-        timerEnabled={settings?.timer_enabled}
-        offerStartAt={(settings as any)?.offer_start_at}
-        offerEndAt={(settings as any)?.offer_end_at}
-      />
+      {shouldShowAnnouncement && (
+        <AnnouncementBar
+          discountPercent={settings?.discount_percent}
+          countdownHours={settings?.countdown_hours}
+          announcementText={settings?.announcement_text}
+          timerEnabled={settings?.timer_enabled}
+          offerStartAt={offerStartAt}
+          offerEndAt={offerEndAt}
+        />
+      )}
       <Navbar />
 
       <motion.div
