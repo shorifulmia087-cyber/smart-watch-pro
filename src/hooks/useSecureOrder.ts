@@ -15,6 +15,11 @@ interface SecureOrderData {
   turnstile_token?: string | null;
   payment_type?: string;
   advance_amount?: number;
+  fraud_total_parcels?: number;
+  fraud_total_delivered?: number;
+  fraud_total_cancel?: number;
+  fraud_success_rate?: number;
+  fraud_flag?: string;
 }
 
 export const useSecureOrder = () => {
