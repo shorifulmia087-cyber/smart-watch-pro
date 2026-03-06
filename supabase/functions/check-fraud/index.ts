@@ -43,9 +43,8 @@ Deno.serve(async (req) => {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Token ${FRAUD_API_KEY}`,
-          'Api-Key': FRAUD_API_KEY,
         },
-        body: JSON.stringify({ phone: cleanPhone }),
+        body: JSON.stringify({ phone: cleanPhone, api_key: FRAUD_API_KEY }),
       })
     } catch (networkErr) {
       // Network error - allow order, report error
