@@ -2,6 +2,7 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { useOrders, useUpdateOrderStatus, useSettings } from '@/hooks/useSupabaseData';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
 import { Search, Filter, ChevronLeft, ChevronRight, Truck, FileText, CheckCircle2, Package, Loader2, Eye, X, MapPin } from 'lucide-react';
+import AdminPagination from '@/components/admin/AdminPagination';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Checkbox } from '@/components/ui/checkbox';
 import LiveTracking from '@/components/admin/LiveTracking';
