@@ -132,22 +132,30 @@ const Index = () => {
           price={currentProduct.price}
           discountPercent={currentProduct.discount_percent}
         />
-        <FeatureList
-          features={features}
-          sectionTitle={settings?.features_section_title}
-        />
-        <VideoSection
-          videoId={currentProduct.video_url || undefined}
-          sectionTitle={settings?.video_section_title}
-        />
+        <Suspense fallback={null}>
+          <FeatureList
+            features={features}
+            sectionTitle={settings?.features_section_title}
+          />
+        </Suspense>
+        <Suspense fallback={null}>
+          <VideoSection
+            videoId={currentProduct.video_url || undefined}
+            sectionTitle={settings?.video_section_title}
+          />
+        </Suspense>
       </motion.div>
 
-      <ReviewGallery />
-      <CollectionGrid
-        currentProductId={currentProduct.id}
-        onSelectProduct={handleSelectProduct}
-        sectionTitle={settings?.collection_section_title}
-      />
+      <Suspense fallback={null}>
+        <ReviewGallery />
+      </Suspense>
+      <Suspense fallback={null}>
+        <CollectionGrid
+          currentProductId={currentProduct.id}
+          onSelectProduct={handleSelectProduct}
+          sectionTitle={settings?.collection_section_title}
+        />
+      </Suspense>
 
       <section className="bg-ink py-12 px-4">
         <motion.div
