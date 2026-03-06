@@ -86,7 +86,7 @@ const FacebookPixelPage = () => {
 
   if (loading) {
     return (
-      <div className="space-y-5 w-full max-w-[1000px]">
+      <div className="space-y-5 w-full">
         {Array.from({ length: 3 }).map((_, i) => (
           <div key={i} className="h-[120px] bg-muted/30 rounded-sm animate-pulse" />
         ))}
