@@ -1,25 +1,34 @@
 import { useAuth } from '@/hooks/useAuth';
 import AdminLogin from './AdminLogin';
 import AdminLayout from './admin/AdminLayout';
-import DashboardPage from './admin/DashboardPage';
-import OrdersPage from './admin/OrdersPage';
-import ProductsPage from './admin/ProductsPage';
-import CustomersPage from './admin/CustomersPage';
-import AnalyticsPage from './admin/AnalyticsPage';
-import SiteControlPage from './admin/SiteControlPage';
-import ReviewsPage from './admin/ReviewsPage';
-import PaymentSettingsPage from './admin/PaymentSettingsPage';
-import AdvancePaymentsPage from './admin/AdvancePaymentsPage';
-import ProfileSettingsPage from './admin/ProfileSettingsPage';
-import CourierSettingsPage from './admin/CourierSettingsPage';
-import CourierPaymentsPage from './admin/CourierPaymentsPage';
-import TrackingDashboardPage from './admin/TrackingDashboardPage';
-import FacebookPixelPage from './admin/FacebookPixelPage';
-import SmsSettingsPage from './admin/SmsSettingsPage';
-import TeamPage from './admin/TeamPage';
-import FraudCheckerPage from './admin/FraudCheckerPage';
 import { Loader2 } from 'lucide-react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
+
+// Lazy load all admin pages for route-level code splitting
+const DashboardPage = lazy(() => import('./admin/DashboardPage'));
+const OrdersPage = lazy(() => import('./admin/OrdersPage'));
+const ProductsPage = lazy(() => import('./admin/ProductsPage'));
+const CustomersPage = lazy(() => import('./admin/CustomersPage'));
+const AnalyticsPage = lazy(() => import('./admin/AnalyticsPage'));
+const SiteControlPage = lazy(() => import('./admin/SiteControlPage'));
+const ReviewsPage = lazy(() => import('./admin/ReviewsPage'));
+const PaymentSettingsPage = lazy(() => import('./admin/PaymentSettingsPage'));
+const AdvancePaymentsPage = lazy(() => import('./admin/AdvancePaymentsPage'));
+const ProfileSettingsPage = lazy(() => import('./admin/ProfileSettingsPage'));
+const CourierSettingsPage = lazy(() => import('./admin/CourierSettingsPage'));
+const CourierPaymentsPage = lazy(() => import('./admin/CourierPaymentsPage'));
+const TrackingDashboardPage = lazy(() => import('./admin/TrackingDashboardPage'));
+const FacebookPixelPage = lazy(() => import('./admin/FacebookPixelPage'));
+const SmsSettingsPage = lazy(() => import('./admin/SmsSettingsPage'));
+const TeamPage = lazy(() => import('./admin/TeamPage'));
+const FraudCheckerPage = lazy(() => import('./admin/FraudCheckerPage'));
+
+const AdminPageLoader = () => (
+  <div className="flex items-center justify-center py-20">
+    <Loader2 className="w-6 h-6 animate-spin text-accent" />
+  </div>
+);
 
 const Admin = () => {
   const { user, hasAdminAccess, isOrderManager, loading } = useAuth();
@@ -51,9 +60,9 @@ const Admin = () => {
       <Routes>
         <Route element={<AdminLayout />}>
           <Route index element={<Navigate to="/admin/orders" replace />} />
-          <Route path="orders" element={<OrdersPage />} />
-          <Route path="tracking" element={<TrackingDashboardPage />} />
-          <Route path="profile" element={<ProfileSettingsPage />} />
+          <Route path="orders" element={<Suspense fallback={<AdminPageLoader />}><OrdersPage /></Suspense>} />
+          <Route path="tracking" element={<Suspense fallback={<AdminPageLoader />}><TrackingDashboardPage /></Suspense>} />
+          <Route path="profile" element={<Suspense fallback={<AdminPageLoader />}><ProfileSettingsPage /></Suspense>} />
           <Route path="*" element={<Navigate to="/admin/orders" replace />} />
         </Route>
       </Routes>
@@ -63,23 +72,23 @@ const Admin = () => {
   return (
     <Routes>
       <Route element={<AdminLayout />}>
-        <Route index element={<DashboardPage />} />
-        <Route path="orders" element={<OrdersPage />} />
-        <Route path="products" element={<ProductsPage />} />
-        <Route path="customers" element={<CustomersPage />} />
-        <Route path="reviews" element={<ReviewsPage />} />
-        <Route path="fraud-checker" element={<FraudCheckerPage />} />
-        <Route path="team" element={<TeamPage />} />
-        <Route path="payment" element={<PaymentSettingsPage />} />
-        <Route path="advance-payments" element={<AdvancePaymentsPage />} />
-        <Route path="courier" element={<CourierSettingsPage />} />
-        <Route path="courier-payments" element={<CourierPaymentsPage />} />
-        <Route path="tracking" element={<TrackingDashboardPage />} />
-        <Route path="sms" element={<SmsSettingsPage />} />
-        <Route path="analytics" element={<AnalyticsPage />} />
-        <Route path="pixel" element={<FacebookPixelPage />} />
-        <Route path="settings" element={<SiteControlPage />} />
-        <Route path="profile" element={<ProfileSettingsPage />} />
+        <Route index element={<Suspense fallback={<AdminPageLoader />}><DashboardPage /></Suspense>} />
+        <Route path="orders" element={<Suspense fallback={<AdminPageLoader />}><OrdersPage /></Suspense>} />
+        <Route path="products" element={<Suspense fallback={<AdminPageLoader />}><ProductsPage /></Suspense>} />
+        <Route path="customers" element={<Suspense fallback={<AdminPageLoader />}><CustomersPage /></Suspense>} />
+        <Route path="reviews" element={<Suspense fallback={<AdminPageLoader />}><ReviewsPage /></Suspense>} />
+        <Route path="fraud-checker" element={<Suspense fallback={<AdminPageLoader />}><FraudCheckerPage /></Suspense>} />
+        <Route path="team" element={<Suspense fallback={<AdminPageLoader />}><TeamPage /></Suspense>} />
+        <Route path="payment" element={<Suspense fallback={<AdminPageLoader />}><PaymentSettingsPage /></Suspense>} />
+        <Route path="advance-payments" element={<Suspense fallback={<AdminPageLoader />}><AdvancePaymentsPage /></Suspense>} />
+        <Route path="courier" element={<Suspense fallback={<AdminPageLoader />}><CourierSettingsPage /></Suspense>} />
+        <Route path="courier-payments" element={<Suspense fallback={<AdminPageLoader />}><CourierPaymentsPage /></Suspense>} />
+        <Route path="tracking" element={<Suspense fallback={<AdminPageLoader />}><TrackingDashboardPage /></Suspense>} />
+        <Route path="sms" element={<Suspense fallback={<AdminPageLoader />}><SmsSettingsPage /></Suspense>} />
+        <Route path="analytics" element={<Suspense fallback={<AdminPageLoader />}><AnalyticsPage /></Suspense>} />
+        <Route path="pixel" element={<Suspense fallback={<AdminPageLoader />}><FacebookPixelPage /></Suspense>} />
+        <Route path="settings" element={<Suspense fallback={<AdminPageLoader />}><SiteControlPage /></Suspense>} />
+        <Route path="profile" element={<Suspense fallback={<AdminPageLoader />}><ProfileSettingsPage /></Suspense>} />
       </Route>
     </Routes>
   );
