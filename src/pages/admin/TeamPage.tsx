@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { Users, Shield, UserPlus, Loader2, Crown } from 'lucide-react';
+import { Users, Shield, UserPlus, Loader2, Crown, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
 } from '@/components/ui/table';
@@ -18,9 +18,11 @@ type TeamMember = {
 const TeamPage = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [newEmail, setNewEmail] = useState('');
   const [newRole, setNewRole] = useState<'admin' | 'user'>('user');
   const [adding, setAdding] = useState(false);
+  const [removingId, setRemovingId] = useState<string | null>(null);
 
   const { data: members, isLoading } = useQuery({
     queryKey: ['team-members'],
@@ -51,7 +53,7 @@ const TeamPage = () => {
         });
         setNewEmail('');
         // Refetch team members
-        window.location.reload();
+        queryClient.invalidateQueries({ queryKey: ['team-members'] });
       } else if (result.error === 'user_not_found') {
         toast({
           title: '❌ ইউজার পাওয়া যায়নি',
@@ -78,6 +80,28 @@ const TeamPage = () => {
       });
     } finally {
       setAdding(false);
+    }
+  };
+
+  const handleRemove = async (targetUserId: string) => {
+    if (!confirm('আপনি কি নিশ্চিত এই সদস্যকে রিমুভ করতে চান?')) return;
+    setRemovingId(targetUserId);
+    try {
+      const { data, error } = await supabase.rpc('remove_team_member', { _user_id: targetUserId });
+      if (error) throw error;
+      const result = data as { success: boolean; error?: string };
+      if (result.success) {
+        toast({ title: '✅ সফলভাবে রিমুভ করা হয়েছে' });
+        queryClient.invalidateQueries({ queryKey: ['team-members'] });
+      } else if (result.error === 'cannot_remove_self') {
+        toast({ title: '❌ নিজেকে রিমুভ করা যাবে না', variant: 'destructive' });
+      } else {
+        toast({ title: '❌ ত্রুটি', description: result.error, variant: 'destructive' });
+      }
+    } catch (err: any) {
+      toast({ title: 'ত্রুটি', description: err.message, variant: 'destructive' });
+    } finally {
+      setRemovingId(null);
     }
   };
 
@@ -156,6 +180,7 @@ const TeamPage = () => {
                 <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">User ID</TableHead>
                 <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">রোল</TableHead>
                 <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground text-center">স্ট্যাটাস</TableHead>
+                <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground text-center">অ্যাকশন</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -174,6 +199,18 @@ const TeamPage = () => {
                       <span className="text-[10px] text-success font-medium">আপনি</span>
                     ) : (
                       <span className="text-[10px] text-muted-foreground">অ্যাক্টিভ</span>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {m.user_id !== user?.id && (
+                      <button
+                        onClick={() => handleRemove(m.user_id)}
+                        disabled={removingId === m.user_id}
+                        className="text-destructive hover:text-destructive/80 disabled:opacity-50 transition-colors"
+                        title="রিমুভ করুন"
+                      >
+                        {removingId === m.user_id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                      </button>
                     )}
                   </TableCell>
                 </TableRow>

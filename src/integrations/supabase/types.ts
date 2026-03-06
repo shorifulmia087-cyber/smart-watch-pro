@@ -336,6 +336,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      remove_team_member: { Args: { _user_id: string }; Returns: Json }
     }
     Enums: {
       app_role: "admin" | "user"
