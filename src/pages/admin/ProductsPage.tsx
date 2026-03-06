@@ -205,7 +205,7 @@ const ProductsPage = () => {
           {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-sm" />)}
         </div>
       ) : !filtered.length ? (
-        <div className="glass-card rounded-2xl p-16 text-center text-muted-foreground">
+        <div className="bg-surface dark:bg-card rounded-sm border border-border/30 p-16 text-center text-muted-foreground shadow-sm">
           কোনো প্রোডাক্ট পাওয়া যায়নি।
         </div>
       ) : (
