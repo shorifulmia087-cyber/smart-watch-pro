@@ -45,19 +45,22 @@ const AnnouncementBar = ({
   offerStartAt,
   offerEndAt,
 }: AnnouncementBarProps) => {
+  const hasSchedule = !!(offerStartAt && offerEndAt);
+  
   // For non-scheduled mode, store the absolute target time
   const fallbackTarget = useRef(Date.now() + countdownHours * 3600_000);
   const [time, setTime] = useState<TimeParts>({ d: 0, h: countdownHours, m: 0, s: 0 });
   const [timerLabel, setTimerLabel] = useState('অফার শেষ হতে বাকি:');
-  const [expired, setExpired] = useState(false);
+  const [expired, setExpired] = useState(!hasSchedule);
   const rafId = useRef(0);
 
   // Reset fallback target when countdownHours changes and no schedule
   useEffect(() => {
-    if (!offerStartAt || !offerEndAt) {
-      fallbackTarget.current = Date.now() + countdownHours * 3600_000;
+    if (!hasSchedule) {
+      // No schedule set by admin — don't show fallback timer at all
+      setExpired(true);
     }
-  }, [countdownHours, offerStartAt, offerEndAt]);
+  }, [hasSchedule]);
 
   const tick = useCallback(() => {
     const start = offerStartAt ? new Date(offerStartAt).getTime() : NaN;
