@@ -121,28 +121,30 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
     const cleanPhone = phone.replace(/[\s-]/g, '');
     const cleanAddress = sanitizeForDisplay(address);
 
+    if (turnstileEnabled && !turnstileToken) {
+      toast({ title: 'ভেরিফিকেশন প্রয়োজন', description: 'অনুগ্রহ করে "আমি রোবট নই" চেকবক্স ক্লিক করুন।', variant: 'destructive' });
+      return;
+    }
+
     setLoading(true);
 
-    const orderData = {
-      customer_name: cleanName,
-      customer_email: email ? sanitizeForDisplay(email) : null,
-      phone: cleanPhone,
-      address: cleanAddress,
-      watch_model: watchName,
-      quantity: qty,
-      payment_method: tab === 'cod' ? 'cod' : payMethod,
-      trx_id: tab === 'online' ? txnId.replace(/[^a-zA-Z0-9]/g, '') : null,
-      delivery_location: location,
-      delivery_charge: deliveryCharge,
-      total_price: grandTotal,
-      selected_color: selectedColor || null,
-    } as any;
-
     try {
-      await createOrder.mutateAsync(orderData);
-      supabase.functions.invoke('send-order-email', { body: orderData }).catch(console.error);
+      await createOrder.mutateAsync({
+        customer_name: cleanName,
+        customer_email: email ? sanitizeForDisplay(email) : null,
+        phone: cleanPhone,
+        address: cleanAddress,
+        watch_model: watchName,
+        quantity: qty,
+        payment_method: tab === 'cod' ? 'cod' : payMethod,
+        trx_id: tab === 'online' ? txnId.replace(/[^a-zA-Z0-9]/g, '') : null,
+        delivery_location: location,
+        selected_color: selectedColor || null,
+        turnstile_token: turnstileToken,
+      });
       setLoading(false);
       setSuccess(true);
+      resetTurnstile();
     } catch (err: any) {
       setLoading(false);
       console.error('Order submission failed:', err);
