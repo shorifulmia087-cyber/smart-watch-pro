@@ -38,18 +38,16 @@ Deno.serve(async (req) => {
     // Call FraudChecker API
     let fraudRes: Response
     try {
-      // Try form-encoded approach
-      const formData = new URLSearchParams()
-      formData.append('phone', cleanPhone)
-      
-      fraudRes = await fetch('https://fraudchecker.link/api/v1/qc/', {
+      fraudRes = await fetch(`https://fraudchecker.link/api/v1/qc/?api_key=${FRAUD_API_KEY}`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/json',
           'Authorization': `Token ${FRAUD_API_KEY}`,
         },
-        body: formData.toString(),
+        body: JSON.stringify({ phone: cleanPhone }),
       })
+      console.log('FraudChecker response status:', fraudRes.status)
+      console.log('FraudChecker response headers:', Object.fromEntries(fraudRes.headers.entries()))
     } catch (networkErr) {
       // Network error - allow order, report error
       console.error('FraudChecker network error:', networkErr)
