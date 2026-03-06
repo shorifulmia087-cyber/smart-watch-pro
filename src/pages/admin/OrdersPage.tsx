@@ -473,6 +473,24 @@ const OrdersPage = () => {
                           <span className="text-muted-foreground text-[11px]">COD</span>
                         )}
                       </TableCell>
+                      {/* Payment Status */}
+                      <TableCell>
+                        {o.payment_method === 'cod' ? (
+                          <span className="text-[10px] font-semibold px-2 py-1 rounded-sm border bg-muted/20 text-muted-foreground border-border/20">ক্যাশ অন ডেলিভারি</span>
+                        ) : (o as any).payment_type === 'full_payment' ? (
+                          <div>
+                            <span className="text-[10px] font-semibold px-2 py-1 rounded-sm border bg-success/10 text-success border-success/20">পেমেন্ট সম্পন্ন ✓</span>
+                            <p className="text-[10px] text-success/70 mt-0.5 font-inter">৳{formatBengaliPrice((o as any).advance_amount || 0)}</p>
+                          </div>
+                        ) : (o as any).payment_type === 'delivery_charge_only' ? (
+                          <div>
+                            <span className="text-[10px] font-semibold px-2 py-1 rounded-sm border bg-warning/10 text-warning border-warning/20">ডেলিভারি চার্জ দেওয়া</span>
+                            <p className="text-[10px] text-warning/70 mt-0.5 font-inter">বাকি: ৳{formatBengaliPrice(o.total_price - ((o as any).advance_amount || 0))}</p>
+                          </div>
+                        ) : (
+                          <span className="text-[10px] font-semibold px-2 py-1 rounded-sm border bg-info/10 text-info border-info/20">অনলাইন</span>
+                        )}
+                      </TableCell>
                       <TableCell>
                         {(o as any).tracking_id ? (
                           <div className="flex flex-col gap-0.5">
