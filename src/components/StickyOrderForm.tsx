@@ -19,9 +19,10 @@ const StickyOrderForm = () => {
   const [honeypot, setHoneypot] = useState('');
   const { data: settings } = useSettings();
   const { data: product } = useFeaturedProduct();
-  const createOrder = useCreateOrder();
+  const createOrder = useSecureOrder();
   const { toast } = useToast();
   const { checkLimit } = useRateLimit({ maxAttempts: 10, windowMs: 60_000 });
+  const { containerRef: turnstileRef, token: turnstileToken, reset: resetTurnstile, isEnabled: turnstileEnabled } = useTurnstile();
 
   const deliveryCharge = location === 'dhaka'
     ? (settings?.delivery_charge_inside ?? 70)
