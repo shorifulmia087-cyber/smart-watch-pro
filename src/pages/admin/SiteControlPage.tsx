@@ -38,12 +38,12 @@ const SiteControlPage = () => {
 
   const save = () => {
     // Sanitize all text fields before saving
-    const sanitizedForm: Partial<SettingsRow> = {};
+    const sanitizedForm: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(form)) {
       if (typeof value === 'string' && !key.includes('url') && !key.includes('color')) {
-        sanitizedForm[key as keyof SettingsRow] = sanitizeForDisplay(value) as any;
+        sanitizedForm[key] = sanitizeForDisplay(value);
       } else {
-        sanitizedForm[key as keyof SettingsRow] = value as any;
+        sanitizedForm[key] = value;
       }
     }
     updateSettings.mutate(sanitizedForm as any, {
