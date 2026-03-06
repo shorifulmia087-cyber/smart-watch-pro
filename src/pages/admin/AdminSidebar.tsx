@@ -12,7 +12,6 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { motion } from 'framer-motion';
 
 const mainNav = [
   { title: 'ড্যাশবোর্ড', url: '/admin', icon: LayoutDashboard },
@@ -58,14 +57,15 @@ const AdminSidebar = () => {
   };
 
   const renderNavGroup = (label: string, items: typeof mainNav) => (
-    <SidebarGroup>
+    <SidebarGroup className="py-0">
       {!collapsed && (
-        <SidebarGroupLabel className="px-4 text-[10px] uppercase tracking-[0.15em] font-semibold text-sidebar-foreground/35 mb-1">
+        <SidebarGroupLabel className="px-5 pt-4 pb-1.5 text-[10px] uppercase tracking-[0.18em] font-semibold text-muted-foreground/40 select-none">
           {label}
         </SidebarGroupLabel>
       )}
+      {collapsed && <div className="pt-3" />}
       <SidebarGroupContent>
-        <SidebarMenu>
+        <SidebarMenu className="space-y-0.5 px-2">
           {items.map((item) => {
             const active = isActive(item.url);
             return (
@@ -74,22 +74,30 @@ const AdminSidebar = () => {
                   onClick={() => handleNav(item.url)}
                   isActive={active}
                   tooltip={item.title}
-                  className={`group relative h-9 mx-2 px-3 gap-3 transition-all duration-200 rounded-sm overflow-hidden ${
+                  className={`group relative h-9 px-3 gap-3 rounded-sm transition-all duration-200 ${
                     active
-                      ? 'gradient-gold text-white shadow-[0_2px_8px_hsl(var(--gold)/0.3)]'
-                      : 'text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/60'
+                      ? 'bg-accent/[0.12] text-accent shadow-[inset_0_0_0_1px_hsl(var(--gold)/0.15),0_0_12px_-3px_hsl(var(--gold)/0.2)]'
+                      : 'text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/50'
                   }`}
                 >
-                  <item.icon className={`h-[18px] w-[18px] shrink-0 transition-colors ${active ? 'text-white' : 'text-sidebar-foreground/50 group-hover:text-accent'}`} />
-                  {!collapsed && (
-                    <span className="text-sm font-medium truncate">{item.title}</span>
+                  {/* Active indicator bar */}
+                  {active && (
+                    <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[2.5px] h-4 rounded-r-full bg-accent" />
                   )}
-                  {active && !collapsed && (
-                    <motion.div
-                      layoutId="sidebar-active-dot"
-                      className="ml-auto w-1.5 h-1.5 rounded-full bg-white/80"
-                      transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-                    />
+                  <item.icon
+                    className={`h-[17px] w-[17px] shrink-0 transition-colors duration-200 ${
+                      active
+                        ? 'text-accent'
+                        : 'text-sidebar-foreground/40 group-hover:text-sidebar-foreground/70'
+                    }`}
+                    strokeWidth={active ? 2 : 1.5}
+                  />
+                  {!collapsed && (
+                    <span className={`text-sm truncate transition-colors duration-200 ${
+                      active ? 'font-semibold text-accent' : 'font-medium'
+                    }`}>
+                      {item.title}
+                    </span>
                   )}
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -100,76 +108,94 @@ const AdminSidebar = () => {
     </SidebarGroup>
   );
 
+  const userInitial = user?.email?.charAt(0)?.toUpperCase() || 'A';
+
   return (
-    <Sidebar collapsible="icon" className="border-r border-sidebar-border/50">
-      <SidebarContent className="pt-2 scrollbar-none">
-        {/* Brand Header */}
-        <div className="px-4 pb-4 pt-3">
+    <Sidebar collapsible="icon" className="border-r-[0.5px] border-border/40">
+      <SidebarContent className="pt-1 overflow-y-auto overflow-x-hidden scrollbar-none">
+        {/* Brand */}
+        <div className="px-4 py-4">
           {!collapsed ? (
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="relative">
-                  <div className="w-10 h-10 rounded-sm gradient-gold flex items-center justify-center shadow-[0_4px_12px_hsl(var(--gold)/0.35)]">
-                    <Sparkles className="h-5 w-5 text-white" />
-                  </div>
-                  <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-success border-2 border-sidebar-background" />
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-sm gradient-gold flex items-center justify-center shadow-[0_2px_8px_hsl(var(--gold)/0.25)]">
+                  <Sparkles className="h-4 w-4 text-white" strokeWidth={1.5} />
                 </div>
                 <div className="min-w-0">
-                  <p className="font-bold text-sm text-sidebar-foreground tracking-tight truncate">
+                  <p className="font-semibold text-[13px] text-sidebar-foreground tracking-tight truncate leading-tight">
                     {settings?.brand_name || 'Admin'}
                   </p>
-                  <p className="text-[10px] font-medium text-accent tracking-wide uppercase">Enterprise</p>
+                  <p className="text-[9px] font-medium text-accent/70 tracking-[0.1em] uppercase leading-tight mt-0.5">
+                    Enterprise Panel
+                  </p>
                 </div>
               </div>
               {isMobile && (
                 <button
                   onClick={() => setOpenMobile(false)}
-                  className="p-1.5 rounded-sm hover:bg-sidebar-accent transition-colors"
+                  className="p-1 rounded-sm hover:bg-sidebar-accent transition-colors"
                 >
-                  <X className="h-5 w-5 text-sidebar-foreground/50" />
+                  <X className="h-4 w-4 text-sidebar-foreground/40" strokeWidth={1.5} />
                 </button>
               )}
             </div>
           ) : (
-            <div className="relative mx-auto">
-              <div className="w-10 h-10 rounded-sm gradient-gold flex items-center justify-center shadow-[0_4px_12px_hsl(var(--gold)/0.35)]">
-                <Sparkles className="h-5 w-5 text-white" />
+            <div className="flex justify-center">
+              <div className="w-8 h-8 rounded-sm gradient-gold flex items-center justify-center shadow-[0_2px_8px_hsl(var(--gold)/0.25)]">
+                <Sparkles className="h-4 w-4 text-white" strokeWidth={1.5} />
               </div>
-              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-success border-2 border-sidebar-background" />
             </div>
           )}
         </div>
 
-        {/* Separator */}
-        <div className="mx-4 mb-2 h-px bg-sidebar-border/50" />
+        {/* Thin separator */}
+        <div className="mx-4 h-px bg-border/30" />
 
-        {/* Navigation Groups */}
+        {/* Nav Groups */}
         {renderNavGroup('প্রধান', mainNav)}
+        <div className="mx-4 h-px bg-border/20" />
         {renderNavGroup('ম্যানেজমেন্ট', managementNav)}
+        <div className="mx-4 h-px bg-border/20" />
         {renderNavGroup('সিস্টেম', systemNav)}
       </SidebarContent>
 
-      {/* Footer */}
-      <SidebarFooter className="p-3">
-        <div className={`rounded-sm border border-sidebar-border/50 bg-sidebar-accent/30 p-3 ${collapsed ? 'flex justify-center' : ''}`}>
-          {!collapsed && (
-            <div className="mb-3 flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-sm bg-accent/10 flex items-center justify-center">
-                <UserCog className="h-4 w-4 text-accent" />
+      {/* Profile Footer — Bento Card */}
+      <SidebarFooter className="p-2.5">
+        <div className={`rounded-sm bg-surface dark:bg-card border border-border/30 shadow-[0_1px_3px_0_hsl(0_0%_0%/0.04)] ${collapsed ? 'p-2' : 'p-3'}`}>
+          {!collapsed ? (
+            <>
+              <div className="flex items-center gap-2.5 mb-2.5">
+                <div className="w-7 h-7 rounded-sm gradient-gold flex items-center justify-center text-[11px] font-bold text-white font-inter shadow-sm">
+                  {userInitial}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[11px] font-semibold text-foreground truncate leading-tight">
+                    {user?.email}
+                  </p>
+                  <p className="text-[9px] font-medium text-accent leading-tight mt-0.5">অ্যাডমিন</p>
+                </div>
               </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-[11px] font-semibold text-sidebar-foreground truncate">{user?.email}</p>
-                <p className="text-[10px] text-accent font-medium">অ্যাডমিন</p>
+              <button
+                onClick={signOut}
+                className="flex items-center gap-2 text-[11px] font-medium rounded-sm px-2 py-1.5 w-full transition-all duration-200 text-muted-foreground/60 hover:text-destructive hover:bg-destructive/[0.06]"
+              >
+                <LogOut className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5} />
+                <span>লগআউট</span>
+              </button>
+            </>
+          ) : (
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-7 h-7 rounded-sm gradient-gold flex items-center justify-center text-[11px] font-bold text-white font-inter shadow-sm">
+                {userInitial}
               </div>
+              <button
+                onClick={signOut}
+                className="p-1 rounded-sm text-muted-foreground/50 hover:text-destructive hover:bg-destructive/[0.06] transition-colors"
+              >
+                <LogOut className="h-3.5 w-3.5" strokeWidth={1.5} />
+              </button>
             </div>
           )}
-          <button
-            onClick={signOut}
-            className={`flex items-center gap-2 text-xs font-medium rounded-sm px-2.5 py-1.5 w-full transition-colors text-sidebar-foreground/50 hover:text-destructive hover:bg-destructive/10 ${collapsed ? 'justify-center px-1.5' : ''}`}
-          >
-            <LogOut className="h-4 w-4 shrink-0" />
-            {!collapsed && <span>লগআউট</span>}
-          </button>
         </div>
       </SidebarFooter>
     </Sidebar>
