@@ -47,9 +47,10 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
   const [touched, setTouched] = useState(false);
   const [honeypot, setHoneypot] = useState('');
   const [honeypot2, setHoneypot2] = useState('');
-  const createOrder = useCreateOrder();
+  const createOrder = useSecureOrder();
   const { toast } = useToast();
   const { checkLimit } = useRateLimit({ maxAttempts: 10, windowMs: 60_000 });
+  const { containerRef: turnstileRef, token: turnstileToken, reset: resetTurnstile, isEnabled: turnstileEnabled } = useTurnstile();
 
   useEffect(() => {
     if (!isOpen) {
