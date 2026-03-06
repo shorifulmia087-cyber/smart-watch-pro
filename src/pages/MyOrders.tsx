@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
 import Navbar from '@/components/Navbar';
 
-import { useSettings } from '@/hooks/useSupabaseData';
+
 
 const statusConfig: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
   pending: { label: 'পেন্ডিং', icon: <Clock className="h-4 w-4" />, color: 'bg-warning/15 text-warning' },
