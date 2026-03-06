@@ -461,10 +461,10 @@ const OrdersPage = () => {
                         )}
                       </TableCell>
                       <TableCell className="text-center font-inter text-sm text-foreground">{toBengaliNum(o.quantity)}</TableCell>
-                      <TableCell className="font-semibold text-gold font-inter text-sm">
+                      <TableCell className="font-semibold text-gold font-inter text-sm whitespace-nowrap">
                         ৳{formatBengaliPrice(o.total_price)}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="whitespace-nowrap">
                         {o.trx_id ? (
                           <span className="bg-gold/10 text-gold px-2 py-1 rounded-sm text-[11px] font-mono font-semibold border border-gold/15">
                             {o.trx_id}
@@ -474,30 +474,30 @@ const OrdersPage = () => {
                         )}
                       </TableCell>
                       {/* Payment Status */}
-                      <TableCell>
+                      <TableCell className="whitespace-nowrap">
                         {o.payment_method === 'cod' ? (
-                          <span className="text-[10px] font-semibold px-2 py-1 rounded-sm border bg-muted/20 text-muted-foreground border-border/20">ক্যাশ অন ডেলিভারি</span>
+                          <span className="text-[10px] font-semibold px-2 py-1 rounded-sm border bg-muted/20 text-muted-foreground border-border/20 whitespace-nowrap">ক্যাশ অন ডেলিভারি</span>
                         ) : (o as any).payment_type === 'full_payment' ? (
                           <div>
-                            <span className="text-[10px] font-semibold px-2 py-1 rounded-sm border bg-success/10 text-success border-success/20">পেমেন্ট সম্পন্ন ✓</span>
-                            <p className="text-[10px] text-success/70 mt-0.5 font-inter">৳{formatBengaliPrice((o as any).advance_amount || 0)}</p>
+                            <span className="text-[10px] font-semibold px-2 py-1 rounded-sm border bg-success/10 text-success border-success/20 whitespace-nowrap">পেমেন্ট সম্পন্ন ✓</span>
+                            <p className="text-[10px] text-success/70 mt-0.5 font-inter whitespace-nowrap">৳{formatBengaliPrice((o as any).advance_amount || 0)}</p>
                           </div>
                         ) : (o as any).payment_type === 'delivery_charge_only' ? (
                           <div>
-                            <span className="text-[10px] font-semibold px-2 py-1 rounded-sm border bg-warning/10 text-warning border-warning/20">ডেলিভারি চার্জ দেওয়া</span>
-                            <p className="text-[10px] text-warning/70 mt-0.5 font-inter">বাকি: ৳{formatBengaliPrice(o.total_price - ((o as any).advance_amount || 0))}</p>
+                            <span className="text-[10px] font-semibold px-2 py-1 rounded-sm border bg-warning/10 text-warning border-warning/20 whitespace-nowrap">ডেলিভারি চার্জ দেওয়া</span>
+                            <p className="text-[10px] text-warning/70 mt-0.5 font-inter whitespace-nowrap">বাকি: ৳{formatBengaliPrice(o.total_price - ((o as any).advance_amount || 0))}</p>
                           </div>
                         ) : (
-                          <span className="text-[10px] font-semibold px-2 py-1 rounded-sm border bg-info/10 text-info border-info/20">অনলাইন</span>
+                          <span className="text-[10px] font-semibold px-2 py-1 rounded-sm border bg-info/10 text-info border-info/20 whitespace-nowrap">অনলাইন</span>
                         )}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="whitespace-nowrap">
                         {(o as any).tracking_id ? (
                           <div className="flex flex-col gap-0.5">
-                            <span className="bg-success/10 text-success px-2 py-1 rounded-sm text-[11px] font-mono font-semibold border border-success/15">
+                            <span className="bg-success/10 text-success px-2 py-1 rounded-sm text-[11px] font-mono font-semibold border border-success/15 whitespace-nowrap">
                               {(o as any).tracking_id}
                             </span>
-                            <span className="text-[10px] text-muted-foreground">
+                            <span className="text-[10px] text-muted-foreground whitespace-nowrap">
                               {(o as any).courier_provider === 'pathao' ? 'Pathao' : (o as any).courier_provider === 'steadfast' ? 'Steadfast' : 'RedX'}
                             </span>
                           </div>
@@ -506,11 +506,11 @@ const OrdersPage = () => {
                         )}
                       </TableCell>
                       {/* Tracking Status Badge */}
-                      <TableCell>
+                      <TableCell className="whitespace-nowrap">
                         {courierBooked ? (
                           <button
                             onClick={() => setExpandedOrderId(expandedOrderId === o.id ? null : o.id)}
-                            className={`inline-flex items-center gap-1 px-2 py-1 rounded-sm text-[10px] font-semibold border transition-colors cursor-pointer ${
+                            className={`inline-flex items-center gap-1 px-2 py-1 rounded-sm text-[10px] font-semibold border transition-colors cursor-pointer whitespace-nowrap ${
                               o.status === 'completed'
                                 ? 'bg-success/10 text-success border-success/20'
                                 : o.status === 'shipped'
@@ -527,10 +527,10 @@ const OrdersPage = () => {
                           <span className="text-muted-foreground text-[10px]">—</span>
                         )}
                       </TableCell>
-                      <TableCell className="text-[11px] text-foreground">
+                      <TableCell className="text-[11px] text-foreground whitespace-nowrap">
                         {o.delivery_location === 'dhaka' ? 'ঢাকা' : 'ঢাকার বাইরে'}
                       </TableCell>
-                      <TableCell className="text-[11px] text-muted-foreground font-inter tabular-nums">
+                      <TableCell className="text-[11px] text-muted-foreground font-inter tabular-nums whitespace-nowrap">
                         {new Date(o.created_at).toLocaleDateString('bn-BD')}
                       </TableCell>
                       <TableCell>
