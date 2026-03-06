@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useSearchParams } from 'react-router-dom';
 import { Package, Search, Truck, CheckCircle2, Clock, MapPin, ArrowLeft, Box, XCircle, Loader2, ExternalLink } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -46,12 +47,14 @@ const statusIndex: Record<OrderStatus, number> = {
 };
 
 const TrackOrder = () => {
+  const [searchParams] = useSearchParams();
   const [query, setQuery] = useState('');
   const [order, setOrder] = useState<OrderInfo | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [liveTracking, setLiveTracking] = useState<LiveTrackingData | null>(null);
   const [trackingLoading, setTrackingLoading] = useState(false);
+  const [autoSearched, setAutoSearched] = useState(false);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -126,6 +129,53 @@ const TrackOrder = () => {
       setTrackingLoading(false);
     }
   };
+
+  // Auto-search from URL param
+  useEffect(() => {
+    const idParam = searchParams.get('id');
+    if (idParam && !autoSearched) {
+      setQuery(idParam);
+      setAutoSearched(true);
+      // Trigger search programmatically
+      const doSearch = async () => {
+        setLoading(true);
+        setError('');
+        setOrder(null);
+        setLiveTracking(null);
+        const cleanQuery = idParam.trim();
+        let result: any = null;
+
+        const { data: byTracking } = await supabase
+          .from('orders')
+          .select('id, customer_name, watch_model, status, tracking_id, courier_provider, created_at, delivery_location')
+          .eq('tracking_id', cleanQuery)
+          .limit(1);
+
+        if (byTracking && byTracking.length > 0) {
+          result = byTracking[0];
+        } else {
+          const { data: byPhone } = await supabase
+            .from('orders')
+            .select('id, customer_name, watch_model, status, tracking_id, courier_provider, created_at, delivery_location')
+            .eq('phone', cleanQuery)
+            .order('created_at', { ascending: false })
+            .limit(1);
+          if (byPhone && byPhone.length > 0) result = byPhone[0];
+        }
+
+        setLoading(false);
+        if (result) {
+          setOrder(result as OrderInfo);
+          if (result.tracking_id && result.courier_provider) {
+            fetchLiveTracking(result.tracking_id, result.courier_provider);
+          }
+        } else {
+          setError('এই তথ্য দিয়ে কোনো অর্ডার পাওয়া যায়নি।');
+        }
+      };
+      doSearch();
+    }
+  }, [searchParams, autoSearched]);
 
   const currentStep = order ? statusIndex[order.status] : -1;
   const isCancelled = order?.status === 'cancelled';
