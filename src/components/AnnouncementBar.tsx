@@ -65,10 +65,10 @@ const AnnouncementBar = ({
   const tick = useCallback(() => {
     const start = offerStartAt ? new Date(offerStartAt).getTime() : NaN;
     const end = offerEndAt ? new Date(offerEndAt).getTime() : NaN;
-    const hasSchedule = Number.isFinite(start) && Number.isFinite(end) && end > start;
+    const validSchedule = Number.isFinite(start) && Number.isFinite(end) && end > start;
     const now = Date.now();
 
-    if (hasSchedule) {
+    if (validSchedule) {
       if (now < start) {
         setTimerLabel('অফার শুরু হতে বাকি:');
         setTime(toTimeParts(Math.floor((start - now) / 1000)));
@@ -81,14 +81,8 @@ const AnnouncementBar = ({
         setExpired(true);
       }
     } else {
-      const remaining = Math.max(0, Math.floor((fallbackTarget.current - now) / 1000));
-      if (remaining <= 0) {
-        setExpired(true);
-      } else {
-        setTimerLabel('অফার শেষ হতে বাকি:');
-        setTime(toTimeParts(remaining));
-        setExpired(false);
-      }
+      // No valid schedule — hide the bar
+      setExpired(true);
     }
   }, [offerStartAt, offerEndAt]);
 
