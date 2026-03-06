@@ -361,8 +361,28 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
               </div>
               <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ইমেইল (ঐচ্ছিক)" className="w-full bg-transparent border border-border/60 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/20 focus:border-gold/40 transition-all" maxLength={255} />
               <div>
-                <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="মোবাইল নম্বর *" className={`w-full bg-transparent border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/20 focus:border-gold/40 transition-all ${touched && errors.phone ? 'border-destructive/60 bg-destructive/5' : 'border-border/60'}`} maxLength={15} />
+                <div className="relative">
+                  <input value={phone} onChange={(e) => setPhone(e.target.value)} onBlur={handlePhoneBlur} placeholder="মোবাইল নম্বর *" className={`w-full bg-transparent border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/20 focus:border-gold/40 transition-all ${touched && errors.phone ? 'border-destructive/60 bg-destructive/5' : 'border-border/60'}`} maxLength={15} />
+                  {fraudLoading && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      <Loader2 className="w-4 h-4 animate-spin text-gold" />
+                    </div>
+                  )}
+                </div>
                 <ErrorMessage error={errors.phone} />
+                {fraudResult?.flag === 'low_success' && (
+                  <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="mt-2 p-3 rounded-lg bg-destructive/5 border border-destructive/15">
+                    <div className="flex items-start gap-2">
+                      <ShieldAlert className="w-4 h-4 text-destructive flex-shrink-0 mt-0.5" />
+                      <p className="text-xs text-destructive leading-relaxed">{fraudResult.message}</p>
+                    </div>
+                  </motion.div>
+                )}
+                {fraudResult?.flag === 'new_customer' && (
+                  <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-[11px] text-warning mt-1.5 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3" /> নতুন কাস্টমার
+                  </motion.p>
+                )}
               </div>
               <div>
                 <textarea value={address} onChange={(e) => setAddress(e.target.value)} placeholder="সম্পূর্ণ ঠিকানা *" rows={2} className={`w-full bg-transparent border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/20 focus:border-gold/40 transition-all resize-none ${touched && errors.address ? 'border-destructive/60 bg-destructive/5' : 'border-border/60'}`} maxLength={500} />
