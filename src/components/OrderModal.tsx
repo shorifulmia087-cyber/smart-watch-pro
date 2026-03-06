@@ -168,6 +168,11 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
         turnstile_token: turnstileToken,
         payment_type: tab === 'cod' ? 'cod' : paymentType,
         advance_amount: advanceAmount,
+        fraud_total_parcels: fraudResult?.total_parcels ?? undefined,
+        fraud_total_delivered: fraudResult?.total_delivered ?? undefined,
+        fraud_total_cancel: fraudResult?.total_cancel ?? undefined,
+        fraud_success_rate: fraudResult?.success_rate ?? undefined,
+        fraud_flag: fraudResult?.flag ?? undefined,
       });
       setLoading(false);
       setSuccess(true);
