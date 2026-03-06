@@ -55,14 +55,6 @@ const MyOrders = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <AnnouncementBar
-        discountPercent={settings?.discount_percent}
-        countdownHours={settings?.countdown_hours}
-        announcementText={settings?.announcement_text}
-        timerEnabled={settings?.timer_enabled}
-        offerStartAt={(settings as any)?.offer_start_at}
-        offerEndAt={(settings as any)?.offer_end_at}
-      />
       <Navbar />
 
       <div className="max-w-3xl mx-auto px-4 py-8">
