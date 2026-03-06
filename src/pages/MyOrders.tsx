@@ -7,7 +7,7 @@ import { Package, ArrowLeft, Clock, Truck, CheckCircle2, XCircle, RotateCcw, Loa
 import { motion } from 'framer-motion';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
 import Navbar from '@/components/Navbar';
-import AnnouncementBar from '@/components/AnnouncementBar';
+
 import { useSettings } from '@/hooks/useSupabaseData';
 
 const statusConfig: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
