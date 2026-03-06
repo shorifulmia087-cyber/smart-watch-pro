@@ -53,6 +53,8 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
   const { toast } = useToast();
   const { checkLimit } = useRateLimit({ maxAttempts: 10, windowMs: 60_000 });
   const { containerRef: turnstileRef, token: turnstileToken, reset: resetTurnstile, isEnabled: turnstileEnabled } = useTurnstile();
+  const { checkPhone, loading: fraudLoading, result: fraudResult, reset: resetFraud } = useFraudCheck();
+  const fraudCheckedRef = useRef('');
 
   useEffect(() => {
     if (!isOpen) {
