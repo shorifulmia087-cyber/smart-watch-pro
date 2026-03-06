@@ -414,9 +414,10 @@ const OrdersPage = () => {
                     />
                   </TableHead>
                   <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 w-[50px]">#</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">কাস্টমার</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">ফোন</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">মডেল</TableHead>
+                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">কাস্টমার</TableHead>
+                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">ঠিকানা</TableHead>
+                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">ফোন</TableHead>
+                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">মডেল</TableHead>
                   <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 text-center">পরিমাণ</TableHead>
                   <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">মোট</TableHead>
                   <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">TrxID</TableHead>
