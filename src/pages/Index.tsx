@@ -84,11 +84,38 @@ const Index = () => {
 
   if (!currentProduct) {
     return (
-      <div className="min-h-screen bg-surface flex items-center justify-center">
-        <div className="text-center text-muted-foreground">
-          <div className="animate-pulse text-lg mb-2">লোড হচ্ছে...</div>
-          <p className="text-sm">প্রোডাক্ট লোড হচ্ছে, অনুগ্রহ করে অপেক্ষা করুন।</p>
-        </div>
+      <div className="min-h-screen bg-ink flex items-center justify-center">
+        <motion.div
+          className="flex flex-col items-center gap-6"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          {/* Animated logo spinner */}
+          <div className="relative w-16 h-16">
+            <motion.div
+              className="absolute inset-0 rounded-full border-[3px] border-gold/20"
+            />
+            <motion.div
+              className="absolute inset-0 rounded-full border-[3px] border-transparent border-t-gold"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+            />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-gold font-bold text-lg">{(settings?.brand_name || 'K').charAt(0)}</span>
+            </div>
+          </div>
+          <motion.div
+            className="h-1 w-32 rounded-full bg-surface/10 overflow-hidden"
+          >
+            <motion.div
+              className="h-full rounded-full bg-gradient-to-r from-gold/60 to-gold"
+              initial={{ x: '-100%' }}
+              animate={{ x: '100%' }}
+              transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+            />
+          </motion.div>
+        </motion.div>
       </div>
     );
   }
