@@ -31,16 +31,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const { data: isAdmin } = await supabase.rpc('has_role', { _user_id: userId, _role: 'admin' });
       if (isAdmin) {
         setUserRole('admin');
+        // Check super admin
+        const { data: isSA } = await supabase.rpc('is_super_admin', { _user_id: userId });
+        setIsSuperAdmin(!!isSA);
         return;
       }
       const { data: isUser } = await supabase.rpc('has_role', { _user_id: userId, _role: 'user' });
       if (isUser) {
         setUserRole('user');
+        setIsSuperAdmin(false);
         return;
       }
       setUserRole(null);
+      setIsSuperAdmin(false);
     } catch {
       setUserRole(null);
+      setIsSuperAdmin(false);
     }
   };
 
