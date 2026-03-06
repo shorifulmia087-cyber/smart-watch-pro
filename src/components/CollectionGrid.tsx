@@ -61,7 +61,7 @@ const CollectionGrid = ({ currentProductId, onSelectProduct, sectionTitle = 'আ
               viewport={{ once: true }}
               transition={{ delay: i * 0.06, duration: 0.35 }}
               onClick={() => onSelectProduct(product)}
-              className="group text-left rounded-sm overflow-hidden bg-surface border-[0.5px] border-border/30 shadow-[0_1px_3px_0_rgba(0,0,0,0.04)] hover:shadow-[0_2px_8px_0_rgba(0,0,0,0.06)] transition-shadow duration-200"
+              className="group text-left rounded-sm overflow-hidden bg-surface border border-border/40 shadow-[0_1px_3px_0_rgba(0,0,0,0.04)] hover:shadow-[0_2px_8px_0_rgba(0,0,0,0.06)] transition-shadow duration-200"
             >
               <div className="aspect-square overflow-hidden bg-muted relative rounded-sm">
                 {product.thumbnail_url ? (
