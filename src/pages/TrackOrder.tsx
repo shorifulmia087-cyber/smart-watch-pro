@@ -4,7 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Package, Search, Truck, CheckCircle2, Clock, MapPin, ArrowLeft, Box, XCircle, Loader2, ExternalLink } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import Navbar from '@/components/Navbar';
+
 
 type OrderStatus = 'pending' | 'processing' | 'shipped' | 'completed' | 'cancelled' | 'returned';
 
