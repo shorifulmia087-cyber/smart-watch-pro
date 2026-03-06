@@ -86,7 +86,7 @@ const FacebookPixelPage = () => {
 
   if (loading) {
     return (
-      <div className="space-y-5 w-full max-w-[1000px]">
+      <div className="space-y-5 w-full">
         {Array.from({ length: 3 }).map((_, i) => (
           <div key={i} className="h-[120px] bg-muted/30 rounded-sm animate-pulse" />
         ))}
@@ -95,9 +95,9 @@ const FacebookPixelPage = () => {
   }
 
   return (
-    <div className="space-y-5 w-full max-w-[1000px]">
+    <div className="space-y-5 w-full">
       {/* Bento Header */}
-      <div className="bg-white dark:bg-card rounded-sm border border-border/30 shadow-sm p-4 md:p-5">
+      <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-4 md:p-5">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-lg font-bold text-foreground">Facebook Pixel</h2>
@@ -116,7 +116,7 @@ const FacebookPixelPage = () => {
       </div>
 
       {/* Credentials */}
-      <div className="bg-white dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6 space-y-4">
+      <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6 space-y-4">
         <h3 className="font-semibold text-sm flex items-center gap-2 text-foreground">
           <Activity className="h-4 w-4 text-info" /> Pixel ক্রেডেনশিয়াল
         </h3>
@@ -138,7 +138,7 @@ const FacebookPixelPage = () => {
       </div>
 
       {/* Event Tracking */}
-      <div className="bg-white dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6 space-y-4">
+      <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6 space-y-4">
         <h3 className="font-semibold text-sm text-foreground">ইভেন্ট ট্র্যাকিং</h3>
         <p className="text-[11px] text-muted-foreground">কোন ইভেন্টগুলো ট্র্যাক করতে চান সিলেক্ট করুন।</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -169,7 +169,7 @@ const FacebookPixelPage = () => {
       </div>
 
       {/* Status */}
-      <div className="bg-white dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6">
+      <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6">
         <div className="flex items-center gap-3">
           <div className={`w-3 h-3 rounded-full ${pixelId ? 'bg-success' : 'bg-warning'} animate-pulse`} />
           <div>

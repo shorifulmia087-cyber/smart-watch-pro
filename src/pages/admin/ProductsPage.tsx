@@ -176,14 +176,15 @@ const ProductsPage = () => {
   ) || [];
 
   return (
-    <div className="space-y-5 max-w-[1400px]">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-semibold">প্রোডাক্ট ক্যাটালগ</h2>
-          <p className="text-[11px] text-muted-foreground">মোট {toBengaliNum(products?.length ?? 0)} টি প্রোডাক্ট</p>
-        </div>
+    <div className="space-y-5 w-full">
+      <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-4 md:p-5">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-bold text-foreground">প্রোডাক্ট ক্যাটালগ</h2>
+            <p className="text-[11px] text-muted-foreground mt-0.5">মোট {toBengaliNum(products?.length ?? 0)} টি প্রোডাক্ট</p>
+          </div>
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 glass-card rounded-xl px-3 py-2 min-w-[200px]">
+          <div className="flex items-center gap-2 bg-muted/30 border border-border/40 rounded-sm px-3 py-2 min-w-[200px]">
             <Search className="h-4 w-4 text-muted-foreground shrink-0" />
             <input
               type="text" value={search} onChange={e => { setSearch(e.target.value); setPage(0); }}
@@ -193,27 +194,28 @@ const ProductsPage = () => {
           </div>
           <button
             onClick={openNew}
-            className="gradient-gold text-white font-semibold px-5 py-2.5 rounded-xl text-sm hover:opacity-90 flex items-center gap-2 shrink-0 transition-all duration-200 shadow-sm"
+            className="gradient-gold text-white font-semibold px-5 py-2.5 rounded-sm text-sm hover:opacity-90 flex items-center gap-2 shrink-0 transition-all duration-200 shadow-sm"
           >
             <Plus className="h-4 w-4" /> নতুন প্রোডাক্ট
           </button>
+        </div>
         </div>
       </div>
 
       {isLoading ? (
         <div className="space-y-2">
-          {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)}
+          {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-sm" />)}
         </div>
       ) : !filtered.length ? (
-        <div className="glass-card rounded-2xl p-16 text-center text-muted-foreground">
+        <div className="bg-surface dark:bg-card rounded-sm border border-border/30 p-16 text-center text-muted-foreground shadow-sm">
           কোনো প্রোডাক্ট পাওয়া যায়নি।
         </div>
       ) : (
-        <div className="glass-card rounded-2xl overflow-hidden">
+        <div className="bg-surface dark:bg-card rounded-sm border border-border/30 overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="bg-muted/40 hover:bg-muted/40 border-b border-border/60">
+                <TableRow className="bg-muted/30 hover:bg-muted/30 border-b border-border/40">
                   <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 w-[70px]">ছবি</TableHead>
                   <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">নাম</TableHead>
                   <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">টাইপ</TableHead>

@@ -44,7 +44,7 @@ const CourierPaymentsPage = () => {
   const providerNames: Record<string, string> = { redx: 'RedX', pathao: 'Pathao', steadfast: 'Steadfast', unknown: 'অজানা' };
 
   return (
-    <div className="space-y-5 w-full max-w-[1400px]">
+    <div className="space-y-5 w-full">
       {/* Bento Header */}
       <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-4 md:p-5">
         <h2 className="text-lg font-bold text-foreground">কুরিয়ার পেমেন্ট</h2>

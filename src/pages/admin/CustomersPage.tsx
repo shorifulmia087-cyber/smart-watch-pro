@@ -121,12 +121,12 @@ const CustomersPage = () => {
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/30 hover:bg-muted/30 border-b border-border/40">
-                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">কাস্টমার</TableHead>
-                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">ফোন</TableHead>
-                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground text-center">অর্ডার</TableHead>
-                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">মোট খরচ</TableHead>
-                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">সর্বশেষ অর্ডার</TableHead>
-                  <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">লেবেল</TableHead>
+                  <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">কাস্টমার</TableHead>
+                  <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">ফোন</TableHead>
+                  <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 text-center">অর্ডার</TableHead>
+                  <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">মোট খরচ</TableHead>
+                  <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">সর্বশেষ অর্ডার</TableHead>
+                  <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">লেবেল</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

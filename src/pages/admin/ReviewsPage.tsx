@@ -18,7 +18,7 @@ const ReviewsPage = () => {
   };
 
   return (
-    <div className="space-y-5 w-full max-w-[1400px]">
+    <div className="space-y-5 w-full">
       {/* Bento Header */}
       <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-4 md:p-5">
         <h2 className="text-lg font-bold text-foreground">রিভিউ গ্যালারি</h2>

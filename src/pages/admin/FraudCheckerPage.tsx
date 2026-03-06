@@ -91,20 +91,20 @@ const FraudCheckerPage = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
-          <Shield className="h-5 w-5 text-accent" strokeWidth={1.5} />
+    <div className="space-y-5 w-full">
+      {/* Bento Header */}
+      <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-4 md:p-5">
+        <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
+          <Shield className="h-4 w-4 text-accent" strokeWidth={1.5} />
           ফ্রড চেকার
-        </h1>
-        <p className="text-sm text-muted-foreground mt-1">
+        </h2>
+        <p className="text-[11px] text-muted-foreground mt-0.5">
           যেকোনো ফোন নম্বরের ডেলিভারি হিস্টোরি চেক করুন — কুরিয়ার ভিত্তিক বিস্তারিত রিপোর্ট
         </p>
       </div>
 
       {/* Search Box */}
-      <div className="bg-card border border-border/40 rounded-sm p-5">
+      <div className="bg-surface dark:bg-card border border-border/30 rounded-sm shadow-sm p-5">
         <label className="text-[10px] font-semibold text-muted-foreground/60 uppercase tracking-wider mb-2 block">
           ফোন নম্বর
         </label>

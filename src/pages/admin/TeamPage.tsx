@@ -112,7 +112,7 @@ const TeamPage = () => {
   };
 
   return (
-    <div className="space-y-5 w-full max-w-[1000px]">
+    <div className="space-y-5 w-full">
       {/* Bento Header */}
       <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-4 md:p-5">
         <h2 className="text-lg font-bold text-foreground">টিম ম্যানেজমেন্ট</h2>
@@ -183,10 +183,10 @@ const TeamPage = () => {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/30 hover:bg-muted/30 border-b border-border/40">
-                <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">User ID</TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">রোল</TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground text-center">স্ট্যাটাস</TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground text-center">অ্যাকশন</TableHead>
+                <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">User ID</TableHead>
+                <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">রোল</TableHead>
+                <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 text-center">স্ট্যাটাস</TableHead>
+                <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 text-center">অ্যাকশন</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
