@@ -1,12 +1,12 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Minus, Plus, Loader2, Check, Copy, AlertCircle } from 'lucide-react';
 import { toBengaliNum, formatBengaliPrice } from '@/lib/bengali';
-import { useCreateOrder } from '@/hooks/useSupabaseData';
+import { useSecureOrder } from '@/hooks/useSecureOrder';
 import { useRateLimit } from '@/hooks/useRateLimit';
 import { sanitizeForDisplay, isValidPhone, isBot } from '@/lib/security';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useTurnstile } from '@/hooks/useTurnstile';
 
 interface OrderModalProps {
   isOpen: boolean;
@@ -47,9 +47,10 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
   const [touched, setTouched] = useState(false);
   const [honeypot, setHoneypot] = useState('');
   const [honeypot2, setHoneypot2] = useState('');
-  const createOrder = useCreateOrder();
+  const createOrder = useSecureOrder();
   const { toast } = useToast();
   const { checkLimit } = useRateLimit({ maxAttempts: 10, windowMs: 60_000 });
+  const { containerRef: turnstileRef, token: turnstileToken, reset: resetTurnstile, isEnabled: turnstileEnabled } = useTurnstile();
 
   useEffect(() => {
     if (!isOpen) {
@@ -120,28 +121,30 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
     const cleanPhone = phone.replace(/[\s-]/g, '');
     const cleanAddress = sanitizeForDisplay(address);
 
+    if (turnstileEnabled && !turnstileToken) {
+      toast({ title: 'ভেরিফিকেশন প্রয়োজন', description: 'অনুগ্রহ করে "আমি রোবট নই" চেকবক্স ক্লিক করুন।', variant: 'destructive' });
+      return;
+    }
+
     setLoading(true);
 
-    const orderData = {
-      customer_name: cleanName,
-      customer_email: email ? sanitizeForDisplay(email) : null,
-      phone: cleanPhone,
-      address: cleanAddress,
-      watch_model: watchName,
-      quantity: qty,
-      payment_method: tab === 'cod' ? 'cod' : payMethod,
-      trx_id: tab === 'online' ? txnId.replace(/[^a-zA-Z0-9]/g, '') : null,
-      delivery_location: location,
-      delivery_charge: deliveryCharge,
-      total_price: grandTotal,
-      selected_color: selectedColor || null,
-    } as any;
-
     try {
-      await createOrder.mutateAsync(orderData);
-      supabase.functions.invoke('send-order-email', { body: orderData }).catch(console.error);
+      await createOrder.mutateAsync({
+        customer_name: cleanName,
+        customer_email: email ? sanitizeForDisplay(email) : null,
+        phone: cleanPhone,
+        address: cleanAddress,
+        watch_model: watchName,
+        quantity: qty,
+        payment_method: tab === 'cod' ? 'cod' : payMethod,
+        trx_id: tab === 'online' ? txnId.replace(/[^a-zA-Z0-9]/g, '') : null,
+        delivery_location: location,
+        selected_color: selectedColor || null,
+        turnstile_token: turnstileToken,
+      });
       setLoading(false);
       setSuccess(true);
+      resetTurnstile();
     } catch (err: any) {
       setLoading(false);
       console.error('Order submission failed:', err);
@@ -440,6 +443,11 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
                 </motion.div>
               )}
             </div>
+
+            {/* Turnstile Widget */}
+            {turnstileEnabled && (
+              <div ref={turnstileRef} className="flex justify-center" />
+            )}
 
             {/* Submit Button */}
             <motion.button

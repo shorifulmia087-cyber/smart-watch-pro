@@ -7,6 +7,7 @@ import {
 import type { Database } from '@/integrations/supabase/types';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { sanitizeForDisplay } from '@/lib/security';
 
 type SettingsRow = Database['public']['Tables']['site_settings']['Row'];
 
@@ -36,7 +37,16 @@ const SiteControlPage = () => {
   }
 
   const save = () => {
-    updateSettings.mutate(form as any, {
+    // Sanitize all text fields before saving
+    const sanitizedForm: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(form)) {
+      if (typeof value === 'string' && !key.includes('url') && !key.includes('color')) {
+        sanitizedForm[key] = sanitizeForDisplay(value);
+      } else {
+        sanitizedForm[key] = value;
+      }
+    }
+    updateSettings.mutate(sanitizedForm as any, {
       onSuccess: () => {
         setSaved(true);
         setTimeout(() => setSaved(false), 2000);

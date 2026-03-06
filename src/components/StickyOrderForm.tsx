@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toBengaliNum, formatBengaliPrice } from '@/lib/bengali';
-import { useCreateOrder, useSettings, useFeaturedProduct } from '@/hooks/useSupabaseData';
+import { useSettings, useFeaturedProduct } from '@/hooks/useSupabaseData';
+import { useSecureOrder } from '@/hooks/useSecureOrder';
 import { useRateLimit } from '@/hooks/useRateLimit';
 import { sanitizeForDisplay, isValidPhone, isBot } from '@/lib/security';
+import { useTurnstile } from '@/hooks/useTurnstile';
 import { Loader2, Check } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -17,9 +19,10 @@ const StickyOrderForm = () => {
   const [honeypot, setHoneypot] = useState('');
   const { data: settings } = useSettings();
   const { data: product } = useFeaturedProduct();
-  const createOrder = useCreateOrder();
+  const createOrder = useSecureOrder();
   const { toast } = useToast();
   const { checkLimit } = useRateLimit({ maxAttempts: 10, windowMs: 60_000 });
+  const { containerRef: turnstileRef, token: turnstileToken, reset: resetTurnstile, isEnabled: turnstileEnabled } = useTurnstile();
 
   const deliveryCharge = location === 'dhaka'
     ? (settings?.delivery_charge_inside ?? 70)
@@ -39,15 +42,22 @@ const StickyOrderForm = () => {
     if (!cleanName || !cleanPhone || !cleanAddress || !product) return;
     if (!isValidPhone(cleanPhone)) { toast({ title: 'সঠিক মোবাইল নম্বর দিন', variant: 'destructive' }); return; }
 
+    if (turnstileEnabled && !turnstileToken) {
+      toast({ title: 'ভেরিফিকেশন প্রয়োজন', description: '"আমি রোবট নই" চেকবক্স ক্লিক করুন।', variant: 'destructive' });
+      return;
+    }
+
     setLoading(true);
     try {
       await createOrder.mutateAsync({
         customer_name: cleanName, phone: cleanPhone, address: cleanAddress,
         watch_model: product.name, quantity: 1, payment_method: 'cod',
-        delivery_location: location, delivery_charge: deliveryCharge, total_price: total,
+        delivery_location: location,
+        turnstile_token: turnstileToken,
       });
       setSuccess(true);
       setName(''); setPhone(''); setAddress(''); setHoneypot('');
+      resetTurnstile();
       setTimeout(() => setSuccess(false), 3000);
     } catch {
       toast({ title: 'ত্রুটি হয়েছে', variant: 'destructive' });
@@ -130,6 +140,9 @@ const StickyOrderForm = () => {
                   বাইরে (৳{toBengaliNum(settings?.delivery_charge_outside ?? 150)})
                 </button>
               </div>
+              {turnstileEnabled && (
+                <div ref={turnstileRef} className="flex justify-center" />
+              )}
               <button
                 type="submit" disabled={loading}
                 className="w-full gradient-gold text-surface font-semibold py-3.5 rounded-xl text-base hover:opacity-90 transition-opacity disabled:opacity-70 flex items-center justify-center gap-2"
