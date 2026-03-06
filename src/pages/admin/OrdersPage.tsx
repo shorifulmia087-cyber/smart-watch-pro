@@ -561,7 +561,7 @@ const OrdersPage = () => {
               <button
                 key={s ?? 'all'}
                 onClick={() => { setFilter(s as OrderStatus | undefined); setPage(0); }}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 border ${
+                className={`px-3.5 py-1.5 rounded-sm text-xs font-medium transition-all duration-200 border ${
                   filter === s
                     ? 'gradient-gold text-white border-transparent shadow-sm'
                     : 'bg-muted/15 dark:bg-muted/10 text-muted-foreground border-border/30 hover:border-gold/30 hover:text-gold'
