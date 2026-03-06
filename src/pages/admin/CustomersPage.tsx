@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useOrders } from '@/hooks/useSupabaseData';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
 import { Search, Users, Crown, UserCheck, UserPlus } from 'lucide-react';
+import AdminPagination from '@/components/admin/AdminPagination';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
@@ -26,6 +27,8 @@ const labelConfig = {
 const CustomersPage = () => {
   const { data: orders, isLoading } = useOrders();
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(0);
+  const pageSize = 20;
 
   const customers = useMemo(() => {
     if (!orders) return [];
@@ -88,7 +91,7 @@ const CustomersPage = () => {
           <div className="flex items-center gap-2 bg-muted/30 border border-border/40 rounded-sm px-3 py-2 min-w-[240px]">
             <Search className="h-4 w-4 text-muted-foreground shrink-0" />
             <input
-              type="text" value={search} onChange={e => setSearch(e.target.value)}
+              type="text" value={search} onChange={e => { setSearch(e.target.value); setPage(0); }}
               placeholder="নাম বা ফোন দিয়ে খুঁজুন..."
               className="bg-transparent border-none outline-none w-full text-sm text-foreground placeholder:text-muted-foreground"
             />
@@ -127,7 +130,7 @@ const CustomersPage = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filtered.map((c) => {
+                {filtered.slice(page * pageSize, (page + 1) * pageSize).map((c) => {
                   const lbl = labelConfig[c.label];
                   return (
                     <TableRow key={c.phone} className="hover:bg-gold/[0.03] transition-colors border-b border-border/30">
@@ -155,6 +158,13 @@ const CustomersPage = () => {
               </TableBody>
             </Table>
           </div>
+          <AdminPagination
+            currentPage={page}
+            totalPages={Math.ceil(filtered.length / pageSize)}
+            totalItems={filtered.length}
+            pageSize={pageSize}
+            onPageChange={setPage}
+          />
         </div>
       )}
     </div>

@@ -9,6 +9,7 @@ import {
   Upload, X, ImagePlus, GripVertical, Package, Palette, Globe, Camera, ListChecks, Sparkles, Tag,
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import AdminPagination from '@/components/admin/AdminPagination';
 import {
   Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription,
 } from '@/components/ui/sheet';
@@ -35,6 +36,8 @@ const ProductsPage = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
+  const [page, setPage] = useState(0);
+  const pageSize = 15;
 
   const [form, setForm] = useState({
     name: '', price: 0, subtitle: '', video_url: '', stock_status: 'in_stock',
@@ -171,7 +174,7 @@ const ProductsPage = () => {
           <div className="flex items-center gap-2 glass-card rounded-xl px-3 py-2 min-w-[200px]">
             <Search className="h-4 w-4 text-muted-foreground shrink-0" />
             <input
-              type="text" value={search} onChange={e => setSearch(e.target.value)}
+              type="text" value={search} onChange={e => { setSearch(e.target.value); setPage(0); }}
               placeholder="প্রোডাক্ট খুঁজুন..."
               className="bg-transparent border-none outline-none w-full text-sm"
             />
@@ -210,7 +213,7 @@ const ProductsPage = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filtered.map((p) => (
+                {filtered.slice(page * pageSize, (page + 1) * pageSize).map((p) => (
                   <TableRow key={p.id} className="group hover:bg-muted/20 transition-colors cursor-pointer border-b border-border/30" onClick={() => openEdit(p)}>
                     <TableCell className="py-3">
                       {p.thumbnail_url ? (
@@ -287,6 +290,13 @@ const ProductsPage = () => {
               </TableBody>
             </Table>
           </div>
+          <AdminPagination
+            currentPage={page}
+            totalPages={Math.ceil(filtered.length / pageSize)}
+            totalItems={filtered.length}
+            pageSize={pageSize}
+            onPageChange={setPage}
+          />
         </div>
       )}
 
