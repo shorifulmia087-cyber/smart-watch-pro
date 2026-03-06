@@ -185,7 +185,7 @@ const TrackOrder = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/30">
-      <Navbar />
+      
 
       <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
         {/* Page Header */}
