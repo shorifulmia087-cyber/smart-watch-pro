@@ -40,7 +40,7 @@ const systemNav = [
 const AdminSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
+  const { user, signOut, isAdmin, isOrderManager } = useAuth();
   const { state, setOpenMobile } = useSidebar();
   const collapsed = state === 'collapsed';
   const { data: settings } = useSettings();
