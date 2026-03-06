@@ -138,7 +138,7 @@ const FacebookPixelPage = () => {
       </div>
 
       {/* Event Tracking */}
-      <div className="bg-white dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6 space-y-4">
+      <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6 space-y-4">
         <h3 className="font-semibold text-sm text-foreground">ইভেন্ট ট্র্যাকিং</h3>
         <p className="text-[11px] text-muted-foreground">কোন ইভেন্টগুলো ট্র্যাক করতে চান সিলেক্ট করুন।</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
