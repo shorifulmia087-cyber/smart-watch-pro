@@ -15,7 +15,7 @@ Deno.serve(async (req) => {
     const {
       customer_name, customer_email, phone, address, watch_model,
       quantity, payment_method, trx_id, delivery_location,
-      selected_color, turnstile_token,
+      selected_color, turnstile_token, payment_type, advance_amount,
     } = body
 
     // === Input validation ===
