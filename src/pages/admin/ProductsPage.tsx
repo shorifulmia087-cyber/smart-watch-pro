@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
+import { sanitizeForDisplay } from '@/lib/security';
 import {
   useProducts, useUpsertProduct, useDeleteProduct, useToggleStock, useToggleFeatured,
 } from '@/hooks/useSupabaseData';
