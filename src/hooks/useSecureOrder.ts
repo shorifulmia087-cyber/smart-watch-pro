@@ -13,6 +13,8 @@ interface SecureOrderData {
   delivery_location: string;
   selected_color?: string | null;
   turnstile_token?: string | null;
+  payment_type?: string;
+  advance_amount?: number;
 }
 
 export const useSecureOrder = () => {
