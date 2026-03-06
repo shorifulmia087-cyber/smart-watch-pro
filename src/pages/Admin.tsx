@@ -9,6 +9,7 @@ import AnalyticsPage from './admin/AnalyticsPage';
 import SiteControlPage from './admin/SiteControlPage';
 import ReviewsPage from './admin/ReviewsPage';
 import PaymentSettingsPage from './admin/PaymentSettingsPage';
+import AdvancePaymentsPage from './admin/AdvancePaymentsPage';
 import ProfileSettingsPage from './admin/ProfileSettingsPage';
 import CourierSettingsPage from './admin/CourierSettingsPage';
 import CourierPaymentsPage from './admin/CourierPaymentsPage';
@@ -68,6 +69,7 @@ const Admin = () => {
         <Route path="reviews" element={<ReviewsPage />} />
         <Route path="team" element={<TeamPage />} />
         <Route path="payment" element={<PaymentSettingsPage />} />
+        <Route path="advance-payments" element={<AdvancePaymentsPage />} />
         <Route path="courier" element={<CourierSettingsPage />} />
         <Route path="courier-payments" element={<CourierPaymentsPage />} />
         <Route path="tracking" element={<TrackingDashboardPage />} />

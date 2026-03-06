@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { useOrders, useUpdateOrderStatus, useSettings } from '@/hooks/useSupabaseData';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
-import { Search, Filter, ChevronLeft, ChevronRight, Truck, FileText, CheckCircle2, Package, Loader2, Eye, X, MapPin } from 'lucide-react';
+import { Search, Filter, ChevronLeft, ChevronRight, Truck, FileText, CheckCircle2, Package, Loader2, Eye, X, MapPin, CreditCard } from 'lucide-react';
 import AdminPagination from '@/components/admin/AdminPagination';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -32,11 +32,12 @@ const statusStyles: Record<OrderStatus, string> = {
 
 const OrdersPage = () => {
   const [filter, setFilter] = useState<OrderStatus | undefined>();
+  const [paymentFilter, setPaymentFilter] = useState<string | undefined>();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(15);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
-  const pageSize = 15;
   const { data: orders, isLoading } = useOrders(filter);
   const { data: settings } = useSettings();
   const updateStatus = useUpdateOrderStatus();
@@ -249,15 +250,23 @@ const OrdersPage = () => {
 
   const filtered = useMemo(() => {
     if (!orders) return [];
-    if (!search.trim()) return orders;
+    let list = orders;
+    if (paymentFilter) {
+      if (paymentFilter === 'cod') {
+        list = list.filter(o => o.payment_method === 'cod');
+      } else {
+        list = list.filter(o => o.payment_method !== 'cod');
+      }
+    }
+    if (!search.trim()) return list;
     const q = search.toLowerCase();
-    return orders.filter(o =>
+    return list.filter(o =>
       o.customer_name.toLowerCase().includes(q) ||
       o.phone.includes(q) ||
       o.watch_model.toLowerCase().includes(q) ||
       (o.trx_id && o.trx_id.toLowerCase().includes(q))
     );
-  }, [orders, search]);
+  }, [orders, search, paymentFilter]);
 
   const paged = filtered.slice(page * pageSize, (page + 1) * pageSize);
   const totalPages = Math.ceil(filtered.length / pageSize);
@@ -336,6 +345,25 @@ const OrdersPage = () => {
             </button>
           ))}
         </div>
+
+        {/* Payment Type Filter */}
+        <div className="flex items-center gap-2 flex-wrap mt-3 pt-3 border-t border-border/10">
+          <CreditCard className="h-4 w-4 text-muted-foreground" />
+          <span className="text-[10px] text-muted-foreground/60 uppercase tracking-wider font-semibold mr-1">পেমেন্ট:</span>
+          {[undefined, 'cod', 'online'].map(f => (
+            <button
+              key={f ?? 'all'}
+              onClick={() => { setPaymentFilter(f); setPage(0); }}
+              className={`px-3 py-1.5 rounded-sm text-xs font-medium transition-all duration-200 border ${
+                paymentFilter === f
+                  ? 'gradient-gold text-white border-transparent shadow-sm'
+                  : 'bg-transparent text-muted-foreground border-border/40 hover:border-gold/30 hover:text-gold'
+              }`}
+            >
+              {f === 'cod' ? 'ক্যাশ অন ডেলিভারি' : f === 'online' ? 'অনলাইন পেমেন্ট' : 'সব'}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* ─── Bulk Actions Bar ─── */}
@@ -392,6 +420,7 @@ const OrdersPage = () => {
                   <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 text-center">পরিমাণ</TableHead>
                   <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">মোট</TableHead>
                   <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">TrxID</TableHead>
+                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">পেমেন্ট</TableHead>
                   <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">ট্র্যাকিং</TableHead>
                   <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">ট্র্যাক স্ট্যাটাস</TableHead>
                   <TableHead className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">এলাকা</TableHead>
@@ -443,6 +472,24 @@ const OrdersPage = () => {
                           </span>
                         ) : (
                           <span className="text-muted-foreground text-[11px]">COD</span>
+                        )}
+                      </TableCell>
+                      {/* Payment Status */}
+                      <TableCell>
+                        {o.payment_method === 'cod' ? (
+                          <span className="text-[10px] font-semibold px-2 py-1 rounded-sm border bg-muted/20 text-muted-foreground border-border/20">ক্যাশ অন ডেলিভারি</span>
+                        ) : (o as any).payment_type === 'full_payment' ? (
+                          <div>
+                            <span className="text-[10px] font-semibold px-2 py-1 rounded-sm border bg-success/10 text-success border-success/20">পেমেন্ট সম্পন্ন ✓</span>
+                            <p className="text-[10px] text-success/70 mt-0.5 font-inter">৳{formatBengaliPrice((o as any).advance_amount || 0)}</p>
+                          </div>
+                        ) : (o as any).payment_type === 'delivery_charge_only' ? (
+                          <div>
+                            <span className="text-[10px] font-semibold px-2 py-1 rounded-sm border bg-warning/10 text-warning border-warning/20">ডেলিভারি চার্জ দেওয়া</span>
+                            <p className="text-[10px] text-warning/70 mt-0.5 font-inter">বাকি: ৳{formatBengaliPrice(o.total_price - ((o as any).advance_amount || 0))}</p>
+                          </div>
+                        ) : (
+                          <span className="text-[10px] font-semibold px-2 py-1 rounded-sm border bg-info/10 text-info border-info/20">অনলাইন</span>
                         )}
                       </TableCell>
                       <TableCell>
@@ -534,7 +581,7 @@ const OrdersPage = () => {
                     {/* Expandable Live Tracking Row */}
                     {expandedOrderId === o.id && (
                       <TableRow className="bg-muted/10 hover:bg-muted/10">
-                        <TableCell colSpan={14} className="py-4 px-6">
+                        <TableCell colSpan={15} className="py-4 px-6">
                           <div className="flex items-start justify-between">
                             <LiveTracking
                               orderId={o.id}
@@ -558,13 +605,14 @@ const OrdersPage = () => {
             </Table>
           </div>
 
-          {/* Pagination */}
+           {/* Pagination */}
           <AdminPagination
             currentPage={page}
             totalPages={totalPages}
             totalItems={filtered.length}
             pageSize={pageSize}
             onPageChange={setPage}
+            onPageSizeChange={s => { setPageSize(s); setPage(0); }}
           />
         </div>
       )}

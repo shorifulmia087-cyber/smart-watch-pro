@@ -15,7 +15,7 @@ Deno.serve(async (req) => {
     const {
       customer_name, customer_email, phone, address, watch_model,
       quantity, payment_method, trx_id, delivery_location,
-      selected_color, turnstile_token,
+      selected_color, turnstile_token, payment_type, advance_amount,
     } = body
 
     // === Input validation ===
@@ -106,6 +106,21 @@ Deno.serve(async (req) => {
     // Sanitize inputs
     const sanitize = (s: string) => s.replace(/<[^>]*>/g, '').trim()
 
+    // Determine payment type and advance amount
+    const resolvedPaymentType = payment_method === 'cod' ? 'cod' : (payment_type || 'delivery_charge_only')
+    let resolvedAdvanceAmount = 0
+    if (payment_method !== 'cod') {
+      if (resolvedPaymentType === 'full_payment') {
+        resolvedAdvanceAmount = verifiedTotal
+      } else if (resolvedPaymentType === 'delivery_charge_only') {
+        resolvedAdvanceAmount = deliveryCharge
+      }
+      // Override with client value if provided and valid
+      if (typeof advance_amount === 'number' && advance_amount > 0 && advance_amount <= verifiedTotal) {
+        resolvedAdvanceAmount = advance_amount
+      }
+    }
+
     const orderData = {
       customer_name: sanitize(customer_name),
       customer_email: customer_email ? sanitize(customer_email) : null,
@@ -119,6 +134,8 @@ Deno.serve(async (req) => {
       delivery_charge: deliveryCharge,
       total_price: verifiedTotal,
       selected_color: selected_color || null,
+      payment_type: resolvedPaymentType,
+      advance_amount: resolvedAdvanceAmount,
     }
 
     const { data: order, error: insertErr } = await supabase

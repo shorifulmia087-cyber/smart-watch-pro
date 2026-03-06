@@ -33,6 +33,7 @@ interface FormErrors {
 const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInside = 70, deliveryChargeOutside = 150, onlinePaymentEnabled = true, bkashNumber = '', nagadNumber = '', rocketNumber = '', availableColors = [] }: OrderModalProps) => {
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState<'cod' | 'online'>('cod');
+  const [paymentType, setPaymentType] = useState<'full_payment' | 'delivery_charge_only'>('delivery_charge_only');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -54,7 +55,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
 
   useEffect(() => {
     if (!isOpen) {
-      setQty(1); setTab('cod'); setName(''); setEmail(''); setPhone(''); setAddress(''); setTxnId(''); setLoading(false); setSuccess(false); setLocation('dhaka'); setHoneypot(''); setHoneypot2(''); setSelectedColor(''); setErrors({}); setTouched(false);
+      setQty(1); setTab('cod'); setPaymentType('delivery_charge_only'); setName(''); setEmail(''); setPhone(''); setAddress(''); setTxnId(''); setLoading(false); setSuccess(false); setLocation('dhaka'); setHoneypot(''); setHoneypot2(''); setSelectedColor(''); setErrors({}); setTouched(false);
     }
   }, [isOpen]);
 
@@ -129,6 +130,10 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
     setLoading(true);
 
     try {
+      const advanceAmount = tab === 'online'
+        ? (paymentType === 'full_payment' ? grandTotal : deliveryCharge)
+        : 0;
+
       await createOrder.mutateAsync({
         customer_name: cleanName,
         customer_email: email ? sanitizeForDisplay(email) : null,
@@ -141,6 +146,8 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
         delivery_location: location,
         selected_color: selectedColor || null,
         turnstile_token: turnstileToken,
+        payment_type: tab === 'cod' ? 'cod' : paymentType,
+        advance_amount: advanceAmount,
       });
       setLoading(false);
       setSuccess(true);
@@ -387,6 +394,45 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
               )}
               {tab === 'online' && onlinePaymentEnabled && (
                 <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="mt-3 space-y-3">
+                  {/* Payment Type Choice */}
+                  <div>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium mb-2">কতটুকু পেমেন্ট করবেন?</p>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setPaymentType('full_payment')}
+                        className={`flex-1 py-2.5 rounded-xl border text-sm font-medium transition-all ${
+                          paymentType === 'full_payment'
+                            ? 'border-success bg-success/10 text-success shadow-sm'
+                            : 'border-border/60 bg-surface text-muted-foreground hover:border-border'
+                        }`}
+                      >
+                        সম্পূর্ণ পেমেন্ট
+                        <span className="block text-[10px] mt-0.5 opacity-70">৳{formatBengaliPrice(grandTotal)}</span>
+                      </button>
+                      <button
+                        onClick={() => setPaymentType('delivery_charge_only')}
+                        className={`flex-1 py-2.5 rounded-xl border text-sm font-medium transition-all ${
+                          paymentType === 'delivery_charge_only'
+                            ? 'border-warning bg-warning/10 text-warning shadow-sm'
+                            : 'border-border/60 bg-surface text-muted-foreground hover:border-border'
+                        }`}
+                      >
+                        শুধু ডেলিভারি চার্জ
+                        <span className="block text-[10px] mt-0.5 opacity-70">৳{formatBengaliPrice(deliveryCharge)}</span>
+                      </button>
+                    </div>
+                    {paymentType === 'delivery_charge_only' && (
+                      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-xs text-warning mt-2 bg-warning/5 p-2 rounded-lg border border-warning/10">
+                        💰 বাকি ৳{formatBengaliPrice(grandTotal - deliveryCharge)} ক্যাশ অন ডেলিভারিতে পরিশোধ করতে হবে
+                      </motion.p>
+                    )}
+                    {paymentType === 'full_payment' && (
+                      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-xs text-success mt-2 bg-success/5 p-2 rounded-lg border border-success/10">
+                        ✅ ডেলিভারির সময় আর কোনো টাকা দিতে হবে না
+                      </motion.p>
+                    )}
+                  </div>
+
                   <div className="flex gap-2">
                     {['bkash', 'nagad', 'rocket'].map((m) => (
                       <button key={m} onClick={() => setPayMethod(m)} className={`flex-1 py-2.5 rounded-xl border text-sm font-semibold transition-all ${payMethod === m ? 'border-gold bg-gold/10 text-gold shadow-sm' : 'border-border/60 bg-surface text-muted-foreground hover:border-border'}`}>
@@ -400,11 +446,12 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
                     const numberMap: Record<string, string> = { bkash: bkashNumber, nagad: nagadNumber, rocket: rocketNumber };
                     const labelMap: Record<string, string> = { bkash: 'বিকাশ', nagad: 'নগদ', rocket: 'রকেট' };
                     const currentNumber = numberMap[payMethod] || '';
+                    const payAmount = paymentType === 'full_payment' ? grandTotal : deliveryCharge;
                     if (!currentNumber) return null;
                     return (
                       <div className="flex items-center justify-between p-3 rounded-lg bg-gold/5 border border-gold/15">
                         <div>
-                          <p className="text-xs text-muted-foreground">{labelMap[payMethod]} নম্বর</p>
+                          <p className="text-xs text-muted-foreground">{labelMap[payMethod]} নম্বরে ৳{formatBengaliPrice(payAmount)} পাঠান</p>
                           <p className="text-sm font-bold text-foreground font-mono tracking-wider mt-0.5">{currentNumber}</p>
                         </div>
                         <button

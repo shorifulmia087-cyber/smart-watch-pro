@@ -62,6 +62,7 @@ export type Database = {
       orders: {
         Row: {
           address: string
+          advance_amount: number
           courier_booked: boolean
           courier_provider: string | null
           created_at: string
@@ -71,6 +72,7 @@ export type Database = {
           delivery_location: string
           id: string
           payment_method: string
+          payment_type: string
           phone: string
           quantity: number
           selected_color: string | null
@@ -82,6 +84,7 @@ export type Database = {
         }
         Insert: {
           address: string
+          advance_amount?: number
           courier_booked?: boolean
           courier_provider?: string | null
           created_at?: string
@@ -91,6 +94,7 @@ export type Database = {
           delivery_location?: string
           id?: string
           payment_method: string
+          payment_type?: string
           phone: string
           quantity?: number
           selected_color?: string | null
@@ -102,6 +106,7 @@ export type Database = {
         }
         Update: {
           address?: string
+          advance_amount?: number
           courier_booked?: boolean
           courier_provider?: string | null
           created_at?: string
@@ -111,6 +116,7 @@ export type Database = {
           delivery_location?: string
           id?: string
           payment_method?: string
+          payment_type?: string
           phone?: string
           quantity?: number
           selected_color?: string | null

@@ -28,7 +28,7 @@ const CustomersPage = () => {
   const { data: orders, isLoading } = useOrders();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(0);
-  const pageSize = 20;
+  const [pageSize, setPageSize] = useState(20);
 
   const customers = useMemo(() => {
     if (!orders) return [];
@@ -164,6 +164,7 @@ const CustomersPage = () => {
             totalItems={filtered.length}
             pageSize={pageSize}
             onPageChange={setPage}
+            onPageSizeChange={s => { setPageSize(s); setPage(0); }}
           />
         </div>
       )}
