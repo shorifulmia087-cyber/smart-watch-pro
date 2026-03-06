@@ -27,6 +27,7 @@ const fromDateTimeLocalValue = (value: string) => {
 
 const SiteControlPage = () => {
   const { data: settings, isLoading } = useSettings();
+  const { isSuperAdmin } = useAuth();
   const updateSettings = useUpdateSettings();
   const [form, setForm] = useState<Partial<SettingsRow>>({});
   const [initialized, setInitialized] = useState(false);
