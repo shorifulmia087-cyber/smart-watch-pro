@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Save, Loader2, CheckCircle2, Activity, Eye, ShoppingCart, CreditCard } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const events = [
   { id: 'PageView', label: 'পেজ ভিউ', icon: Eye, desc: 'প্রতিটি পেজ ভিজিটে ফায়ার হবে' },
@@ -14,6 +16,28 @@ const FacebookPixelPage = () => {
   const [enabledEvents, setEnabledEvents] = useState<string[]>(['PageView', 'Purchase']);
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [settingsId, setSettingsId] = useState<string | null>(null);
+
+  // Load settings from DB
+  useEffect(() => {
+    const loadSettings = async () => {
+      const { data, error } = await supabase
+        .from('facebook_pixel_settings')
+        .select('*')
+        .limit(1)
+        .maybeSingle();
+
+      if (data) {
+        setPixelId(data.pixel_id || '');
+        setAccessToken(data.access_token || '');
+        setEnabledEvents(data.enabled_events || ['PageView', 'Purchase']);
+        setSettingsId(data.id);
+      }
+      setLoading(false);
+    };
+    loadSettings();
+  }, []);
 
   const toggleEvent = (id: string) => {
     setEnabledEvents(prev =>
@@ -21,19 +45,59 @@ const FacebookPixelPage = () => {
     );
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setSaving(true);
-    setTimeout(() => {
-      setSaving(false);
+    try {
+      if (settingsId) {
+        const { error } = await supabase
+          .from('facebook_pixel_settings')
+          .update({
+            pixel_id: pixelId,
+            access_token: accessToken,
+            enabled_events: enabledEvents,
+          })
+          .eq('id', settingsId);
+
+        if (error) throw error;
+      } else {
+        const { data, error } = await supabase
+          .from('facebook_pixel_settings')
+          .insert({
+            pixel_id: pixelId,
+            access_token: accessToken,
+            enabled_events: enabledEvents,
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+        if (data) setSettingsId(data.id);
+      }
+
       setSaved(true);
+      toast.success('সেটিংস সংরক্ষণ করা হয়েছে!');
       setTimeout(() => setSaved(false), 2000);
-    }, 1000);
+    } catch (err: any) {
+      toast.error('সংরক্ষণ ব্যর্থ হয়েছে: ' + (err?.message || ''));
+    } finally {
+      setSaving(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="space-y-5 w-full max-w-[1000px]">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="h-[120px] bg-muted/30 rounded-sm animate-pulse" />
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-5 w-full max-w-[1000px]">
       {/* Bento Header */}
-      <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-4 md:p-5">
+      <div className="bg-white dark:bg-card rounded-sm border border-border/30 shadow-sm p-4 md:p-5">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-lg font-bold text-foreground">Facebook Pixel</h2>
@@ -52,7 +116,7 @@ const FacebookPixelPage = () => {
       </div>
 
       {/* Credentials */}
-      <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6 space-y-4">
+      <div className="bg-white dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6 space-y-4">
         <h3 className="font-semibold text-sm flex items-center gap-2 text-foreground">
           <Activity className="h-4 w-4 text-info" /> Pixel ক্রেডেনশিয়াল
         </h3>
@@ -74,7 +138,7 @@ const FacebookPixelPage = () => {
       </div>
 
       {/* Event Tracking */}
-      <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6 space-y-4">
+      <div className="bg-white dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6 space-y-4">
         <h3 className="font-semibold text-sm text-foreground">ইভেন্ট ট্র্যাকিং</h3>
         <p className="text-[11px] text-muted-foreground">কোন ইভেন্টগুলো ট্র্যাক করতে চান সিলেক্ট করুন।</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -105,7 +169,7 @@ const FacebookPixelPage = () => {
       </div>
 
       {/* Status */}
-      <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6">
+      <div className="bg-white dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6">
         <div className="flex items-center gap-3">
           <div className={`w-3 h-3 rounded-full ${pixelId ? 'bg-success' : 'bg-warning'} animate-pulse`} />
           <div>
