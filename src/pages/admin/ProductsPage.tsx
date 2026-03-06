@@ -290,6 +290,13 @@ const ProductsPage = () => {
               </TableBody>
             </Table>
           </div>
+          <AdminPagination
+            currentPage={page}
+            totalPages={Math.ceil(filtered.length / pageSize)}
+            totalItems={filtered.length}
+            pageSize={pageSize}
+            onPageChange={setPage}
+          />
         </div>
       )}
 
