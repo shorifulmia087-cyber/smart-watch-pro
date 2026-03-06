@@ -140,6 +140,9 @@ const StickyOrderForm = () => {
                   বাইরে (৳{toBengaliNum(settings?.delivery_charge_outside ?? 150)})
                 </button>
               </div>
+              {turnstileEnabled && (
+                <div ref={turnstileRef} className="flex justify-center" />
+              )}
               <button
                 type="submit" disabled={loading}
                 className="w-full gradient-gold text-surface font-semibold py-3.5 rounded-xl text-base hover:opacity-90 transition-opacity disabled:opacity-70 flex items-center justify-center gap-2"
