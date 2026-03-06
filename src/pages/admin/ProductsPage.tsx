@@ -209,7 +209,7 @@ const ProductsPage = () => {
           কোনো প্রোডাক্ট পাওয়া যায়নি।
         </div>
       ) : (
-        <div className="glass-card rounded-2xl overflow-hidden">
+        <div className="bg-surface dark:bg-card rounded-sm border border-border/30 overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
