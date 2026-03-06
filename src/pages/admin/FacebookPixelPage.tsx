@@ -169,7 +169,7 @@ const FacebookPixelPage = () => {
       </div>
 
       {/* Status */}
-      <div className="bg-white dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6">
+      <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6">
         <div className="flex items-center gap-3">
           <div className={`w-3 h-3 rounded-full ${pixelId ? 'bg-success' : 'bg-warning'} animate-pulse`} />
           <div>
