@@ -91,7 +91,7 @@ const CustomersPage = () => {
           <div className="flex items-center gap-2 bg-muted/30 border border-border/40 rounded-sm px-3 py-2 min-w-[240px]">
             <Search className="h-4 w-4 text-muted-foreground shrink-0" />
             <input
-              type="text" value={search} onChange={e => setSearch(e.target.value)}
+              type="text" value={search} onChange={e => { setSearch(e.target.value); setPage(0); }}
               placeholder="নাম বা ফোন দিয়ে খুঁজুন..."
               className="bg-transparent border-none outline-none w-full text-sm text-foreground placeholder:text-muted-foreground"
             />

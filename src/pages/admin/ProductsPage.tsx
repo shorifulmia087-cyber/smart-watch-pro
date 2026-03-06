@@ -174,7 +174,7 @@ const ProductsPage = () => {
           <div className="flex items-center gap-2 glass-card rounded-xl px-3 py-2 min-w-[200px]">
             <Search className="h-4 w-4 text-muted-foreground shrink-0" />
             <input
-              type="text" value={search} onChange={e => setSearch(e.target.value)}
+              type="text" value={search} onChange={e => { setSearch(e.target.value); setPage(0); }}
               placeholder="প্রোডাক্ট খুঁজুন..."
               className="bg-transparent border-none outline-none w-full text-sm"
             />
