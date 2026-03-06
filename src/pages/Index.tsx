@@ -154,10 +154,27 @@ const Index = () => {
       </section>
 
       <footer className="bg-ink border-t border-surface/10 py-8 px-4">
-        <div className="max-w-6xl mx-auto text-center">
+        <div className="max-w-6xl mx-auto text-center space-y-2">
           <p className="text-surface/40 text-sm">
             {settings?.footer_text || `© ২০২৬ ${brandName}। সর্বস্বত্ব সংরক্ষিত।`}
           </p>
+          {(settings as any)?.developer_name && (
+            <p className="text-surface/25 text-xs">
+              Developed by{' '}
+              {(settings as any)?.developer_url ? (
+                <a
+                  href={(settings as any).developer_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gold/60 hover:text-gold transition-colors duration-200 underline underline-offset-2"
+                >
+                  {(settings as any).developer_name}
+                </a>
+              ) : (
+                <span className="text-gold/60">{(settings as any).developer_name}</span>
+              )}
+            </p>
+          )}
         </div>
       </footer>
 
