@@ -581,7 +581,7 @@ const OrdersPage = () => {
                     {/* Expandable Live Tracking Row */}
                     {expandedOrderId === o.id && (
                       <TableRow className="bg-muted/10 hover:bg-muted/10">
-                        <TableCell colSpan={14} className="py-4 px-6">
+                        <TableCell colSpan={15} className="py-4 px-6">
                           <div className="flex items-start justify-between">
                             <LiveTracking
                               orderId={o.id}
