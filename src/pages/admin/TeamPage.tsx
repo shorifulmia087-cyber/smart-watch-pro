@@ -12,6 +12,7 @@ type TeamMember = {
   id: string;
   user_id: string;
   role: string;
+  created_at: string;
   email?: string;
 };
 
@@ -32,6 +33,11 @@ const TeamPage = () => {
       return data as TeamMember[];
     },
   });
+
+  // Super admin = first admin by created_at
+  const superAdminId = members
+    ?.filter(m => m.role === 'admin')
+    .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())[0]?.user_id;
 
   const handleInvite = async () => {
     if (!newEmail.trim()) return;
@@ -189,9 +195,10 @@ const TeamPage = () => {
                   <TableCell className="font-mono text-xs text-foreground">{m.user_id.slice(0, 8)}...</TableCell>
                   <TableCell>
                     <span className={`text-[10px] font-medium px-2.5 py-1 rounded-sm border ${
+                      m.user_id === superAdminId ? 'bg-gold/10 text-gold border-gold/20' :
                       m.role === 'admin' ? 'bg-accent/10 text-accent border-accent/20' : 'bg-info/10 text-info border-info/20'
                     }`}>
-                      {m.role === 'admin' ? 'ফুল অ্যাডমিন' : 'অর্ডার ম্যানেজার'}
+                      {m.user_id === superAdminId ? '👑 সুপার অ্যাডমিন' : m.role === 'admin' ? 'ফুল অ্যাডমিন' : 'অর্ডার ম্যানেজার'}
                     </span>
                   </TableCell>
                   <TableCell className="text-center">
@@ -202,7 +209,7 @@ const TeamPage = () => {
                     )}
                   </TableCell>
                   <TableCell className="text-center">
-                    {m.user_id !== user?.id && (
+                    {m.user_id !== superAdminId && user?.id === superAdminId && (
                       <button
                         onClick={() => handleRemove(m.user_id)}
                         disabled={removingId === m.user_id}
