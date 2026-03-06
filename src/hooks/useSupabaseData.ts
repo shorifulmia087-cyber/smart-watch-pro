@@ -171,9 +171,11 @@ export const useUploadReviewImage = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ file, sort_order }: { file: File; sort_order: number }) => {
-      const ext = file.name.split('.').pop();
+      // Compress to WebP before uploading
+      const compressed = await compressImage(file);
+      const ext = compressed.name.split('.').pop() || 'webp';
       const filePath = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-      const { error: uploadError } = await supabase.storage.from('review-images').upload(filePath, file);
+      const { error: uploadError } = await supabase.storage.from('review-images').upload(filePath, compressed);
       if (uploadError) throw uploadError;
       const { data: urlData } = supabase.storage.from('review-images').getPublicUrl(filePath);
       const image_url = urlData.publicUrl;
