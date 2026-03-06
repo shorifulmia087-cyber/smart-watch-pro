@@ -22,7 +22,7 @@ const statusConfig: Record<string, { label: string; icon: React.ReactNode; color
 const MyOrders = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
-  const { data: settings } = useSettings();
+  
 
   useEffect(() => {
     if (!authLoading && !user) {
