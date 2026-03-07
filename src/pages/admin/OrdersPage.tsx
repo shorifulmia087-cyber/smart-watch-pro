@@ -231,6 +231,7 @@ const OrdersPage = () => {
     pageSize,
     statusFilter: filter,
     paymentFilter,
+    courierFilter: courierFilterState,
     search: debouncedSearch,
   });
 
