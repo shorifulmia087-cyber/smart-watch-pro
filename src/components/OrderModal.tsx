@@ -100,7 +100,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
     }
 
     return errs;
-  }, [name, phone, address, selectedColor, availableColors, tab, payMethod, txnId]);
+  }, [name, phone, address, selectedColor, availableColors, tab, payMethod, txnId, selectedUpazila]);
 
   useEffect(() => {
     if (touched) {
