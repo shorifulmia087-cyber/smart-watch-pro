@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { sanitizeForDisplay } from '@/lib/security';
 import {
-  useProducts, useUpsertProduct, useDeleteProduct, useToggleStock, useToggleFeatured,
+  useProducts, useProductsLite, useUpsertProduct, useDeleteProduct, useToggleStock, useToggleFeatured,
 } from '@/hooks/useSupabaseData';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
 import {
