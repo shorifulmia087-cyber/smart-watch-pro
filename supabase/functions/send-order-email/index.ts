@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -22,15 +23,47 @@ interface OrderData {
   total_price: number;
 }
 
-function adminEmailHtml(order: OrderData): string {
+interface BrandInfo {
+  brand_name: string;
+  logo_url: string | null;
+  brand_tagline: string;
+}
+
+async function fetchBrandInfo(): Promise<BrandInfo> {
+  const supabase = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+  );
+  const { data } = await supabase
+    .from("site_settings")
+    .select("brand_name, logo_url, brand_tagline")
+    .limit(1)
+    .single();
+
+  return {
+    brand_name: data?.brand_name || "Kronos Premium Watch",
+    logo_url: data?.logo_url || null,
+    brand_tagline: data?.brand_tagline || "প্রিমিয়াম ক্রাফটসম্যানশিপ, অতুলনীয় ডিজাইন",
+  };
+}
+
+function logoHtml(brand: BrandInfo): string {
+  if (brand.logo_url) {
+    return `<img src="${brand.logo_url}" alt="${brand.brand_name}" style="max-height:48px;max-width:200px;display:block;margin:0 auto 12px;" />`;
+  }
+  return "";
+}
+
+function adminEmailHtml(order: OrderData, brand: BrandInfo): string {
   return `
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"></head>
 <body style="margin:0;padding:0;background:#f6f6f4;font-family:'Helvetica Neue',Arial,sans-serif;">
   <div style="max-width:560px;margin:40px auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.06);">
-    <div style="background:#0a0a0a;padding:32px 40px;">
-      <h1 style="margin:0;color:#b8963e;font-size:22px;font-weight:700;letter-spacing:0.5px;">Kronos — নতুন অর্ডার</h1>
+    <div style="background:#0a0a0a;padding:32px 40px;text-align:center;">
+      ${logoHtml(brand)}
+      <h1 style="margin:0;color:#b8963e;font-size:22px;font-weight:700;letter-spacing:0.5px;">${brand.brand_name} — নতুন অর্ডার</h1>
     </div>
     <div style="padding:32px 40px;">
       <p style="color:#0a0a0a;font-size:15px;margin:0 0 24px;line-height:1.6;">একটি নতুন অর্ডার পাওয়া গেছে। বিস্তারিত নিচে দেওয়া হলো:</p>
@@ -78,14 +111,14 @@ function adminEmailHtml(order: OrderData): string {
       </div>
     </div>
     <div style="padding:20px 40px;background:#fafafa;text-align:center;">
-      <p style="margin:0;color:#999;font-size:11px;">Kronos Admin Notification</p>
+      <p style="margin:0;color:#999;font-size:11px;">${brand.brand_name} Admin Notification</p>
     </div>
   </div>
 </body>
 </html>`;
 }
 
-function customerEmailHtml(order: OrderData): string {
+function customerEmailHtml(order: OrderData, brand: BrandInfo): string {
   return `
 <!DOCTYPE html>
 <html>
@@ -93,8 +126,9 @@ function customerEmailHtml(order: OrderData): string {
 <body style="margin:0;padding:0;background:#f6f6f4;font-family:'Helvetica Neue',Arial,sans-serif;">
   <div style="max-width:560px;margin:40px auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.06);">
     <div style="background:#0a0a0a;padding:40px;text-align:center;">
-      <h1 style="margin:0;color:#b8963e;font-size:28px;font-weight:700;letter-spacing:1px;">KRONOS</h1>
-      <p style="margin:8px 0 0;color:#666;font-size:13px;letter-spacing:2px;">PREMIUM WATCH</p>
+      ${logoHtml(brand)}
+      <h1 style="margin:0;color:#b8963e;font-size:28px;font-weight:700;letter-spacing:1px;">${brand.brand_name.toUpperCase()}</h1>
+      <p style="margin:8px 0 0;color:#666;font-size:13px;letter-spacing:2px;">${brand.brand_tagline}</p>
     </div>
     <div style="padding:40px;text-align:center;">
       <div style="width:64px;height:64px;border-radius:50%;background:#ecfdf5;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;">
@@ -133,8 +167,8 @@ function customerEmailHtml(order: OrderData): string {
       </div>
     </div>
     <div style="padding:24px 40px;background:#0a0a0a;text-align:center;">
-      <p style="margin:0 0 4px;color:#b8963e;font-size:13px;font-weight:600;">Kronos Premium Watch</p>
-      <p style="margin:0;color:#555;font-size:11px;">প্রিমিয়াম ক্রাফটসম্যানশিপ, অতুলনীয় ডিজাইন</p>
+      <p style="margin:0 0 4px;color:#b8963e;font-size:13px;font-weight:600;">${brand.brand_name}</p>
+      <p style="margin:0;color:#555;font-size:11px;">${brand.brand_tagline}</p>
     </div>
   </div>
 </body>
@@ -153,6 +187,7 @@ serve(async (req) => {
     }
 
     const order: OrderData = await req.json();
+    const brand = await fetchBrandInfo();
 
     // Send admin notification
     const adminRes = await fetch("https://api.resend.com/emails", {
@@ -162,10 +197,10 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "Kronos Orders <onboarding@resend.dev>",
+        from: `${brand.brand_name} Orders <onboarding@resend.dev>`,
         to: [ADMIN_EMAIL],
         subject: `🛒 নতুন অর্ডার — ${order.watch_model} (৳${order.total_price.toLocaleString("en-IN")})`,
-        html: adminEmailHtml(order),
+        html: adminEmailHtml(order, brand),
       }),
     });
 
@@ -184,10 +219,10 @@ serve(async (req) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: "Kronos Premium Watch <onboarding@resend.dev>",
+          from: `${brand.brand_name} <onboarding@resend.dev>`,
           to: [order.customer_email],
           subject: `ধন্যবাদ, ${order.customer_name}! আপনার অর্ডার নিশ্চিত হয়েছে ✓`,
-          html: customerEmailHtml(order),
+          html: customerEmailHtml(order, brand),
         }),
       });
       customerData = await customerRes.json();
