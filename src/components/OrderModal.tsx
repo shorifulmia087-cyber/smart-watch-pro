@@ -8,6 +8,8 @@ import { sanitizeForDisplay, isValidPhone, isBot } from '@/lib/security';
 import { useToast } from '@/hooks/use-toast';
 import { useTurnstile } from '@/hooks/useTurnstile';
 import { useFraudCheck, type FraudResult } from '@/hooks/useFraudCheck';
+import UpazilaCombobox from '@/components/UpazilaCombobox';
+import type { Upazila } from '@/data/bangladeshLocations';
 
 interface OrderModalProps {
   isOpen: boolean;
