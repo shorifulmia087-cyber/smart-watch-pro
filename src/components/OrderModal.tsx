@@ -363,11 +363,6 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
                     উপজেলা অনুযায়ী ডেলিভারি এলাকা অটোমেটিক নির্ধারিত। পরিবর্তন করতে উপজেলা বদলান।
                   </p>
                 )}
-                {location === 'outside' && (
-                  <motion.p initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="text-xs text-destructive mt-2 leading-relaxed bg-destructive/5 p-2 rounded-lg border border-destructive/10">
-                    ⚠️ ঢাকার বাইরে ডেলিভারির জন্য ২০০ টাকা অগ্রিম প্রদান করতে হবে।
-                  </motion.p>
-                )}
               </div>
 
               {/* Total */}
