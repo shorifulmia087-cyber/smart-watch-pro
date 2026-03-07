@@ -128,6 +128,7 @@ export const useUpdateOrderStatus = () => {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['orders'] });
       qc.invalidateQueries({ queryKey: ['orders_lite'] });
+      qc.invalidateQueries({ queryKey: ['orders_paginated'] });
     },
   });
 };
