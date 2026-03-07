@@ -455,7 +455,7 @@ const StatusBadge = ({ status }: { status: string }) => {
     pending: 'পেন্ডিং', processing: 'প্রসেসিং', shipped: 'শিপড', completed: 'সম্পন্ন', cancelled: 'ক্যানসেল', returned: 'রিটার্ন',
   };
   return (
-    <span className={`text-[10px] font-medium px-2.5 py-1 rounded-sm border ${styles[status] || 'bg-muted text-muted-foreground'}`}>
+    <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-sm border ${styles[status] || 'bg-muted text-muted-foreground'}`}>
       {labels[status] || status}
     </span>
   );
