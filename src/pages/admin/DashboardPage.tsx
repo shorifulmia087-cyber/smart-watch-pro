@@ -436,7 +436,7 @@ const StatCard = ({ icon: Icon, label, value, sub, variant, sparkData }: {
           </div>
         )}
       </div>
-      <p className="mt-2.5 text-2xl font-bold font-inter tracking-tight text-foreground">{value}</p>
+      <p className="mt-2.5 text-2xl font-bold font-inter tracking-tight text-foreground" style={{ fontWeight: 600 }}>{value}</p>
       <p className="text-[10px] text-muted-foreground mt-0.5">{label} · {sub}</p>
     </div>
   );
