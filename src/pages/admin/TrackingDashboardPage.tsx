@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useOrders } from '@/hooks/useSupabaseData';
+import { useOrdersLite } from '@/hooks/useSupabaseData';
 import { toBengaliNum, formatBengaliPrice } from '@/lib/bengali';
 import { Package, Truck, CheckCircle2, XCircle, RotateCcw, Clock, MapPin, TrendingUp } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -15,7 +15,7 @@ const statusConfig: Record<ShipmentStatus, { label: string; icon: typeof Package
 };
 
 const TrackingDashboardPage = () => {
-  const { data: orders, isLoading } = useOrders();
+  const { data: orders, isLoading } = useOrdersLite();
 
   const stats = useMemo(() => {
     if (!orders) return null;

@@ -1,4 +1,4 @@
-import { useOrders, useProducts } from '@/hooks/useSupabaseData';
+import { useOrdersLite, useProductsLite } from '@/hooks/useSupabaseData';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
 import { TrendingUp, ShoppingCart, Clock, DollarSign, Package, ArrowUpRight, CalendarIcon, Box, Truck, CheckCircle2, XCircle, AlertTriangle, RotateCcw, Calculator } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -24,8 +24,8 @@ const presets = [
 ] as const;
 
 const DashboardPage = () => {
-  const { data: orders, isLoading: ordersLoading } = useOrders();
-  const { data: products, isLoading: productsLoading } = useProducts();
+  const { data: orders, isLoading: ordersLoading } = useOrdersLite();
+  const { data: products, isLoading: productsLoading } = useProductsLite();
   const [activePreset, setActivePreset] = useState(1);
   const [dateRange, setDateRange] = useState<DateRange>({
     from: subDays(new Date(), 7),

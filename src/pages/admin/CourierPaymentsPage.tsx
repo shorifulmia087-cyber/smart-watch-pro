@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
-import { useOrders } from '@/hooks/useSupabaseData';
+import { useOrdersLite } from '@/hooks/useSupabaseData';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
 import { DollarSign, CheckCircle2, AlertTriangle, Truck, TrendingUp } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const CourierPaymentsPage = () => {
-  const { data: orders, isLoading } = useOrders();
+  const { data: orders, isLoading } = useOrdersLite();
 
   const stats = useMemo(() => {
     if (!orders) return null;

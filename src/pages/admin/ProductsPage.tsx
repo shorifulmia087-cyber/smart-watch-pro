@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { sanitizeForDisplay } from '@/lib/security';
 import {
-  useProducts, useUpsertProduct, useDeleteProduct, useToggleStock, useToggleFeatured,
+  useProducts, useProductsLite, useUpsertProduct, useDeleteProduct, useToggleStock, useToggleFeatured,
 } from '@/hooks/useSupabaseData';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
 import {
@@ -25,7 +25,7 @@ import { compressImage, generateThumbnail } from '@/lib/imageCompressor';
 const BUCKET = 'product-images';
 
 const ProductsPage = () => {
-  const { data: products, isLoading } = useProducts();
+  const { data: products, isLoading } = useProductsLite();
   const upsertProduct = useUpsertProduct();
   const deleteProduct = useDeleteProduct();
   const toggleStock = useToggleStock();

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useOrders } from '@/hooks/useSupabaseData';
+import { useOrdersLite } from '@/hooks/useSupabaseData';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
 import { Search, Banknote, CheckCircle2, Clock, CreditCard } from 'lucide-react';
 import AdminPagination from '@/components/admin/AdminPagination';
@@ -14,7 +14,7 @@ const paymentTypeLabels: Record<string, { text: string; style: string }> = {
 };
 
 const AdvancePaymentsPage = () => {
-  const { data: orders, isLoading } = useOrders();
+  const { data: orders, isLoading } = useOrdersLite();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(20);

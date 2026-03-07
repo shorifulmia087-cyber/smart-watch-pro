@@ -11,16 +11,16 @@ interface CompressOptions {
 }
 
 const DEFAULT_OPTIONS: CompressOptions = {
-  maxWidth: 1920,
-  maxHeight: 1920,
-  quality: 0.82,
+  maxWidth: 1200,
+  maxHeight: 1200,
+  quality: 0.80,
   format: 'webp',
 };
 
 const THUMBNAIL_OPTIONS: CompressOptions = {
-  maxWidth: 400,
-  maxHeight: 400,
-  quality: 0.75,
+  maxWidth: 300,
+  maxHeight: 300,
+  quality: 0.70,
   format: 'webp',
 };
 

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useOrders, useProducts } from '@/hooks/useSupabaseData';
+import { useOrdersLite, useProductsLite } from '@/hooks/useSupabaseData';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TrendingUp, Users, Wallet, Crown, MapPin, ArrowUp, ArrowDown, Minus, Package } from 'lucide-react';
@@ -19,8 +19,8 @@ const tooltipStyle = {
 };
 
 const AnalyticsPage = () => {
-  const { data: orders, isLoading: ordersLoading } = useOrders();
-  const { data: products, isLoading: productsLoading } = useProducts();
+  const { data: orders, isLoading: ordersLoading } = useOrdersLite();
+  const { data: products, isLoading: productsLoading } = useProductsLite();
   const [range, setRange] = useState<7 | 14 | 30 | 90>(30);
 
   const isLoading = ordersLoading || productsLoading;

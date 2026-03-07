@@ -10,19 +10,46 @@ type Product = Database['public']['Tables']['products']['Row'];
 type ProductInsert = Database['public']['Tables']['products']['Insert'];
 type Settings = Database['public']['Tables']['site_settings']['Row'];
 
-// Orders
+// ─── Lightweight column sets for bandwidth optimization ───
+
+const ORDER_LIST_COLUMNS = 'id,customer_name,phone,address,watch_model,quantity,total_price,delivery_charge,delivery_location,status,payment_method,payment_type,advance_amount,trx_id,selected_color,courier_booked,courier_provider,tracking_id,fraud_flag,fraud_success_rate,fraud_error_message,created_at' as const;
+
+const ORDER_STATS_COLUMNS = 'id,customer_name,phone,customer_email,watch_model,quantity,total_price,delivery_charge,delivery_location,status,payment_method,payment_type,advance_amount,courier_booked,courier_provider,created_at' as const;
+
+const PRODUCT_LIST_COLUMNS = 'id,name,subtitle,price,discount_percent,stock_status,is_featured,product_type,thumbnail_url,image_urls,sort_order,sourcing_cost' as const;
+
+// ─── Orders ───
+
+/** Full order list for admin table — paginated on client, lightweight columns */
 export const useOrders = (statusFilter?: OrderStatus) => {
   return useQuery({
     queryKey: ['orders', statusFilter],
     queryFn: async () => {
-      let query = supabase.from('orders').select('*').order('created_at', { ascending: false });
+      let query = supabase.from('orders').select(ORDER_LIST_COLUMNS).order('created_at', { ascending: false });
       if (statusFilter) query = query.eq('status', statusFilter);
       const { data, error } = await query;
       if (error) throw error;
       return data as Order[];
     },
-    staleTime: 10_000,
-    refetchInterval: 15_000,
+    staleTime: 30_000,
+    refetchInterval: 30_000,
+  });
+};
+
+/** Lightweight orders for Dashboard/Analytics/Customers aggregation */
+export const useOrdersLite = () => {
+  return useQuery({
+    queryKey: ['orders_lite'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('orders')
+        .select(ORDER_STATS_COLUMNS)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data as Order[];
+    },
+    staleTime: 60_000,
+    refetchInterval: 60_000,
   });
 };
 
@@ -47,11 +74,16 @@ export const useUpdateOrderStatus = () => {
       const { error } = await supabase.from('orders').update({ status }).eq('id', id);
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['orders'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['orders'] });
+      qc.invalidateQueries({ queryKey: ['orders_lite'] });
+    },
   });
 };
 
-// Products
+// ─── Products ───
+
+/** Full product data for edit forms */
 export const useProducts = () => {
   return useQuery({
     queryKey: ['products'],
@@ -60,8 +92,25 @@ export const useProducts = () => {
       if (error) throw error;
       return data as Product[];
     },
-    staleTime: 30_000,
-    refetchInterval: 60_000,
+    staleTime: 60_000,
+    refetchInterval: 120_000,
+  });
+};
+
+/** Lightweight product list for admin table & dashboard */
+export const useProductsLite = () => {
+  return useQuery({
+    queryKey: ['products_lite'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('products')
+        .select(PRODUCT_LIST_COLUMNS)
+        .order('sort_order');
+      if (error) throw error;
+      return data as Product[];
+    },
+    staleTime: 60_000,
+    refetchInterval: 120_000,
   });
 };
 
@@ -73,8 +122,8 @@ export const useFeaturedProduct = () => {
       if (error) throw error;
       return data as Product | null;
     },
-    staleTime: 30_000,
-    refetchInterval: 60_000,
+    staleTime: 60_000,
+    refetchInterval: 120_000,
   });
 };
 
@@ -86,7 +135,10 @@ export const useUpsertProduct = () => {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['products'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['products'] });
+      qc.invalidateQueries({ queryKey: ['products_lite'] });
+    },
   });
 };
 
@@ -97,7 +149,10 @@ export const useDeleteProduct = () => {
       const { error } = await supabase.from('products').delete().eq('id', id);
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['products'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['products'] });
+      qc.invalidateQueries({ queryKey: ['products_lite'] });
+    },
   });
 };
 
@@ -108,7 +163,10 @@ export const useToggleStock = () => {
       const { error } = await supabase.from('products').update({ stock_status }).eq('id', id);
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['products'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['products'] });
+      qc.invalidateQueries({ queryKey: ['products_lite'] });
+    },
   });
 };
 
@@ -116,18 +174,21 @@ export const useToggleFeatured = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, is_featured }: { id: string; is_featured: boolean }) => {
-      // If setting as featured, unfeatured all others first
       if (is_featured) {
         await supabase.from('products').update({ is_featured: false }).neq('id', id);
       }
       const { error } = await supabase.from('products').update({ is_featured }).eq('id', id);
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['products'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['products'] });
+      qc.invalidateQueries({ queryKey: ['products_lite'] });
+    },
   });
 };
 
-// Settings
+// ─── Settings ───
+
 export const useSettings = () => {
   return useQuery({
     queryKey: ['settings'],
@@ -136,8 +197,8 @@ export const useSettings = () => {
       if (error) throw error;
       return data as Settings;
     },
-    staleTime: 60_000,
-    refetchInterval: 120_000,
+    staleTime: 120_000,
+    refetchInterval: 300_000,
   });
 };
 
@@ -154,7 +215,8 @@ export const useUpdateSettings = () => {
   });
 };
 
-// Review Images
+// ─── Review Images ───
+
 export const useReviewImages = () => {
   return useQuery({
     queryKey: ['review_images'],
@@ -163,7 +225,7 @@ export const useReviewImages = () => {
       if (error) throw error;
       return data as unknown as { id: string; image_url: string; sort_order: number; created_at: string }[];
     },
-    staleTime: 60_000,
+    staleTime: 120_000,
   });
 };
 
@@ -171,7 +233,6 @@ export const useUploadReviewImage = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ file, sort_order }: { file: File; sort_order: number }) => {
-      // Compress to WebP before uploading
       const compressed = await compressImage(file);
       const ext = compressed.name.split('.').pop() || 'webp';
       const filePath = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
