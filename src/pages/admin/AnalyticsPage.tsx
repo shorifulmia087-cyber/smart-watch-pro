@@ -321,9 +321,9 @@ const AnalyticsPage = () => {
                   <Tooltip contentStyle={tooltipStyle} formatter={(value: number) => [`${toBengaliNum(value)} অর্ডার`, '']} />
                 </PieChart>
               </ResponsiveContainer>
-              <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-3">
+              <div className="flex flex-wrap gap-x-4 gap-y-2 mt-3">
                 {cityData.map((d, i) => (
-                  <span key={d.name} className="text-[11px] text-muted-foreground flex items-center gap-1.5">
+                  <span key={d.name} className="text-sm tracking-wide text-muted-foreground flex items-center gap-1.5" style={{ letterSpacing: '0.02em' }}>
                     <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: COLORS[i % COLORS.length] }} />
                     {d.name} ({toBengaliNum(d.value)})
                   </span>
