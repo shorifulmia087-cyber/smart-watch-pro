@@ -8,6 +8,8 @@ import { sanitizeForDisplay, isValidPhone, isBot } from '@/lib/security';
 import { useTurnstile } from '@/hooks/useTurnstile';
 import { Loader2, Check } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import UpazilaCombobox from '@/components/UpazilaCombobox';
+import type { Upazila } from '@/data/bangladeshLocations';
 
 const StickyOrderForm = () => {
   const [name, setName] = useState('');
@@ -17,6 +19,7 @@ const StickyOrderForm = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [honeypot, setHoneypot] = useState('');
+  const [selectedUpazila, setSelectedUpazila] = useState<Upazila | null>(null);
   const { data: settings } = useSettings();
   const { data: product } = useFeaturedProduct();
   const createOrder = useSecureOrder();
@@ -41,6 +44,7 @@ const StickyOrderForm = () => {
 
     if (!cleanName || !cleanPhone || !cleanAddress || !product) return;
     if (!isValidPhone(cleanPhone)) { toast({ title: 'সঠিক মোবাইল নম্বর দিন', variant: 'destructive' }); return; }
+    if (!selectedUpazila) { toast({ title: 'উপজেলা নির্বাচন করুন', variant: 'destructive' }); return; }
 
     if (turnstileEnabled && !turnstileToken) {
       toast({ title: 'ভেরিফিকেশন প্রয়োজন', description: '"আমি রোবট নই" চেকবক্স ক্লিক করুন।', variant: 'destructive' });
@@ -56,9 +60,12 @@ const StickyOrderForm = () => {
         turnstile_token: turnstileToken,
         payment_type: 'cod',
         advance_amount: 0,
+        upazila: selectedUpazila.name,
+        district: selectedUpazila.district,
+        division: selectedUpazila.division,
       });
       setSuccess(true);
-      setName(''); setPhone(''); setAddress(''); setHoneypot('');
+      setName(''); setPhone(''); setAddress(''); setHoneypot(''); setSelectedUpazila(null);
       resetTurnstile();
       setTimeout(() => setSuccess(false), 3000);
     } catch {
@@ -123,9 +130,18 @@ const StickyOrderForm = () => {
               </div>
               <textarea
                 value={address} onChange={e => setAddress(e.target.value)} required
-                placeholder="সম্পূর্ণ ঠিকানা (বাড়ি, এলাকা, জেলা) *" rows={2} maxLength={500}
+                placeholder="বিস্তারিত ঠিকানা (বাড়ি, রোড, এলাকা) *" rows={2} maxLength={500}
                 className="w-full bg-transparent border border-border/60 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/20 focus:border-gold/40 transition-all resize-none placeholder:text-muted-foreground"
               />
+
+              {/* Upazila Selector */}
+              <UpazilaCombobox value={selectedUpazila} onChange={setSelectedUpazila} />
+              {selectedUpazila && (
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <span className="px-2 py-0.5 rounded bg-gold/5 border border-gold/10 text-gold">{selectedUpazila.district}</span>
+                  <span className="px-2 py-0.5 rounded bg-muted/30 border border-border/30">{selectedUpazila.division} বিভাগ</span>
+                </div>
+              )}
               
               {/* Honeypot */}
               <div className="absolute left-[-9999px] top-[-9999px]" aria-hidden="true" tabIndex={-1}>

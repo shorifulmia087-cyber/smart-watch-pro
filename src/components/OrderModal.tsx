@@ -8,6 +8,8 @@ import { sanitizeForDisplay, isValidPhone, isBot } from '@/lib/security';
 import { useToast } from '@/hooks/use-toast';
 import { useTurnstile } from '@/hooks/useTurnstile';
 import { useFraudCheck, type FraudResult } from '@/hooks/useFraudCheck';
+import UpazilaCombobox from '@/components/UpazilaCombobox';
+import type { Upazila } from '@/data/bangladeshLocations';
 
 interface OrderModalProps {
   isOpen: boolean;
@@ -29,6 +31,7 @@ interface FormErrors {
   address?: string;
   color?: string;
   txnId?: string;
+  upazila?: string;
 }
 
 const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInside = 70, deliveryChargeOutside = 150, onlinePaymentEnabled = true, bkashNumber = '', nagadNumber = '', rocketNumber = '', availableColors = [] }: OrderModalProps) => {
@@ -46,6 +49,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
   const [location, setLocation] = useState<'dhaka' | 'outside'>('dhaka');
   const [selectedColor, setSelectedColor] = useState('');
   const [errors, setErrors] = useState<FormErrors>({});
+  const [selectedUpazila, setSelectedUpazila] = useState<Upazila | null>(null);
   const [touched, setTouched] = useState(false);
   const [honeypot, setHoneypot] = useState('');
   const [honeypot2, setHoneypot2] = useState('');
@@ -58,7 +62,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
 
   useEffect(() => {
     if (!isOpen) {
-      setQty(1); setTab('cod'); setPaymentType('delivery_charge_only'); setName(''); setEmail(''); setPhone(''); setAddress(''); setTxnId(''); setLoading(false); setSuccess(false); setLocation('dhaka'); setHoneypot(''); setHoneypot2(''); setSelectedColor(''); setErrors({}); setTouched(false);
+      setQty(1); setTab('cod'); setPaymentType('delivery_charge_only'); setName(''); setEmail(''); setPhone(''); setAddress(''); setTxnId(''); setLoading(false); setSuccess(false); setLocation('dhaka'); setHoneypot(''); setHoneypot2(''); setSelectedColor(''); setErrors({}); setTouched(false); setSelectedUpazila(null);
       resetFraud(); fraudCheckedRef.current = '';
     }
   }, [isOpen]);
@@ -84,6 +88,8 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
 
     if (availableColors.length > 0 && !selectedColor) errs.color = 'একটি কালার সিলেক্ট করুন';
 
+    if (!selectedUpazila) errs.upazila = 'উপজেলা নির্বাচন করুন';
+
     if (tab === 'online') {
       const requiredLen = payMethod === 'bkash' ? 10 : payMethod === 'nagad' ? 8 : 10;
       if (!txnId) errs.txnId = 'ট্রানজেকশন আইডি দিন';
@@ -94,7 +100,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
     }
 
     return errs;
-  }, [name, phone, address, selectedColor, availableColors, tab, payMethod, txnId]);
+  }, [name, phone, address, selectedColor, availableColors, tab, payMethod, txnId, selectedUpazila]);
 
   useEffect(() => {
     if (touched) {
@@ -168,6 +174,9 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
         turnstile_token: turnstileToken,
         payment_type: tab === 'cod' ? 'cod' : paymentType,
         advance_amount: advanceAmount,
+        upazila: selectedUpazila?.name ?? null,
+        district: selectedUpazila?.district ?? null,
+        division: selectedUpazila?.division ?? null,
         fraud_total_parcels: fraudResult?.total_parcels ?? undefined,
         fraud_total_delivered: fraudResult?.total_delivered ?? undefined,
         fraud_total_cancel: fraudResult?.total_cancel ?? undefined,
@@ -386,8 +395,20 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
                 )}
               </div>
               <div>
-                <textarea value={address} onChange={(e) => setAddress(e.target.value)} placeholder="সম্পূর্ণ ঠিকানা *" rows={2} className={`w-full bg-transparent border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/20 focus:border-gold/40 transition-all resize-none ${touched && errors.address ? 'border-destructive/60 bg-destructive/5' : 'border-border/60'}`} maxLength={500} />
+                <textarea value={address} onChange={(e) => setAddress(e.target.value)} placeholder="বিস্তারিত ঠিকানা (বাড়ি, রোড, এলাকা) *" rows={2} className={`w-full bg-transparent border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/20 focus:border-gold/40 transition-all resize-none ${touched && errors.address ? 'border-destructive/60 bg-destructive/5' : 'border-border/60'}`} maxLength={500} />
                 <ErrorMessage error={errors.address} />
+              </div>
+
+              {/* Upazila Selector */}
+              <div>
+                <UpazilaCombobox value={selectedUpazila} onChange={setSelectedUpazila} hasError={touched && !!errors.upazila} />
+                <ErrorMessage error={errors.upazila} />
+                {selectedUpazila && (
+                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-1.5 flex items-center gap-2 text-xs text-muted-foreground">
+                    <span className="px-2 py-0.5 rounded bg-gold/5 border border-gold/10 text-gold">{selectedUpazila.district}</span>
+                    <span className="px-2 py-0.5 rounded bg-muted/30 border border-border/30">{selectedUpazila.division} বিভাগ</span>
+                  </motion.div>
+                )}
               </div>
               
               {/* Color Selection */}

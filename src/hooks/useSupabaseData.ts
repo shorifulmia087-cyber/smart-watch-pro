@@ -12,9 +12,9 @@ type Settings = Database['public']['Tables']['site_settings']['Row'];
 
 // ─── Lightweight column sets for bandwidth optimization ───
 
-const ORDER_LIST_COLUMNS = 'id,customer_name,phone,address,watch_model,quantity,total_price,delivery_charge,delivery_location,status,payment_method,payment_type,advance_amount,trx_id,selected_color,courier_booked,courier_provider,tracking_id,fraud_flag,fraud_success_rate,fraud_error_message,created_at' as const;
+const ORDER_LIST_COLUMNS = 'id,customer_name,phone,address,watch_model,quantity,total_price,delivery_charge,delivery_location,status,payment_method,payment_type,advance_amount,trx_id,selected_color,courier_booked,courier_provider,tracking_id,fraud_flag,fraud_success_rate,fraud_error_message,upazila,district,division,created_at' as const;
 
-const ORDER_STATS_COLUMNS = 'id,customer_name,phone,customer_email,watch_model,quantity,total_price,delivery_charge,delivery_location,status,payment_method,payment_type,advance_amount,courier_booked,courier_provider,created_at' as const;
+const ORDER_STATS_COLUMNS = 'id,customer_name,phone,customer_email,watch_model,quantity,total_price,delivery_charge,delivery_location,status,payment_method,payment_type,advance_amount,courier_booked,courier_provider,division,district,created_at' as const;
 
 const PRODUCT_LIST_COLUMNS = 'id,name,subtitle,price,discount_percent,stock_status,is_featured,product_type,thumbnail_url,image_urls,sort_order,sourcing_cost' as const;
 

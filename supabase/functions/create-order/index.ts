@@ -16,6 +16,7 @@ Deno.serve(async (req) => {
       customer_name, customer_email, phone, address, watch_model,
       quantity, payment_method, trx_id, delivery_location,
       selected_color, turnstile_token, payment_type, advance_amount,
+      upazila, district, division,
       fraud_total_parcels, fraud_total_delivered, fraud_total_cancel,
       fraud_success_rate, fraud_flag, fraud_error_message,
     } = body
@@ -27,7 +28,7 @@ Deno.serve(async (req) => {
     if (!phone || !/^01[3-9]\d{8}$/.test(phone.replace(/[\s-]/g, ''))) {
       return new Response(JSON.stringify({ error: 'Invalid phone' }), { status: 400, headers: corsHeaders })
     }
-    if (!address || typeof address !== 'string' || address.trim().length < 10) {
+    if (!address || typeof address !== 'string' || address.trim().length < 5) {
       return new Response(JSON.stringify({ error: 'Invalid address' }), { status: 400, headers: corsHeaders })
     }
     if (!watch_model || typeof watch_model !== 'string') {
@@ -41,6 +42,12 @@ Deno.serve(async (req) => {
     }
     if (!['dhaka', 'outside'].includes(delivery_location)) {
       return new Response(JSON.stringify({ error: 'Invalid delivery location' }), { status: 400, headers: corsHeaders })
+    }
+
+    // Validate location strings (sanitize only, not required)
+    const sanitizeStr = (s: unknown): string | null => {
+      if (typeof s !== 'string' || !s.trim()) return null;
+      return s.replace(/<[^>]*>/g, '').trim().substring(0, 100);
     }
 
     // === Cloudflare Turnstile verification ===
@@ -138,6 +145,9 @@ Deno.serve(async (req) => {
       selected_color: selected_color || null,
       payment_type: resolvedPaymentType,
       advance_amount: resolvedAdvanceAmount,
+      upazila: sanitizeStr(upazila),
+      district: sanitizeStr(district),
+      division: sanitizeStr(division),
       fraud_total_parcels: typeof fraud_total_parcels === 'number' ? fraud_total_parcels : null,
       fraud_total_delivered: typeof fraud_total_delivered === 'number' ? fraud_total_delivered : null,
       fraud_total_cancel: typeof fraud_total_cancel === 'number' ? fraud_total_cancel : null,

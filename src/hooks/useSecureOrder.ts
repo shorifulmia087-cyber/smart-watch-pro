@@ -15,6 +15,9 @@ interface SecureOrderData {
   turnstile_token?: string | null;
   payment_type?: string;
   advance_amount?: number;
+  upazila?: string | null;
+  district?: string | null;
+  division?: string | null;
   fraud_total_parcels?: number;
   fraud_total_delivered?: number;
   fraud_total_cancel?: number;

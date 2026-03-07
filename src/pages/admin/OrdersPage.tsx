@@ -686,6 +686,13 @@ const OrdersPage = () => {
                       </TableCell>
                       <TableCell className="whitespace-nowrap text-sm text-muted-foreground max-w-[250px]">
                         <p className="truncate">{o.address}</p>
+                        {((o as any).upazila || (o as any).district) && (
+                          <p className="text-[10px] text-muted-foreground/70 truncate mt-0.5">
+                            {(o as any).upazila && <span>{(o as any).upazila}</span>}
+                            {(o as any).district && <span>, {(o as any).district}</span>}
+                            {(o as any).division && <span> ({(o as any).division})</span>}
+                          </p>
+                        )}
                       </TableCell>
                       <TableCell className="font-inter text-sm tabular-nums text-foreground whitespace-nowrap">
                         <div className="flex items-center gap-1.5">
