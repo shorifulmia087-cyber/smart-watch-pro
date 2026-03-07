@@ -22,7 +22,7 @@ const Navbar = () => {
   const { data: settings } = useSettings();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const brandName = settings?.brand_name || 'Kronos';
+  const brandName = settings?.brand_name || '';
   const logoUrl = (settings as any)?.logo_url;
 
   const handleMyOrders = () => {

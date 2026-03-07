@@ -15,7 +15,8 @@ const AdminLogin = () => {
   const [success, setSuccess] = useState('');
   const { checkLimit } = useRateLimit({ maxAttempts: 5, windowMs: 300_000 });
   const { data: settings } = useSettings();
-  const brandName = settings?.brand_name?.trim() || 'Kronos';
+  const brandName = settings?.brand_name?.trim();
+  const isLoading = !settings;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,7 +49,7 @@ const AdminLogin = () => {
     <div className="min-h-screen bg-surface flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-foreground">{brandName} Admin</h1>
+          <h1 className="text-2xl font-bold text-foreground">{isLoading ? '\u00A0' : `${brandName} Admin`}</h1>
           <p className="text-muted-foreground text-sm mt-1">
             {mode === 'login' ? 'অ্যাডমিন প্যানেলে লগইন করুন' : 'নতুন অ্যাকাউন্ট তৈরি করুন'}
           </p>
