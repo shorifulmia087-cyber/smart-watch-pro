@@ -35,9 +35,9 @@ interface OrdersPaginatedResult {
 }
 
 /** Server-side paginated orders for the Orders admin table */
-export const useOrdersPaginated = ({ page, pageSize, statusFilter, paymentFilter, search }: OrdersPaginatedParams) => {
+export const useOrdersPaginated = ({ page, pageSize, statusFilter, paymentFilter, courierFilter, search }: OrdersPaginatedParams) => {
   return useQuery({
-    queryKey: ['orders_paginated', page, pageSize, statusFilter, paymentFilter, search],
+    queryKey: ['orders_paginated', page, pageSize, statusFilter, paymentFilter, courierFilter, search],
     queryFn: async (): Promise<OrdersPaginatedResult> => {
       const from = page * pageSize;
       const to = from + pageSize - 1;
