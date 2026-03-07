@@ -25,6 +25,7 @@ interface OrdersPaginatedParams {
   pageSize: number;
   statusFilter?: OrderStatus;
   paymentFilter?: 'cod' | 'online';
+  courierFilter?: 'redx' | 'pathao' | 'steadfast';
   search?: string;
 }
 
@@ -34,9 +35,9 @@ interface OrdersPaginatedResult {
 }
 
 /** Server-side paginated orders for the Orders admin table */
-export const useOrdersPaginated = ({ page, pageSize, statusFilter, paymentFilter, search }: OrdersPaginatedParams) => {
+export const useOrdersPaginated = ({ page, pageSize, statusFilter, paymentFilter, courierFilter, search }: OrdersPaginatedParams) => {
   return useQuery({
-    queryKey: ['orders_paginated', page, pageSize, statusFilter, paymentFilter, search],
+    queryKey: ['orders_paginated', page, pageSize, statusFilter, paymentFilter, courierFilter, search],
     queryFn: async (): Promise<OrdersPaginatedResult> => {
       const from = page * pageSize;
       const to = from + pageSize - 1;
@@ -52,6 +53,10 @@ export const useOrdersPaginated = ({ page, pageSize, statusFilter, paymentFilter
         query = query.eq('payment_method', 'cod');
       } else if (paymentFilter === 'online') {
         query = query.neq('payment_method', 'cod');
+      }
+
+      if (courierFilter) {
+        query = query.eq('courier_provider', courierFilter);
       }
 
       if (search?.trim()) {

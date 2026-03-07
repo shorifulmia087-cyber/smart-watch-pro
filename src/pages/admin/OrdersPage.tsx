@@ -208,6 +208,7 @@ const FraudCheckModal = ({ phone, onClose }: { phone: string; onClose: () => voi
 const OrdersPage = () => {
   const [filter, setFilter] = useState<OrderStatus | undefined>();
   const [paymentFilter, setPaymentFilter] = useState<'cod' | 'online' | undefined>();
+  const [courierFilterState, setCourierFilterState] = useState<'redx' | 'pathao' | 'steadfast' | undefined>();
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [page, setPage] = useState(0);
@@ -231,6 +232,7 @@ const OrdersPage = () => {
     pageSize,
     statusFilter: filter,
     paymentFilter,
+    courierFilter: courierFilterState,
     search: debouncedSearch,
   });
 
@@ -593,6 +595,27 @@ const OrdersPage = () => {
                 }`}
               >
                 {f === 'cod' ? 'ক্যাশ অন ডেলিভারি' : f === 'online' ? 'অনলাইন পেমেন্ট' : 'সব'}
+              </button>
+            ))}
+          </div>
+
+          {/* Courier Filter */}
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <div className="flex items-center gap-1.5 mr-1">
+              <Truck className="h-3.5 w-3.5 text-muted-foreground/50" />
+              <span className="text-[10px] text-muted-foreground/50 uppercase tracking-widest font-semibold">কুরিয়ার:</span>
+            </div>
+            {[undefined, 'redx', 'pathao', 'steadfast'].map((f) => (
+              <button
+                key={f ?? 'all'}
+                onClick={() => { setCourierFilterState(f as 'redx' | 'pathao' | 'steadfast' | undefined); setPage(0); }}
+                className={`px-3.5 py-1.5 rounded-sm text-xs font-medium transition-all duration-200 border ${
+                  courierFilterState === f
+                    ? 'gradient-gold text-white border-transparent shadow-sm'
+                    : 'bg-muted/15 dark:bg-muted/10 text-muted-foreground border-border/30 hover:border-gold/30 hover:text-gold'
+                }`}
+              >
+                {f === 'redx' ? 'RedX' : f === 'pathao' ? 'Pathao' : f === 'steadfast' ? 'Steadfast' : 'সব'}
               </button>
             ))}
           </div>

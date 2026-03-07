@@ -54,7 +54,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
   // Auto-detect delivery zone from division
   useEffect(() => {
     if (selectedUpazila) {
-      setLocation(selectedUpazila.division === 'ঢাকা' ? 'dhaka' : 'outside');
+      setLocation(selectedUpazila.district === 'ঢাকা' ? 'dhaka' : 'outside');
     }
   }, [selectedUpazila]);
   const [touched, setTouched] = useState(false);
