@@ -156,15 +156,28 @@ const StickyOrderForm = () => {
               </div>
 
               <div className="flex gap-2">
-                <button type="button" onClick={() => setLocation('dhaka')}
-                  className={`flex-1 py-2.5 rounded-xl border text-sm font-medium transition-all ${location === 'dhaka' ? 'border-gold bg-gold/10 text-gold' : 'border-border/60 text-muted-foreground hover:border-border'}`}>
+                <button
+                  type="button"
+                  onClick={() => setLocation('dhaka')}
+                  disabled={!!selectedUpazila}
+                  className={`flex-1 py-2.5 rounded-xl border text-sm font-medium transition-all ${location === 'dhaka' ? 'border-gold bg-gold/10 text-gold' : 'border-border/60 text-muted-foreground hover:border-border'} ${selectedUpazila ? 'opacity-60 cursor-not-allowed' : ''}`}
+                >
                   ঢাকা (৳{toBengaliNum(settings?.delivery_charge_inside ?? 70)})
                 </button>
-                <button type="button" onClick={() => setLocation('outside')}
-                  className={`flex-1 py-2.5 rounded-xl border text-sm font-medium transition-all ${location === 'outside' ? 'border-gold bg-gold/10 text-gold' : 'border-border/60 text-muted-foreground hover:border-border'}`}>
+                <button
+                  type="button"
+                  onClick={() => setLocation('outside')}
+                  disabled={!!selectedUpazila}
+                  className={`flex-1 py-2.5 rounded-xl border text-sm font-medium transition-all ${location === 'outside' ? 'border-gold bg-gold/10 text-gold' : 'border-border/60 text-muted-foreground hover:border-border'} ${selectedUpazila ? 'opacity-60 cursor-not-allowed' : ''}`}
+                >
                   বাইরে (৳{toBengaliNum(settings?.delivery_charge_outside ?? 150)})
                 </button>
               </div>
+              {selectedUpazila && (
+                <p className="text-xs text-muted-foreground">
+                  উপজেলা অনুযায়ী ডেলিভারি এলাকা অটোমেটিক সেট হয়েছে। পরিবর্তন করতে উপজেলা বদলান।
+                </p>
+              )}
               {turnstileEnabled && (
                 <div ref={turnstileRef} className="flex justify-center" />
               )}

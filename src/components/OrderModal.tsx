@@ -343,13 +343,26 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
               <div className="border-t border-border/60 pt-3">
                 <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium mb-2">ডেলিভারি এলাকা</p>
                 <div className="flex gap-2">
-                  <button onClick={() => setLocation('dhaka')} className={`flex-1 py-2.5 rounded-xl border text-sm font-medium transition-all ${location === 'dhaka' ? 'border-gold bg-gold/10 text-gold shadow-sm' : 'border-border/60 bg-surface text-muted-foreground hover:border-border'}`}>
+                  <button
+                    onClick={() => setLocation('dhaka')}
+                    disabled={!!selectedUpazila}
+                    className={`flex-1 py-2.5 rounded-xl border text-sm font-medium transition-all ${location === 'dhaka' ? 'border-gold bg-gold/10 text-gold shadow-sm' : 'border-border/60 bg-surface text-muted-foreground hover:border-border'} ${selectedUpazila ? 'opacity-60 cursor-not-allowed' : ''}`}
+                  >
                     ঢাকার ভেতরে
                   </button>
-                  <button onClick={() => setLocation('outside')} className={`flex-1 py-2.5 rounded-xl border text-sm font-medium transition-all ${location === 'outside' ? 'border-gold bg-gold/10 text-gold shadow-sm' : 'border-border/60 bg-surface text-muted-foreground hover:border-border'}`}>
+                  <button
+                    onClick={() => setLocation('outside')}
+                    disabled={!!selectedUpazila}
+                    className={`flex-1 py-2.5 rounded-xl border text-sm font-medium transition-all ${location === 'outside' ? 'border-gold bg-gold/10 text-gold shadow-sm' : 'border-border/60 bg-surface text-muted-foreground hover:border-border'} ${selectedUpazila ? 'opacity-60 cursor-not-allowed' : ''}`}
+                  >
                     ঢাকার বাইরে
                   </button>
                 </div>
+                {selectedUpazila && (
+                  <p className="text-xs text-muted-foreground mt-2">
+                    উপজেলা অনুযায়ী ডেলিভারি এলাকা অটোমেটিক নির্ধারিত। পরিবর্তন করতে উপজেলা বদলান।
+                  </p>
+                )}
                 {location === 'outside' && (
                   <motion.p initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="text-xs text-destructive mt-2 leading-relaxed bg-destructive/5 p-2 rounded-lg border border-destructive/10">
                     ⚠️ ঢাকার বাইরে ডেলিভারির জন্য ২০০ টাকা অগ্রিম প্রদান করতে হবে।
