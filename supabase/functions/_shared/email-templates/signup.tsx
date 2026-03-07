@@ -11,6 +11,7 @@ import {
   Html,
   Link,
   Preview,
+  Section,
   Text,
 } from 'npm:@react-email/components@0.0.22'
 
@@ -27,32 +28,40 @@ export const SignupEmail = ({
   recipient,
   confirmationUrl,
 }: SignupEmailProps) => (
-  <Html lang="en" dir="ltr">
+  <Html lang="bn" dir="ltr">
     <Head />
-    <Preview>Confirm your email for {siteName}</Preview>
+    <Preview>{siteName} — ইমেইল যাচাই করুন</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Heading style={h1}>Confirm your email</Heading>
-        <Text style={text}>
-          Thanks for signing up for{' '}
-          <Link href={siteUrl} style={link}>
-            <strong>{siteName}</strong>
-          </Link>
-          !
-        </Text>
-        <Text style={text}>
-          Please confirm your email address (
-          <Link href={`mailto:${recipient}`} style={link}>
-            {recipient}
-          </Link>
-          ) by clicking the button below:
-        </Text>
-        <Button style={button} href={confirmationUrl}>
-          Verify Email
-        </Button>
-        <Text style={footer}>
-          If you didn't create an account, you can safely ignore this email.
-        </Text>
+        <Section style={header}>
+          <Heading style={brandName}>{siteName}</Heading>
+          <Text style={brandTagline}>প্রিমিয়াম ক্রাফটসম্যানশিপ</Text>
+        </Section>
+        <Section style={content}>
+          <Heading style={h1}>ইমেইল যাচাই করুন</Heading>
+          <Text style={text}>
+            <Link href={siteUrl} style={link}>
+              <strong>{siteName}</strong>
+            </Link>{' '}
+            -এ অ্যাকাউন্ট তৈরি করার জন্য ধন্যবাদ!
+          </Text>
+          <Text style={text}>
+            আপনার ইমেইল অ্যাড্রেস (
+            <Link href={`mailto:${recipient}`} style={link}>
+              {recipient}
+            </Link>
+            ) যাচাই করতে নিচের বাটনে ক্লিক করুন:
+          </Text>
+          <Button style={button} href={confirmationUrl}>
+            ইমেইল যাচাই করুন
+          </Button>
+          <Text style={footer}>
+            আপনি যদি এই অ্যাকাউন্ট তৈরি না করে থাকেন, তাহলে এই ইমেইল উপেক্ষা করতে পারেন।
+          </Text>
+        </Section>
+        <Section style={bottomBar}>
+          <Text style={bottomText}>{siteName}</Text>
+        </Section>
       </Container>
     </Body>
   </Html>
@@ -60,27 +69,16 @@ export const SignupEmail = ({
 
 export default SignupEmail
 
-const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
-const container = { padding: '20px 25px' }
-const h1 = {
-  fontSize: '22px',
-  fontWeight: 'bold' as const,
-  color: '#000000',
-  margin: '0 0 20px',
-}
-const text = {
-  fontSize: '14px',
-  color: '#55575d',
-  lineHeight: '1.5',
-  margin: '0 0 25px',
-}
-const link = { color: 'inherit', textDecoration: 'underline' }
-const button = {
-  backgroundColor: '#000000',
-  color: '#ffffff',
-  fontSize: '14px',
-  borderRadius: '8px',
-  padding: '12px 20px',
-  textDecoration: 'none',
-}
+const main = { backgroundColor: '#ffffff', fontFamily: "'Noto Sans Bengali', Arial, sans-serif" }
+const container = { maxWidth: '560px', margin: '0 auto', borderRadius: '16px', overflow: 'hidden' as const, boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }
+const header = { backgroundColor: '#0a0a0a', padding: '32px 40px', textAlign: 'center' as const }
+const brandName = { margin: '0', color: '#b8963e', fontSize: '22px', fontWeight: '700' as const, letterSpacing: '0.5px' }
+const brandTagline = { margin: '6px 0 0', color: '#666666', fontSize: '12px', letterSpacing: '2px' }
+const content = { padding: '40px' }
+const h1 = { fontSize: '22px', fontWeight: '700' as const, color: '#0a0a0a', margin: '0 0 20px' }
+const text = { fontSize: '14px', color: '#55575d', lineHeight: '1.6', margin: '0 0 25px' }
+const link = { color: '#b8963e', textDecoration: 'underline' }
+const button = { backgroundColor: '#0a0a0a', color: '#ffffff', fontSize: '14px', borderRadius: '12px', padding: '14px 28px', textDecoration: 'none', fontWeight: '600' as const }
 const footer = { fontSize: '12px', color: '#999999', margin: '30px 0 0' }
+const bottomBar = { backgroundColor: '#0a0a0a', padding: '16px 40px', textAlign: 'center' as const }
+const bottomText = { margin: '0', color: '#b8963e', fontSize: '12px', fontWeight: '600' as const }

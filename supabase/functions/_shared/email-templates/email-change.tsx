@@ -11,6 +11,7 @@ import {
   Html,
   Link,
   Preview,
+  Section,
   Text,
 } from 'npm:@react-email/components@0.0.22'
 
@@ -27,33 +28,36 @@ export const EmailChangeEmail = ({
   newEmail,
   confirmationUrl,
 }: EmailChangeEmailProps) => (
-  <Html lang="en" dir="ltr">
+  <Html lang="bn" dir="ltr">
     <Head />
-    <Preview>Confirm your email change for {siteName}</Preview>
+    <Preview>{siteName} — ইমেইল পরিবর্তন নিশ্চিত করুন</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Heading style={h1}>Confirm your email change</Heading>
-        <Text style={text}>
-          You requested to change your email address for {siteName} from{' '}
-          <Link href={`mailto:${email}`} style={link}>
-            {email}
-          </Link>{' '}
-          to{' '}
-          <Link href={`mailto:${newEmail}`} style={link}>
-            {newEmail}
-          </Link>
-          .
-        </Text>
-        <Text style={text}>
-          Click the button below to confirm this change:
-        </Text>
-        <Button style={button} href={confirmationUrl}>
-          Confirm Email Change
-        </Button>
-        <Text style={footer}>
-          If you didn't request this change, please secure your account
-          immediately.
-        </Text>
+        <Section style={header}>
+          <Heading style={brandName}>{siteName}</Heading>
+        </Section>
+        <Section style={content}>
+          <Heading style={h1}>ইমেইল পরিবর্তন নিশ্চিত করুন</Heading>
+          <Text style={text}>
+            আপনি আপনার {siteName} অ্যাকাউন্টের ইমেইল{' '}
+            <Link href={`mailto:${email}`} style={link}>{email}</Link>{' '}
+            থেকে{' '}
+            <Link href={`mailto:${newEmail}`} style={link}>{newEmail}</Link>{' '}
+            -এ পরিবর্তন করতে চেয়েছেন।
+          </Text>
+          <Text style={text}>
+            এই পরিবর্তন নিশ্চিত করতে নিচের বাটনে ক্লিক করুন:
+          </Text>
+          <Button style={button} href={confirmationUrl}>
+            ইমেইল পরিবর্তন নিশ্চিত করুন
+          </Button>
+          <Text style={footer}>
+            আপনি যদি এই পরিবর্তন অনুরোধ না করে থাকেন, অনুগ্রহ করে আপনার অ্যাকাউন্ট সুরক্ষিত করুন।
+          </Text>
+        </Section>
+        <Section style={bottomBar}>
+          <Text style={bottomText}>{siteName}</Text>
+        </Section>
       </Container>
     </Body>
   </Html>
@@ -61,27 +65,15 @@ export const EmailChangeEmail = ({
 
 export default EmailChangeEmail
 
-const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
-const container = { padding: '20px 25px' }
-const h1 = {
-  fontSize: '22px',
-  fontWeight: 'bold' as const,
-  color: '#000000',
-  margin: '0 0 20px',
-}
-const text = {
-  fontSize: '14px',
-  color: '#55575d',
-  lineHeight: '1.5',
-  margin: '0 0 25px',
-}
-const link = { color: 'inherit', textDecoration: 'underline' }
-const button = {
-  backgroundColor: '#000000',
-  color: '#ffffff',
-  fontSize: '14px',
-  borderRadius: '8px',
-  padding: '12px 20px',
-  textDecoration: 'none',
-}
+const main = { backgroundColor: '#ffffff', fontFamily: "'Noto Sans Bengali', Arial, sans-serif" }
+const container = { maxWidth: '560px', margin: '0 auto', borderRadius: '16px', overflow: 'hidden' as const, boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }
+const header = { backgroundColor: '#0a0a0a', padding: '32px 40px', textAlign: 'center' as const }
+const brandName = { margin: '0', color: '#b8963e', fontSize: '22px', fontWeight: '700' as const, letterSpacing: '0.5px' }
+const content = { padding: '40px' }
+const h1 = { fontSize: '22px', fontWeight: '700' as const, color: '#0a0a0a', margin: '0 0 20px' }
+const text = { fontSize: '14px', color: '#55575d', lineHeight: '1.6', margin: '0 0 25px' }
+const link = { color: '#b8963e', textDecoration: 'underline' }
+const button = { backgroundColor: '#0a0a0a', color: '#ffffff', fontSize: '14px', borderRadius: '12px', padding: '14px 28px', textDecoration: 'none', fontWeight: '600' as const }
 const footer = { fontSize: '12px', color: '#999999', margin: '30px 0 0' }
+const bottomBar = { backgroundColor: '#0a0a0a', padding: '16px 40px', textAlign: 'center' as const }
+const bottomText = { margin: '0', color: '#b8963e', fontSize: '12px', fontWeight: '600' as const }
