@@ -857,7 +857,7 @@ const OrdersPage = () => {
           <AdminPagination
             currentPage={page}
             totalPages={totalPages}
-            totalItems={filtered.length}
+            totalItems={totalCount}
             pageSize={pageSize}
             onPageChange={setPage}
             onPageSizeChange={s => { setPageSize(s); setPage(0); }}
