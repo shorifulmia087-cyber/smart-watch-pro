@@ -31,6 +31,7 @@ interface FormErrors {
   address?: string;
   color?: string;
   txnId?: string;
+  upazila?: string;
 }
 
 const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInside = 70, deliveryChargeOutside = 150, onlinePaymentEnabled = true, bkashNumber = '', nagadNumber = '', rocketNumber = '', availableColors = [] }: OrderModalProps) => {
