@@ -1,0 +1,29 @@
+# =============================================
+# Supabase Edge Functions Configuration
+# এই ফাইলটি supabase/config.toml এ কপি করুন
+# project_id আপনার নিজের দিয়ে পরিবর্তন করুন
+# =============================================
+
+project_id = "YOUR_PROJECT_REF"
+
+[functions]
+  [functions.auth-email-hook]
+    verify_jwt = false
+  [functions.book-pathao-courier]
+    verify_jwt = false
+  [functions.book-redx-courier]
+    verify_jwt = false
+  [functions.book-steadfast-courier]
+    verify_jwt = false
+  [functions.check-fraud]
+    verify_jwt = false
+  [functions.courier-webhook]
+    verify_jwt = false
+  [functions.create-order]
+    verify_jwt = false
+  [functions.fetch-areas]
+    verify_jwt = false
+  [functions.send-order-email]
+    verify_jwt = false
+  [functions.track-courier]
+    verify_jwt = false
