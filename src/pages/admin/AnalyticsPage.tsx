@@ -566,10 +566,10 @@ const PieCard = ({ title, data, isLoading }: { title: string; data: { name: stri
             <Tooltip contentStyle={tooltipStyle} />
           </PieChart>
         </ResponsiveContainer>
-        <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2">
+        <div className="flex flex-wrap gap-x-4 gap-y-2 mt-2">
           {data.map((d, i) => (
-            <span key={d.name} className="text-[10px] text-muted-foreground flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full" style={{ background: COLORS[i % COLORS.length] }} />
+            <span key={d.name} className="text-sm tracking-wide text-muted-foreground flex items-center gap-1.5" style={{ letterSpacing: '0.02em' }}>
+              <span className="w-2.5 h-2.5 rounded-full" style={{ background: COLORS[i % COLORS.length] }} />
               {d.name} ({toBengaliNum(d.value)})
             </span>
           ))}
