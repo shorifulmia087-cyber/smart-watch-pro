@@ -20,7 +20,58 @@ const PRODUCT_LIST_COLUMNS = 'id,name,subtitle,price,discount_percent,stock_stat
 
 // ─── Orders ───
 
-/** Full order list for admin table — paginated on client, lightweight columns */
+interface OrdersPaginatedParams {
+  page: number;
+  pageSize: number;
+  statusFilter?: OrderStatus;
+  paymentFilter?: 'cod' | 'online';
+  search?: string;
+}
+
+interface OrdersPaginatedResult {
+  data: Order[];
+  totalCount: number;
+}
+
+/** Server-side paginated orders for the Orders admin table */
+export const useOrdersPaginated = ({ page, pageSize, statusFilter, paymentFilter, search }: OrdersPaginatedParams) => {
+  return useQuery({
+    queryKey: ['orders_paginated', page, pageSize, statusFilter, paymentFilter, search],
+    queryFn: async (): Promise<OrdersPaginatedResult> => {
+      const from = page * pageSize;
+      const to = from + pageSize - 1;
+
+      let query = supabase
+        .from('orders')
+        .select(ORDER_LIST_COLUMNS, { count: 'exact' })
+        .order('created_at', { ascending: false });
+
+      if (statusFilter) query = query.eq('status', statusFilter);
+
+      if (paymentFilter === 'cod') {
+        query = query.eq('payment_method', 'cod');
+      } else if (paymentFilter === 'online') {
+        query = query.neq('payment_method', 'cod');
+      }
+
+      if (search?.trim()) {
+        const q = search.trim();
+        query = query.or(`customer_name.ilike.%${q}%,phone.ilike.%${q}%,watch_model.ilike.%${q}%,trx_id.ilike.%${q}%`);
+      }
+
+      query = query.range(from, to);
+
+      const { data, error, count } = await query;
+      if (error) throw error;
+      return { data: (data || []) as Order[], totalCount: count ?? 0 };
+    },
+    staleTime: 15_000,
+    refetchInterval: 30_000,
+    placeholderData: (prev) => prev,
+  });
+};
+
+/** Full order list (non-paginated) — only used for bulk operations */
 export const useOrders = (statusFilter?: OrderStatus) => {
   return useQuery({
     queryKey: ['orders', statusFilter],
