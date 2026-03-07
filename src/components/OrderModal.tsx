@@ -50,6 +50,13 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
   const [selectedColor, setSelectedColor] = useState('');
   const [errors, setErrors] = useState<FormErrors>({});
   const [selectedUpazila, setSelectedUpazila] = useState<Upazila | null>(null);
+
+  // Auto-detect delivery zone from division
+  useEffect(() => {
+    if (selectedUpazila) {
+      setLocation(selectedUpazila.division === 'ঢাকা' ? 'dhaka' : 'outside');
+    }
+  }, [selectedUpazila]);
   const [touched, setTouched] = useState(false);
   const [honeypot, setHoneypot] = useState('');
   const [honeypot2, setHoneypot2] = useState('');
