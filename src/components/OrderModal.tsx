@@ -395,8 +395,20 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
                 )}
               </div>
               <div>
-                <textarea value={address} onChange={(e) => setAddress(e.target.value)} placeholder="সম্পূর্ণ ঠিকানা *" rows={2} className={`w-full bg-transparent border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/20 focus:border-gold/40 transition-all resize-none ${touched && errors.address ? 'border-destructive/60 bg-destructive/5' : 'border-border/60'}`} maxLength={500} />
+                <textarea value={address} onChange={(e) => setAddress(e.target.value)} placeholder="বিস্তারিত ঠিকানা (বাড়ি, রোড, এলাকা) *" rows={2} className={`w-full bg-transparent border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/20 focus:border-gold/40 transition-all resize-none ${touched && errors.address ? 'border-destructive/60 bg-destructive/5' : 'border-border/60'}`} maxLength={500} />
                 <ErrorMessage error={errors.address} />
+              </div>
+
+              {/* Upazila Selector */}
+              <div>
+                <UpazilaCombobox value={selectedUpazila} onChange={setSelectedUpazila} hasError={touched && !!errors.upazila} />
+                <ErrorMessage error={errors.upazila} />
+                {selectedUpazila && (
+                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-1.5 flex items-center gap-2 text-xs text-muted-foreground">
+                    <span className="px-2 py-0.5 rounded bg-gold/5 border border-gold/10 text-gold">{selectedUpazila.district}</span>
+                    <span className="px-2 py-0.5 rounded bg-muted/30 border border-border/30">{selectedUpazila.division} বিভাগ</span>
+                  </motion.div>
+                )}
               </div>
               
               {/* Color Selection */}
