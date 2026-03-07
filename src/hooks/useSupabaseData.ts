@@ -55,6 +55,10 @@ export const useOrdersPaginated = ({ page, pageSize, statusFilter, paymentFilter
         query = query.neq('payment_method', 'cod');
       }
 
+      if (courierFilter) {
+        query = query.eq('courier_provider', courierFilter);
+      }
+
       if (search?.trim()) {
         const q = search.trim();
         query = query.or(`customer_name.ilike.%${q}%,phone.ilike.%${q}%,watch_model.ilike.%${q}%,trx_id.ilike.%${q}%`);
