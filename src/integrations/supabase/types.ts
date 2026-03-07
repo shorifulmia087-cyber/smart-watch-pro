@@ -94,6 +94,8 @@ export type Database = {
           customer_name: string
           delivery_charge: number
           delivery_location: string
+          district: string | null
+          division: string | null
           fraud_error_message: string | null
           fraud_flag: string | null
           fraud_success_rate: number | null
@@ -110,6 +112,7 @@ export type Database = {
           total_price: number
           tracking_id: string | null
           trx_id: string | null
+          upazila: string | null
           watch_model: string
         }
         Insert: {
@@ -122,6 +125,8 @@ export type Database = {
           customer_name: string
           delivery_charge?: number
           delivery_location?: string
+          district?: string | null
+          division?: string | null
           fraud_error_message?: string | null
           fraud_flag?: string | null
           fraud_success_rate?: number | null
@@ -138,6 +143,7 @@ export type Database = {
           total_price: number
           tracking_id?: string | null
           trx_id?: string | null
+          upazila?: string | null
           watch_model: string
         }
         Update: {
@@ -150,6 +156,8 @@ export type Database = {
           customer_name?: string
           delivery_charge?: number
           delivery_location?: string
+          district?: string | null
+          division?: string | null
           fraud_error_message?: string | null
           fraud_flag?: string | null
           fraud_success_rate?: number | null
@@ -166,6 +174,7 @@ export type Database = {
           total_price?: number
           tracking_id?: string | null
           trx_id?: string | null
+          upazila?: string | null
           watch_model?: string
         }
         Relationships: []
