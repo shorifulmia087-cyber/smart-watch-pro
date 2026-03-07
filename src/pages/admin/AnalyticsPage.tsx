@@ -168,6 +168,34 @@ const AnalyticsPage = () => {
     return Object.entries(map).map(([name, value]) => ({ name, value }));
   }, [filteredOrders]);
 
+  // ===== DIVISION-WISE ANALYTICS =====
+  const divisionData = useMemo(() => {
+    if (!filteredOrders.length) return [];
+    const map: Record<string, number> = {};
+    filteredOrders.forEach(o => {
+      const div = (o as any).division || 'অজানা';
+      map[div] = (map[div] || 0) + 1;
+    });
+    const total = filteredOrders.length;
+    return Object.entries(map)
+      .sort((a, b) => b[1] - a[1])
+      .map(([name, value]) => ({ name, value, pct: Math.round((value / total) * 100) }));
+  }, [filteredOrders]);
+
+  // ===== DISTRICT-WISE TOP 10 =====
+  const districtData = useMemo(() => {
+    if (!filteredOrders.length) return [];
+    const map: Record<string, number> = {};
+    filteredOrders.forEach(o => {
+      const dist = (o as any).district;
+      if (dist) map[dist] = (map[dist] || 0) + 1;
+    });
+    return Object.entries(map)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(([name, value]) => ({ name: name.length > 15 ? name.slice(0, 15) + '…' : name, fullName: name, value }));
+  }, [filteredOrders]);
+
   // ===== Order Status Distribution =====
   const statusData = useMemo(() => {
     if (!filteredOrders.length) return [];
