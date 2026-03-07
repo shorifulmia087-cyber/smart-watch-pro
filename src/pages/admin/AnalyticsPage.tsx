@@ -383,16 +383,16 @@ const AnalyticsPage = () => {
                   <Tooltip contentStyle={tooltipStyle} formatter={(value: number, name: string) => [`${toBengaliNum(value)} অর্ডার`, name]} />
                 </PieChart>
               </ResponsiveContainer>
-              <div className="space-y-1.5 mt-3">
+              <div className="space-y-2 mt-3">
                 {divisionData.map((d, i) => (
-                  <div key={d.name} className="flex items-center justify-between text-[11px]">
+                  <div key={d.name} className="flex items-center justify-between text-sm" style={{ letterSpacing: '0.02em' }}>
                     <span className="text-muted-foreground flex items-center gap-1.5">
                       <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: COLORS[i % COLORS.length] }} />
                       {d.name}
                     </span>
                     <div className="flex items-center gap-2">
-                      <span className="font-inter font-medium text-foreground">{toBengaliNum(d.value)}</span>
-                      <span className="text-muted-foreground/70 w-8 text-right">{toBengaliNum(d.pct)}%</span>
+                      <span className="font-inter font-semibold text-foreground">{toBengaliNum(d.value)}</span>
+                      <span className="text-muted-foreground/70 w-8 text-right font-inter">{toBengaliNum(d.pct)}%</span>
                     </div>
                   </div>
                 ))}
