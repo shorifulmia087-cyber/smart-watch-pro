@@ -49,6 +49,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
   const [location, setLocation] = useState<'dhaka' | 'outside'>('dhaka');
   const [selectedColor, setSelectedColor] = useState('');
   const [errors, setErrors] = useState<FormErrors>({});
+  const [selectedUpazila, setSelectedUpazila] = useState<Upazila | null>(null);
   const [touched, setTouched] = useState(false);
   const [honeypot, setHoneypot] = useState('');
   const [honeypot2, setHoneypot2] = useState('');
