@@ -209,6 +209,7 @@ const OrdersPage = () => {
   const [filter, setFilter] = useState<OrderStatus | undefined>();
   const [paymentFilter, setPaymentFilter] = useState<'cod' | 'online' | undefined>();
   const [courierFilterState, setCourierFilterState] = useState<'redx' | 'pathao' | 'steadfast' | undefined>();
+  const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(15);
