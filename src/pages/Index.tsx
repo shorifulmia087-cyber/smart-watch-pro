@@ -57,7 +57,7 @@ const Index = () => {
     }, 800);
   }, []);
 
-  const brandName = settings?.brand_name || 'Kronos Premium Watch';
+  const brandName = settings?.brand_name || '';
   const offerStartAt = (settings as any)?.offer_start_at ?? null;
   const offerEndAt = (settings as any)?.offer_end_at ?? null;
   const offerStartMs = offerStartAt ? new Date(offerStartAt).getTime() : NaN;
