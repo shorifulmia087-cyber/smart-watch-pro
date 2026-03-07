@@ -88,6 +88,8 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
 
     if (availableColors.length > 0 && !selectedColor) errs.color = 'একটি কালার সিলেক্ট করুন';
 
+    if (!selectedUpazila) errs.upazila = 'উপজেলা নির্বাচন করুন';
+
     if (tab === 'online') {
       const requiredLen = payMethod === 'bkash' ? 10 : payMethod === 'nagad' ? 8 : 10;
       if (!txnId) errs.txnId = 'ট্রানজেকশন আইডি দিন';
