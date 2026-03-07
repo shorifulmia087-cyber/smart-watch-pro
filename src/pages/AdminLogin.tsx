@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useRateLimit } from '@/hooks/useRateLimit';
+import { useSettings } from '@/hooks/useSupabaseData';
 import { Loader2 } from 'lucide-react';
 
 const AdminLogin = () => {
@@ -13,6 +14,8 @@ const AdminLogin = () => {
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [success, setSuccess] = useState('');
   const { checkLimit } = useRateLimit({ maxAttempts: 5, windowMs: 300_000 });
+  const { data: settings } = useSettings();
+  const brandName = settings?.brand_name?.trim() || 'Kronos';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,7 +48,7 @@ const AdminLogin = () => {
     <div className="min-h-screen bg-surface flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-foreground">Kronos Admin</h1>
+          <h1 className="text-2xl font-bold text-foreground">{brandName} Admin</h1>
           <p className="text-muted-foreground text-sm mt-1">
             {mode === 'login' ? 'অ্যাডমিন প্যানেলে লগইন করুন' : 'নতুন অ্যাকাউন্ট তৈরি করুন'}
           </p>
@@ -70,7 +73,7 @@ const AdminLogin = () => {
             className="w-full bg-ash border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30"
           />
           {error && <p className="text-destructive text-sm">{error}</p>}
-          {success && <p className="text-emerald-600 text-sm">{success}</p>}
+          {success && <p className="text-success text-sm">{success}</p>}
           <button
             type="submit"
             disabled={loading}
