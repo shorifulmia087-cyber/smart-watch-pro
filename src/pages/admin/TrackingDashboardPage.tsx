@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useOrders } from '@/hooks/useSupabaseData';
+import { useOrdersLite } from '@/hooks/useSupabaseData';
 import { toBengaliNum, formatBengaliPrice } from '@/lib/bengali';
 import { Package, Truck, CheckCircle2, XCircle, RotateCcw, Clock, MapPin, TrendingUp } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
