@@ -73,7 +73,7 @@ const AdminLogin = () => {
             className="w-full bg-ash border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30"
           />
           {error && <p className="text-destructive text-sm">{error}</p>}
-          {success && <p className="text-emerald-600 text-sm">{success}</p>}
+          {success && <p className="text-success text-sm">{success}</p>}
           <button
             type="submit"
             disabled={loading}
