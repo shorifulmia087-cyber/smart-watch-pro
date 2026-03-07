@@ -15,7 +15,8 @@ const AdminLogin = () => {
   const [success, setSuccess] = useState('');
   const { checkLimit } = useRateLimit({ maxAttempts: 5, windowMs: 300_000 });
   const { data: settings } = useSettings();
-  const brandName = settings?.brand_name?.trim() || 'Kronos';
+  const brandName = settings?.brand_name?.trim();
+  const isLoading = !settings;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
