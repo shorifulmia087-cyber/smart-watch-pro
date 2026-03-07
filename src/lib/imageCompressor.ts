@@ -18,9 +18,9 @@ const DEFAULT_OPTIONS: CompressOptions = {
 };
 
 const THUMBNAIL_OPTIONS: CompressOptions = {
-  maxWidth: 400,
-  maxHeight: 400,
-  quality: 0.75,
+  maxWidth: 300,
+  maxHeight: 300,
+  quality: 0.70,
   format: 'webp',
 };
 
