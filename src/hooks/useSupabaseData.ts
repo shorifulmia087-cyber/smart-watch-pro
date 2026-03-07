@@ -25,6 +25,7 @@ interface OrdersPaginatedParams {
   pageSize: number;
   statusFilter?: OrderStatus;
   paymentFilter?: 'cod' | 'online';
+  courierFilter?: 'redx' | 'pathao' | 'steadfast';
   search?: string;
 }
 
