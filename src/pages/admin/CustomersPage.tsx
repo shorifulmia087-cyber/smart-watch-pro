@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useOrders } from '@/hooks/useSupabaseData';
+import { useOrdersLite } from '@/hooks/useSupabaseData';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
 import { Search, Users, Crown, UserCheck, UserPlus } from 'lucide-react';
 import AdminPagination from '@/components/admin/AdminPagination';
