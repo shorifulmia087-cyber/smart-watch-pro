@@ -362,6 +362,68 @@ const AnalyticsPage = () => {
         </div>
       </div>
 
+      {/* ===== LOCATION ANALYTICS (Division + District) ===== */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Division-wise Pie */}
+        <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6">
+          <div className="flex items-center gap-2 mb-1">
+            <MapPin className="h-4 w-4 text-accent" />
+            <h3 className="font-semibold text-sm text-foreground">বিভাগ ভিত্তিক সেলস</h3>
+          </div>
+          <p className="text-[11px] text-muted-foreground mb-5">কোন বিভাগ থেকে কত % অর্ডার</p>
+          {isLoading ? <Skeleton className="h-[280px] rounded-sm" /> : divisionData.length === 0 || (divisionData.length === 1 && divisionData[0].name === 'অজানা') ? (
+            <p className="text-sm text-muted-foreground text-center py-10">লোকেশন ডেটা এখনো জমা হয়নি</p>
+          ) : (
+            <>
+              <ResponsiveContainer width="100%" height={220}>
+                <PieChart>
+                  <Pie data={divisionData} cx="50%" cy="50%" innerRadius={45} outerRadius={80} paddingAngle={3} dataKey="value">
+                    {divisionData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                  </Pie>
+                  <Tooltip contentStyle={tooltipStyle} formatter={(value: number, name: string) => [`${toBengaliNum(value)} অর্ডার`, name]} />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="space-y-1.5 mt-3">
+                {divisionData.map((d, i) => (
+                  <div key={d.name} className="flex items-center justify-between text-[11px]">
+                    <span className="text-muted-foreground flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: COLORS[i % COLORS.length] }} />
+                      {d.name}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-inter font-medium text-foreground">{toBengaliNum(d.value)}</span>
+                      <span className="text-muted-foreground/70 w-8 text-right">{toBengaliNum(d.pct)}%</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* District-wise Top 10 Bar */}
+        <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6">
+          <div className="flex items-center gap-2 mb-1">
+            <MapPin className="h-4 w-4 text-success" />
+            <h3 className="font-semibold text-sm text-foreground">টপ ১০ জেলা</h3>
+          </div>
+          <p className="text-[11px] text-muted-foreground mb-5">সবচেয়ে বেশি অর্ডার আসা জেলা</p>
+          {isLoading ? <Skeleton className="h-[280px] rounded-sm" /> : districtData.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-10">লোকেশন ডেটা এখনো জমা হয়নি</p>
+          ) : (
+            <ResponsiveContainer width="100%" height={280}>
+              <BarChart data={districtData} layout="vertical" margin={{ left: 10, right: 20 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" horizontal={false} />
+                <XAxis type="number" tick={{ fontSize: 11, fontFamily: 'Inter' }} stroke="hsl(var(--muted-foreground))" axisLine={false} tickLine={false} allowDecimals={false} />
+                <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" axisLine={false} tickLine={false} width={100} />
+                <Tooltip contentStyle={tooltipStyle} formatter={(value: number) => [`${toBengaliNum(value)} অর্ডার`, 'অর্ডার']} />
+                <Bar dataKey="value" fill="hsl(var(--success))" radius={[0, 4, 4, 0]} barSize={22} />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+      </div>
+
       {/* ===== MONTHLY NET PROFIT COMPARISON ===== */}
       <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6">
         <div className="flex items-center justify-between mb-1">
