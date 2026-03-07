@@ -1,4 +1,4 @@
-import { useOrders, useProducts } from '@/hooks/useSupabaseData';
+import { useOrdersLite, useProductsLite } from '@/hooks/useSupabaseData';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
 import { TrendingUp, ShoppingCart, Clock, DollarSign, Package, ArrowUpRight, CalendarIcon, Box, Truck, CheckCircle2, XCircle, AlertTriangle, RotateCcw, Calculator } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
