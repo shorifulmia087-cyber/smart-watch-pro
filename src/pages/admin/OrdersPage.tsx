@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useCallback } from 'react';
-import { useOrders, useUpdateOrderStatus, useSettings } from '@/hooks/useSupabaseData';
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { useOrdersPaginated, useUpdateOrderStatus, useSettings } from '@/hooks/useSupabaseData';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
 import { Search, Filter, Truck, FileText, CheckCircle2, Package, Loader2, Eye, X, CreditCard, AlertTriangle, ShieldCheck, ShieldX, ShieldQuestion, RefreshCw } from 'lucide-react';
 import AdminPagination from '@/components/admin/AdminPagination';
@@ -207,14 +207,37 @@ const FraudCheckModal = ({ phone, onClose }: { phone: string; onClose: () => voi
 
 const OrdersPage = () => {
   const [filter, setFilter] = useState<OrderStatus | undefined>();
-  const [paymentFilter, setPaymentFilter] = useState<string | undefined>();
+  const [paymentFilter, setPaymentFilter] = useState<'cod' | 'online' | undefined>();
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(15);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
   const [fraudCheckPhone, setFraudCheckPhone] = useState<string | null>(null);
-  const { data: orders, isLoading } = useOrders(filter);
+
+  // Debounce search input (400ms)
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  useEffect(() => {
+    debounceRef.current = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(0);
+    }, 400);
+    return () => clearTimeout(debounceRef.current);
+  }, [search]);
+
+  const { data: result, isLoading, isFetching } = useOrdersPaginated({
+    page,
+    pageSize,
+    statusFilter: filter,
+    paymentFilter,
+    search: debouncedSearch,
+  });
+
+  const orders = result?.data ?? [];
+  const totalCount = result?.totalCount ?? 0;
+  const totalPages = Math.ceil(totalCount / pageSize);
+
   const { data: settings } = useSettings();
   const updateStatus = useUpdateOrderStatus();
   const { toast } = useToast();
@@ -250,10 +273,10 @@ const OrdersPage = () => {
         }
       );
 
-      const result = await res.json();
+      const resultData = await res.json();
 
       if (!res.ok) {
-        const errorMsg = result?.details?.message || result?.details || result?.error || 'কুরিয়ার বুক করতে সমস্যা হয়েছে';
+        const errorMsg = resultData?.details?.message || resultData?.details || resultData?.error || 'কুরিয়ার বুক করতে সমস্যা হয়েছে';
         toast({
           title: `❌ ${providerNames[courierProvider]} API ত্রুটি!`,
           description: typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg),
@@ -263,16 +286,17 @@ const OrdersPage = () => {
         return;
       }
 
+      queryClient.invalidateQueries({ queryKey: ['orders_paginated'] });
       queryClient.invalidateQueries({ queryKey: ['orders'] });
-      const modeLabel = result.mode === 'sandbox' ? ' (🧪 TEST)' : '';
-      const apiMessage = result?.redx_response?.message 
-        || result?.pathao_response?.message 
-        || result?.steadfast_response?.message 
-        || result?.api_response?.message
+      const modeLabel = resultData.mode === 'sandbox' ? ' (🧪 TEST)' : '';
+      const apiMessage = resultData?.redx_response?.message 
+        || resultData?.pathao_response?.message 
+        || resultData?.steadfast_response?.message 
+        || resultData?.api_response?.message
         || null;
       const description = apiMessage 
-        ? `${apiMessage} — ট্র্যাকিং: ${result.tracking_id}${result.mode === 'sandbox' ? ' (টেস্ট)' : ''}`
-        : `${customerName} — ট্র্যাকিং আইডি: ${result.tracking_id}${result.mode === 'sandbox' ? ' (টেস্ট অর্ডার)' : ''}`;
+        ? `${apiMessage} — ট্র্যাকিং: ${resultData.tracking_id}${resultData.mode === 'sandbox' ? ' (টেস্ট)' : ''}`
+        : `${customerName} — ট্র্যাকিং আইডি: ${resultData.tracking_id}${resultData.mode === 'sandbox' ? ' (টেস্ট অর্ডার)' : ''}`;
       toast({
         title: `✅ ${providerNames[courierProvider]} কুরিয়ার বুক সফল!${modeLabel}`,
         description,
@@ -330,6 +354,7 @@ const OrdersPage = () => {
       }
     }
 
+    queryClient.invalidateQueries({ queryKey: ['orders_paginated'] });
     queryClient.invalidateQueries({ queryKey: ['orders'] });
     setSelectedIds(new Set());
     setBookingInProgress(null);
@@ -423,28 +448,7 @@ const OrdersPage = () => {
     toast({ title: '📄 PDF ইনভয়েস ডাউনলোড হয়েছে' });
   }, [toast, settings]);
 
-  const filtered = useMemo(() => {
-    if (!orders) return [];
-    let list = orders;
-    if (paymentFilter) {
-      if (paymentFilter === 'cod') {
-        list = list.filter(o => o.payment_method === 'cod');
-      } else {
-        list = list.filter(o => o.payment_method !== 'cod');
-      }
-    }
-    if (!search.trim()) return list;
-    const q = search.toLowerCase();
-    return list.filter(o =>
-      o.customer_name.toLowerCase().includes(q) ||
-      o.phone.includes(q) ||
-      o.watch_model.toLowerCase().includes(q) ||
-      (o.trx_id && o.trx_id.toLowerCase().includes(q))
-    );
-  }, [orders, search, paymentFilter]);
-
-  const paged = filtered.slice(page * pageSize, (page + 1) * pageSize);
-  const totalPages = Math.ceil(filtered.length / pageSize);
+  const paged = orders;
 
   const allPageSelected = paged.length > 0 && paged.every(o => selectedIds.has(o.id));
   const someSelected = selectedIds.size > 0;
@@ -521,7 +525,7 @@ const OrdersPage = () => {
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-5">
           <div>
             <h2 className="text-lg font-bold text-foreground">সকল অর্ডার</h2>
-            <p className="text-[11px] text-muted-foreground mt-0.5">মোট {toBengaliNum(filtered.length)} টি অর্ডার পাওয়া গেছে</p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">মোট {toBengaliNum(totalCount)} টি অর্ডার পাওয়া গেছে {isFetching && !isLoading ? '⟳' : ''}</p>
           </div>
           <div className="flex items-center gap-3 flex-wrap w-full lg:w-auto">
             {/* Courier Provider */}
@@ -541,7 +545,7 @@ const OrdersPage = () => {
             <div className="flex items-center gap-2 bg-muted/30 border border-border/40 rounded-sm px-3 py-2.5 flex-1 lg:min-w-[280px]">
               <Search className="h-4 w-4 text-muted-foreground shrink-0" />
               <input
-                type="text" value={search} onChange={e => { setSearch(e.target.value); setPage(0); }}
+                type="text" value={search} onChange={e => { setSearch(e.target.value); }}
                 placeholder="নাম, ফোন বা TrxID দিয়ে খুঁজুন..."
                 className="bg-transparent border-none outline-none w-full text-sm text-foreground placeholder:text-muted-foreground/60"
               />
@@ -578,10 +582,10 @@ const OrdersPage = () => {
               <CreditCard className="h-3.5 w-3.5 text-muted-foreground/50" />
               <span className="text-[10px] text-muted-foreground/50 uppercase tracking-widest font-semibold">পেমেন্ট:</span>
             </div>
-            {[undefined, 'cod', 'online'].map(f => (
+            {[undefined, 'cod', 'online'].map((f) => (
               <button
                 key={f ?? 'all'}
-                onClick={() => { setPaymentFilter(f); setPage(0); }}
+                onClick={() => { setPaymentFilter(f as 'cod' | 'online' | undefined); setPage(0); }}
                 className={`px-3.5 py-1.5 rounded-sm text-xs font-medium transition-all duration-200 border ${
                   paymentFilter === f
                     ? 'gradient-gold text-white border-transparent shadow-sm'
@@ -853,7 +857,7 @@ const OrdersPage = () => {
           <AdminPagination
             currentPage={page}
             totalPages={totalPages}
-            totalItems={filtered.length}
+            totalItems={totalCount}
             pageSize={pageSize}
             onPageChange={setPage}
             onPageSizeChange={s => { setPageSize(s); setPage(0); }}
