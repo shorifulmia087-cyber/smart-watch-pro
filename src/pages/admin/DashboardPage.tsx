@@ -312,7 +312,7 @@ const DashboardPage = () => {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                <XAxis dataKey="day" tick={{ fontSize: 11, fontFamily: 'Hind Siliguri' }} stroke="hsl(var(--muted-foreground))" axisLine={false} tickLine={false} />
+                <XAxis dataKey="day" tick={{ fontSize: 11, fontFamily: 'Noto Sans Bengali' }} stroke="hsl(var(--muted-foreground))" axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 11, fontFamily: 'Inter' }} stroke="hsl(var(--muted-foreground))" axisLine={false} tickLine={false} />
                 <Tooltip
                   contentStyle={{
