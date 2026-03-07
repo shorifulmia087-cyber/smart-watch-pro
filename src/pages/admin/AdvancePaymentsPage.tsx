@@ -14,7 +14,7 @@ const paymentTypeLabels: Record<string, { text: string; style: string }> = {
 };
 
 const AdvancePaymentsPage = () => {
-  const { data: orders, isLoading } = useOrders();
+  const { data: orders, isLoading } = useOrdersLite();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(20);

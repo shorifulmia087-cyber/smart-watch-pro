@@ -19,8 +19,8 @@ const tooltipStyle = {
 };
 
 const AnalyticsPage = () => {
-  const { data: orders, isLoading: ordersLoading } = useOrders();
-  const { data: products, isLoading: productsLoading } = useProducts();
+  const { data: orders, isLoading: ordersLoading } = useOrdersLite();
+  const { data: products, isLoading: productsLoading } = useProductsLite();
   const [range, setRange] = useState<7 | 14 | 30 | 90>(30);
 
   const isLoading = ordersLoading || productsLoading;

@@ -15,7 +15,7 @@ const statusConfig: Record<ShipmentStatus, { label: string; icon: typeof Package
 };
 
 const TrackingDashboardPage = () => {
-  const { data: orders, isLoading } = useOrders();
+  const { data: orders, isLoading } = useOrdersLite();
 
   const stats = useMemo(() => {
     if (!orders) return null;

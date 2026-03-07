@@ -5,7 +5,7 @@ import { DollarSign, CheckCircle2, AlertTriangle, Truck, TrendingUp } from 'luci
 import { Skeleton } from '@/components/ui/skeleton';
 
 const CourierPaymentsPage = () => {
-  const { data: orders, isLoading } = useOrders();
+  const { data: orders, isLoading } = useOrdersLite();
 
   const stats = useMemo(() => {
     if (!orders) return null;

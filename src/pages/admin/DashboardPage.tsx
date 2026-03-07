@@ -24,8 +24,8 @@ const presets = [
 ] as const;
 
 const DashboardPage = () => {
-  const { data: orders, isLoading: ordersLoading } = useOrders();
-  const { data: products, isLoading: productsLoading } = useProducts();
+  const { data: orders, isLoading: ordersLoading } = useOrdersLite();
+  const { data: products, isLoading: productsLoading } = useProductsLite();
   const [activePreset, setActivePreset] = useState(1);
   const [dateRange, setDateRange] = useState<DateRange>({
     from: subDays(new Date(), 7),
