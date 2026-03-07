@@ -582,10 +582,10 @@ const OrdersPage = () => {
               <CreditCard className="h-3.5 w-3.5 text-muted-foreground/50" />
               <span className="text-[10px] text-muted-foreground/50 uppercase tracking-widest font-semibold">পেমেন্ট:</span>
             </div>
-            {[undefined, 'cod', 'online'].map(f => (
+            {[undefined, 'cod', 'online'].map((f) => (
               <button
                 key={f ?? 'all'}
-                onClick={() => { setPaymentFilter(f); setPage(0); }}
+                onClick={() => { setPaymentFilter(f as 'cod' | 'online' | undefined); setPage(0); }}
                 className={`px-3.5 py-1.5 rounded-sm text-xs font-medium transition-all duration-200 border ${
                   paymentFilter === f
                     ? 'gradient-gold text-white border-transparent shadow-sm'
