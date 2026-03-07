@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useCallback } from 'react';
-import { useOrders, useUpdateOrderStatus, useSettings } from '@/hooks/useSupabaseData';
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { useOrdersPaginated, useUpdateOrderStatus, useSettings } from '@/hooks/useSupabaseData';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
 import { Search, Filter, Truck, FileText, CheckCircle2, Package, Loader2, Eye, X, CreditCard, AlertTriangle, ShieldCheck, ShieldX, ShieldQuestion, RefreshCw } from 'lucide-react';
 import AdminPagination from '@/components/admin/AdminPagination';
