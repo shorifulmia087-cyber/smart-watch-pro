@@ -20,6 +20,13 @@ const StickyOrderForm = () => {
   const [success, setSuccess] = useState(false);
   const [honeypot, setHoneypot] = useState('');
   const [selectedUpazila, setSelectedUpazila] = useState<Upazila | null>(null);
+
+  // Auto-detect delivery zone from division
+  useEffect(() => {
+    if (selectedUpazila) {
+      setLocation(selectedUpazila.division === 'ঢাকা' ? 'dhaka' : 'outside');
+    }
+  }, [selectedUpazila]);
   const { data: settings } = useSettings();
   const { data: product } = useFeaturedProduct();
   const createOrder = useSecureOrder();
