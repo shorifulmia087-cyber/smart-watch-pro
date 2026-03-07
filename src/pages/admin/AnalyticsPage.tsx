@@ -321,9 +321,9 @@ const AnalyticsPage = () => {
                   <Tooltip contentStyle={tooltipStyle} formatter={(value: number) => [`${toBengaliNum(value)} অর্ডার`, '']} />
                 </PieChart>
               </ResponsiveContainer>
-              <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-3">
+              <div className="flex flex-wrap gap-x-4 gap-y-2 mt-3">
                 {cityData.map((d, i) => (
-                  <span key={d.name} className="text-[11px] text-muted-foreground flex items-center gap-1.5">
+                  <span key={d.name} className="text-sm tracking-wide text-muted-foreground flex items-center gap-1.5" style={{ letterSpacing: '0.02em' }}>
                     <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: COLORS[i % COLORS.length] }} />
                     {d.name} ({toBengaliNum(d.value)})
                   </span>
@@ -349,9 +349,9 @@ const AnalyticsPage = () => {
                   <Tooltip contentStyle={tooltipStyle} formatter={(value: number, name: string) => [`${toBengaliNum(value)}`, name]} />
                 </PieChart>
               </ResponsiveContainer>
-              <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-3">
+              <div className="flex flex-wrap gap-x-4 gap-y-2 mt-3">
                 {statusData.map((d, i) => (
-                  <span key={d.name} className="text-[11px] text-muted-foreground flex items-center gap-1.5">
+                  <span key={d.name} className="text-sm tracking-wide text-muted-foreground flex items-center gap-1.5" style={{ letterSpacing: '0.02em' }}>
                     <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: COLORS[i % COLORS.length] }} />
                     {d.name} ({toBengaliNum(d.value)})
                   </span>
@@ -383,16 +383,16 @@ const AnalyticsPage = () => {
                   <Tooltip contentStyle={tooltipStyle} formatter={(value: number, name: string) => [`${toBengaliNum(value)} অর্ডার`, name]} />
                 </PieChart>
               </ResponsiveContainer>
-              <div className="space-y-1.5 mt-3">
+              <div className="space-y-2 mt-3">
                 {divisionData.map((d, i) => (
-                  <div key={d.name} className="flex items-center justify-between text-[11px]">
+                  <div key={d.name} className="flex items-center justify-between text-sm" style={{ letterSpacing: '0.02em' }}>
                     <span className="text-muted-foreground flex items-center gap-1.5">
                       <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: COLORS[i % COLORS.length] }} />
                       {d.name}
                     </span>
                     <div className="flex items-center gap-2">
-                      <span className="font-inter font-medium text-foreground">{toBengaliNum(d.value)}</span>
-                      <span className="text-muted-foreground/70 w-8 text-right">{toBengaliNum(d.pct)}%</span>
+                      <span className="font-inter font-semibold text-foreground">{toBengaliNum(d.value)}</span>
+                      <span className="text-muted-foreground/70 w-8 text-right font-inter">{toBengaliNum(d.pct)}%</span>
                     </div>
                   </div>
                 ))}
@@ -566,10 +566,10 @@ const PieCard = ({ title, data, isLoading }: { title: string; data: { name: stri
             <Tooltip contentStyle={tooltipStyle} />
           </PieChart>
         </ResponsiveContainer>
-        <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2">
+        <div className="flex flex-wrap gap-x-4 gap-y-2 mt-2">
           {data.map((d, i) => (
-            <span key={d.name} className="text-[10px] text-muted-foreground flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full" style={{ background: COLORS[i % COLORS.length] }} />
+            <span key={d.name} className="text-sm tracking-wide text-muted-foreground flex items-center gap-1.5" style={{ letterSpacing: '0.02em' }}>
+              <span className="w-2.5 h-2.5 rounded-full" style={{ background: COLORS[i % COLORS.length] }} />
               {d.name} ({toBengaliNum(d.value)})
             </span>
           ))}
@@ -595,7 +595,7 @@ const MiniStat = ({ icon: Icon, label, value, variant }: { icon: any; label: str
         </div>
         <div>
           <p className="text-[11px] text-muted-foreground">{label}</p>
-          <p className="text-xl font-bold font-inter text-foreground">{value}</p>
+          <p className="text-xl font-semibold font-inter text-foreground">{value}</p>
         </div>
       </div>
     </div>

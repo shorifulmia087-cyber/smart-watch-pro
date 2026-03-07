@@ -14,7 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["'Hind Siliguri'", "sans-serif"],
+        sans: ["'Noto Sans Bengali'", "sans-serif"],
+        inter: ["'Inter'", "sans-serif"],
       },
       colors: {
         gold: {

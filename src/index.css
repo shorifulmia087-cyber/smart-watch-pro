@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -101,6 +101,10 @@
   }
   .font-inter {
     font-family: 'Inter', sans-serif;
+  }
+  .font-numeric {
+    font-family: 'Inter', 'Roboto', sans-serif;
+    font-variant-numeric: tabular-nums;
   }
   .glass-card {
     @apply bg-card border border-border/60 shadow-sm;

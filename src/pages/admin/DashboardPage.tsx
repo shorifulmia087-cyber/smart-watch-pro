@@ -312,7 +312,7 @@ const DashboardPage = () => {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                <XAxis dataKey="day" tick={{ fontSize: 11, fontFamily: 'Hind Siliguri' }} stroke="hsl(var(--muted-foreground))" axisLine={false} tickLine={false} />
+                <XAxis dataKey="day" tick={{ fontSize: 11, fontFamily: 'Noto Sans Bengali' }} stroke="hsl(var(--muted-foreground))" axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 11, fontFamily: 'Inter' }} stroke="hsl(var(--muted-foreground))" axisLine={false} tickLine={false} />
                 <Tooltip
                   contentStyle={{
@@ -436,7 +436,7 @@ const StatCard = ({ icon: Icon, label, value, sub, variant, sparkData }: {
           </div>
         )}
       </div>
-      <p className="mt-2.5 text-2xl font-bold font-inter tracking-tight text-foreground">{value}</p>
+      <p className="mt-2.5 text-2xl font-bold font-inter tracking-tight text-foreground" style={{ fontWeight: 600 }}>{value}</p>
       <p className="text-[10px] text-muted-foreground mt-0.5">{label} · {sub}</p>
     </div>
   );
@@ -455,7 +455,7 @@ const StatusBadge = ({ status }: { status: string }) => {
     pending: 'পেন্ডিং', processing: 'প্রসেসিং', shipped: 'শিপড', completed: 'সম্পন্ন', cancelled: 'ক্যানসেল', returned: 'রিটার্ন',
   };
   return (
-    <span className={`text-[10px] font-medium px-2.5 py-1 rounded-sm border ${styles[status] || 'bg-muted text-muted-foreground'}`}>
+    <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-sm border ${styles[status] || 'bg-muted text-muted-foreground'}`}>
       {labels[status] || status}
     </span>
   );
