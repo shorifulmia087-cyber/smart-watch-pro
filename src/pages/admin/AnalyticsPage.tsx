@@ -595,7 +595,7 @@ const MiniStat = ({ icon: Icon, label, value, variant }: { icon: any; label: str
         </div>
         <div>
           <p className="text-[11px] text-muted-foreground">{label}</p>
-          <p className="text-xl font-bold font-inter text-foreground">{value}</p>
+          <p className="text-xl font-semibold font-inter text-foreground">{value}</p>
         </div>
       </div>
     </div>

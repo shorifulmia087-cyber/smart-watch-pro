@@ -102,6 +102,10 @@
   .font-inter {
     font-family: 'Inter', sans-serif;
   }
+  .font-numeric {
+    font-family: 'Inter', 'Roboto', sans-serif;
+    font-variant-numeric: tabular-nums;
+  }
   .glass-card {
     @apply bg-card border border-border/60 shadow-sm;
   }
