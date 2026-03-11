@@ -53,6 +53,11 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
   const [selectedColor, setSelectedColor] = useState('');
   const [errors, setErrors] = useState<FormErrors>({});
   const [selectedUpazila, setSelectedUpazila] = useState<Upazila | null>(null);
+  const [couponCode, setCouponCode] = useState('');
+  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [couponApplied, setCouponApplied] = useState(false);
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState('');
 
   // Auto-detect delivery zone from division
   useEffect(() => {
