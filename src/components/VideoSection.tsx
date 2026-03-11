@@ -11,10 +11,8 @@ const VideoSection = ({ videoId, sectionTitle = 'Kronos — কাছ থেক�
   const [isVisible, setIsVisible] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // If no video URL provided, don't render the section
-  if (!videoId || !videoId.trim()) return null;
-
-  const thumbUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+  const hasVideo = !!videoId?.trim();
+  const thumbUrl = hasVideo ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : '';
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -24,6 +22,8 @@ const VideoSection = ({ videoId, sectionTitle = 'Kronos — কাছ থেক�
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
   }, []);
+
+  if (!hasVideo) return null;
 
   return (
     <section
