@@ -1,11 +1,12 @@
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useOrdersPaginated, useUpdateOrderStatus, useSettings } from '@/hooks/useSupabaseData';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
-import { Search, Filter, Truck, FileText, CheckCircle2, Package, Loader2, Eye, X, CreditCard, AlertTriangle, ShieldCheck, ShieldX, ShieldQuestion, RefreshCw } from 'lucide-react';
+import { Search, Filter, Truck, FileText, CheckCircle2, Package, Loader2, Eye, X, CreditCard, AlertTriangle, ShieldCheck, ShieldX, ShieldQuestion, RefreshCw, Download, MessageSquare } from 'lucide-react';
 import AdminPagination from '@/components/admin/AdminPagination';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Checkbox } from '@/components/ui/checkbox';
 import LiveTracking from '@/components/admin/LiveTracking';
+import OrderNotesPanel from '@/components/admin/OrderNotesPanel';
 import jsPDF from 'jspdf';
 import {
   Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
@@ -216,6 +217,7 @@ const OrdersPage = () => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
   const [fraudCheckPhone, setFraudCheckPhone] = useState<string | null>(null);
+  const [notesOrderId, setNotesOrderId] = useState<string | null>(null);
 
   // Debounce search input (400ms)
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
@@ -450,6 +452,49 @@ const OrdersPage = () => {
     toast({ title: '📄 PDF ইনভয়েস ডাউনলোড হয়েছে' });
   }, [toast, settings]);
 
+  const exportCSV = useCallback(async () => {
+    toast({ title: '⏳ CSV তৈরি হচ্ছে...' });
+    const { data: allOrders } = await supabase
+      .from('orders')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (!allOrders?.length) {
+      toast({ title: '❌ কোনো অর্ডার পাওয়া যায়নি', variant: 'destructive' });
+      return;
+    }
+
+    const headers = ['ID', 'Name', 'Phone', 'Address', 'District', 'Division', 'Product', 'Qty', 'Total', 'Delivery', 'Payment', 'TrxID', 'Status', 'Courier', 'Tracking', 'Date'];
+    const rows = allOrders.map(o => [
+      o.id.slice(0, 8),
+      o.customer_name,
+      o.phone,
+      `"${o.address.replace(/"/g, '""')}"`,
+      o.district || '',
+      o.division || '',
+      o.watch_model,
+      o.quantity,
+      o.total_price,
+      o.delivery_charge,
+      o.payment_method,
+      o.trx_id || '',
+      o.status,
+      o.courier_provider || '',
+      o.tracking_id || '',
+      new Date(o.created_at).toLocaleDateString('en-GB'),
+    ]);
+
+    const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `orders-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast({ title: '✅ CSV ডাউনলোড সম্পন্ন!' });
+  }, [toast]);
+
   const paged = orders;
 
   const allPageSelected = paged.length > 0 && paged.every(o => selectedIds.has(o.id));
@@ -530,6 +575,14 @@ const OrdersPage = () => {
             <p className="text-[11px] text-muted-foreground mt-0.5">মোট {toBengaliNum(totalCount)} টি অর্ডার পাওয়া গেছে {isFetching && !isLoading ? '⟳' : ''}</p>
           </div>
           <div className="flex items-center gap-3 flex-wrap w-full lg:w-auto">
+            {/* CSV Export */}
+            <button
+              onClick={exportCSV}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-sm text-xs font-semibold border border-border/40 bg-muted/20 text-foreground hover:bg-muted/40 transition-all"
+            >
+              <Download className="h-4 w-4" />
+              CSV এক্সপোর্ট
+            </button>
             {/* Courier Provider */}
             <div className="flex items-center gap-2 bg-muted/30 border border-border/40 rounded-sm px-3 py-2.5">
               <Truck className="h-4 w-4 text-gold shrink-0" />
@@ -853,9 +906,26 @@ const OrdersPage = () => {
                           >
                             <FileText className="h-4 w-4" />
                           </button>
+                          <button
+                            onClick={() => setNotesOrderId(notesOrderId === o.id ? null : o.id)}
+                            className="p-1.5 rounded-sm text-gold/70 hover:text-gold hover:bg-gold/10 transition-all"
+                            title="নোট"
+                          >
+                            <MessageSquare className="h-4 w-4" />
+                          </button>
                         </div>
                       </TableCell>
                     </TableRow>
+                    {/* Notes Panel */}
+                    {notesOrderId === o.id && (
+                      <TableRow className="bg-muted/5 hover:bg-muted/5">
+                        <TableCell colSpan={17} className="py-4 px-6">
+                          <div className="max-w-lg">
+                            <OrderNotesPanel orderId={o.id} />
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
                     {/* Expandable Live Tracking Row */}
                     {expandedOrderId === o.id && (
                       <TableRow className="bg-muted/10 hover:bg-muted/10">
