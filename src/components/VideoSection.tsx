@@ -83,6 +83,23 @@ const VideoSection = ({ videoId, sectionTitle = 'Kronos — কাছ থেক�
             />
           )}
         </motion.div>
+
+        {onOrderClick && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="flex justify-center mt-8"
+          >
+            <button
+              onClick={onOrderClick}
+              className="gradient-gold text-white font-bold px-10 py-3.5 rounded-sm text-base hover:opacity-90 transition-all shadow-lg animate-pulse-gold"
+              style={{ boxShadow: '0 6px 20px -6px hsl(var(--gold) / 0.4)' }}
+            >
+              এখনই কিনুন
+            </button>
+          </motion.div>
+        )}
       </div>
     </section>
   );
