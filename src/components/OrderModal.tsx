@@ -59,27 +59,36 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
   const [couponLoading, setCouponLoading] = useState(false);
   const [couponError, setCouponError] = useState('');
 
-  // Capture referrer source on page load
-  const referrerSource = useMemo(() => {
+  // Capture referrer source and UTM params on page load
+  const utmData = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
     const utmSource = params.get('utm_source');
-    if (utmSource) return utmSource;
+    const utmMedium = params.get('utm_medium') || null;
+    const utmCampaign = params.get('utm_campaign') || null;
     
-    const ref = document.referrer;
-    if (!ref) return 'direct';
-    try {
-      const host = new URL(ref).hostname.toLowerCase();
-      if (host.includes('facebook.com') || host.includes('fb.com') || host.includes('fb.me')) return 'facebook';
-      if (host.includes('tiktok.com')) return 'tiktok';
-      if (host.includes('youtube.com') || host.includes('youtu.be')) return 'youtube';
-      if (host.includes('instagram.com')) return 'instagram';
-      if (host.includes('google.com') || host.includes('google.com.bd')) return 'google';
-      if (host.includes('bing.com')) return 'bing';
-      if (host.includes('twitter.com') || host.includes('x.com')) return 'twitter';
-      if (host.includes('whatsapp.com') || host.includes('wa.me')) return 'whatsapp';
-      if (host === window.location.hostname) return 'direct';
-      return host;
-    } catch { return 'direct'; }
+    let source: string;
+    if (utmSource) {
+      source = utmSource;
+    } else {
+      const ref = document.referrer;
+      if (!ref) { source = 'direct'; }
+      else {
+        try {
+          const host = new URL(ref).hostname.toLowerCase();
+          if (host.includes('facebook.com') || host.includes('fb.com') || host.includes('fb.me')) source = 'facebook';
+          else if (host.includes('tiktok.com')) source = 'tiktok';
+          else if (host.includes('youtube.com') || host.includes('youtu.be')) source = 'youtube';
+          else if (host.includes('instagram.com')) source = 'instagram';
+          else if (host.includes('google.com') || host.includes('google.com.bd')) source = 'google';
+          else if (host.includes('bing.com')) source = 'bing';
+          else if (host.includes('twitter.com') || host.includes('x.com')) source = 'twitter';
+          else if (host.includes('whatsapp.com') || host.includes('wa.me')) source = 'whatsapp';
+          else if (host === window.location.hostname) source = 'direct';
+          else source = host;
+        } catch { source = 'direct'; }
+      }
+    }
+    return { source, medium: utmMedium, campaign: utmCampaign };
   }, []);
 
   // Auto-detect delivery zone from division
@@ -280,7 +289,9 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
         fraud_error_message: fraudResult?.error_message ?? undefined,
         coupon_code: couponApplied ? couponCode.trim().toUpperCase() : undefined,
         coupon_discount: couponDiscount,
-        referrer_source: referrerSource,
+        referrer_source: utmData.source,
+        utm_medium: utmData.medium,
+        utm_campaign: utmData.campaign,
       });
       setLoading(false);
       setSuccess(true);

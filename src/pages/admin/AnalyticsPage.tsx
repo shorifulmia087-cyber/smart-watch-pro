@@ -183,6 +183,23 @@ const AnalyticsPage = () => {
       .map(([name, { count, revenue }]) => ({ name, count, revenue }));
   }, [filteredOrders]);
 
+  // ===== CAMPAIGN ANALYTICS =====
+  const campaignData = useMemo(() => {
+    if (!filteredOrders.length) return [];
+    const map: Record<string, { count: number; revenue: number }> = {};
+    filteredOrders.forEach(o => {
+      const campaign = (o as any).utm_campaign;
+      if (!campaign) return;
+      if (!map[campaign]) map[campaign] = { count: 0, revenue: 0 };
+      map[campaign].count++;
+      map[campaign].revenue += o.total_price;
+    });
+    return Object.entries(map)
+      .sort((a, b) => b[1].count - a[1].count)
+      .slice(0, 10)
+      .map(([name, { count, revenue }]) => ({ name, count, revenue }));
+  }, [filteredOrders]);
+
   // ===== DIVISION-WISE ANALYTICS =====
   const divisionData = useMemo(() => {
     if (!filteredOrders.length) return [];
@@ -351,6 +368,34 @@ const AnalyticsPage = () => {
           </div>
         )}
       </div>
+
+      {/* ===== CAMPAIGN PERFORMANCE ===== */}
+      {campaignData.length > 0 && (
+        <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6">
+          <div className="flex items-center gap-2 mb-1">
+            <TrendingUp className="h-4 w-4 text-success" />
+            <h3 className="font-semibold text-sm text-foreground">ক্যাম্পেইন পারফরম্যান্স</h3>
+          </div>
+          <p className="text-[11px] text-muted-foreground mb-5">কোন অ্যাড ক্যাম্পেইন থেকে কত অর্ডার ও রেভিনিউ</p>
+          <div className="space-y-2">
+            {campaignData.map((d, i) => (
+              <div key={d.name} className="flex items-center gap-3 p-3 rounded-sm border border-border/20 bg-muted/5">
+                <span className="w-7 h-7 rounded-sm bg-accent/10 flex items-center justify-center shrink-0">
+                  <span className="text-xs font-bold text-accent">{toBengaliNum(i + 1)}</span>
+                </span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium text-foreground truncate">{d.name}</p>
+                  <p className="text-[10px] text-muted-foreground">{toBengaliNum(d.count)} অর্ডার • ৳{formatBengaliPrice(d.revenue)}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs font-semibold text-success font-inter">৳{formatBengaliPrice(d.revenue)}</p>
+                  <p className="text-[10px] text-muted-foreground">গড় ৳{formatBengaliPrice(Math.round(d.revenue / d.count))}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ===== GEOGRAPHIC + ORDER STATUS ===== */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
