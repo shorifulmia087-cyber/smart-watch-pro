@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      coupons: {
+        Row: {
+          code: string
+          created_at: string
+          discount_type: string
+          discount_value: number
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          max_uses: number | null
+          min_order_amount: number
+          used_count: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          max_uses?: number | null
+          min_order_amount?: number
+          used_count?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          max_uses?: number | null
+          min_order_amount?: number
+          used_count?: number
+        }
+        Relationships: []
+      }
       courier_settings: {
         Row: {
           api_key: string | null
@@ -87,6 +126,8 @@ export type Database = {
         Row: {
           address: string
           advance_amount: number
+          coupon_code: string | null
+          coupon_discount: number
           courier_booked: boolean
           courier_provider: string | null
           created_at: string
@@ -113,11 +154,14 @@ export type Database = {
           tracking_id: string | null
           trx_id: string | null
           upazila: string | null
+          user_id: string | null
           watch_model: string
         }
         Insert: {
           address: string
           advance_amount?: number
+          coupon_code?: string | null
+          coupon_discount?: number
           courier_booked?: boolean
           courier_provider?: string | null
           created_at?: string
@@ -144,11 +188,14 @@ export type Database = {
           tracking_id?: string | null
           trx_id?: string | null
           upazila?: string | null
+          user_id?: string | null
           watch_model: string
         }
         Update: {
           address?: string
           advance_amount?: number
+          coupon_code?: string | null
+          coupon_discount?: number
           courier_booked?: boolean
           courier_provider?: string | null
           created_at?: string
@@ -175,6 +222,7 @@ export type Database = {
           tracking_id?: string | null
           trx_id?: string | null
           upazila?: string | null
+          user_id?: string | null
           watch_model?: string
         }
         Relationships: []
