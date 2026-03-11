@@ -83,20 +83,39 @@ const Index = () => {
       }))
     : [];
 
+  const { isLoading: featuredLoading } = useFeaturedProduct();
+  const { isLoading: productsLoading } = useProducts();
+
   if (!currentProduct) {
+    // Still loading
+    if (featuredLoading || productsLoading) {
+      return (
+        <div className="min-h-screen bg-white flex items-center justify-center">
+          <div className="flex items-center gap-2">
+            <motion.div
+              className="w-5 h-5 rounded-full bg-accent"
+              animate={{ x: [0, 24, 0], scale: [1, 0.85, 1] }}
+              transition={{ duration: 0.8, repeat: Infinity, ease: 'easeInOut' }}
+            />
+            <motion.div
+              className="w-5 h-5 rounded-full bg-accent/25"
+              animate={{ x: [0, -24, 0], scale: [0.85, 1, 0.85] }}
+              transition={{ duration: 0.8, repeat: Infinity, ease: 'easeInOut' }}
+            />
+          </div>
+        </div>
+      );
+    }
+    
+    // Data loaded but no products found
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="flex items-center gap-2">
-          <motion.div
-            className="w-5 h-5 rounded-full bg-accent"
-            animate={{ x: [0, 24, 0], scale: [1, 0.85, 1] }}
-            transition={{ duration: 0.8, repeat: Infinity, ease: 'easeInOut' }}
-          />
-          <motion.div
-            className="w-5 h-5 rounded-full bg-accent/25"
-            animate={{ x: [0, -24, 0], scale: [0.85, 1, 0.85] }}
-            transition={{ duration: 0.8, repeat: Infinity, ease: 'easeInOut' }}
-          />
+      <div className="min-h-screen bg-white flex items-center justify-center px-6">
+      <div className="text-center max-w-md">
+          <div className="text-6xl mb-4">⌚</div>
+          <h1 className="text-2xl font-bold text-foreground mb-2">শীঘ্রই আসছে!</h1>
+          <p className="text-muted-foreground text-sm">
+            আমাদের কালেকশন প্রস্তুত হচ্ছে। অনুগ্রহ করে কিছুক্ষণ পর আবার ভিজিট করুন।
+          </p>
         </div>
       </div>
     );
