@@ -15,6 +15,7 @@ const tooltipStyle = {
   border: '1px solid hsl(var(--border))',
   borderRadius: '4px',
   fontSize: '12px',
+  color: 'hsl(var(--foreground))',
   boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
 };
 
