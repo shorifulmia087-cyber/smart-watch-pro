@@ -6,10 +6,13 @@ interface VideoSectionProps {
   sectionTitle?: string;
 }
 
-const VideoSection = ({ videoId = 'dQw4w9WgXcQ', sectionTitle = 'Kronos — কাছ থেকে দেখুন' }: VideoSectionProps) => {
+const VideoSection = ({ videoId, sectionTitle = 'Kronos — কাছ থেকে দেখুন' }: VideoSectionProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+
+  // If no video URL provided, don't render the section
+  if (!videoId || !videoId.trim()) return null;
 
   const thumbUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 
