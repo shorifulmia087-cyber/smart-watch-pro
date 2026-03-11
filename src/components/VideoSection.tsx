@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 interface VideoSectionProps {
   videoId?: string;
   sectionTitle?: string;
+  onOrderClick?: () => void;
 }
 
 const VideoSection = ({ videoId, sectionTitle = 'Kronos — কাছ থেকে দেখুন' }: VideoSectionProps) => {
