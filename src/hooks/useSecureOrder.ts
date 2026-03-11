@@ -24,6 +24,8 @@ interface SecureOrderData {
   fraud_success_rate?: number;
   fraud_flag?: string;
   fraud_error_message?: string;
+  coupon_code?: string;
+  coupon_discount?: number;
 }
 
 export const useSecureOrder = () => {
