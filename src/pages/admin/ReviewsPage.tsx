@@ -140,7 +140,7 @@ const ReviewsPage = () => {
                   )}
                   <button
                     onClick={() => deleteReviewImage.mutate(img.id)}
-                    className="absolute top-1.5 right-1.5 w-7 h-7 rounded-sm bg-destructive/90 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute top-1.5 right-1.5 w-7 h-7 rounded-sm bg-destructive/90 text-white flex items-center justify-center sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
