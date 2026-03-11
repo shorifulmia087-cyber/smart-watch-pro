@@ -229,6 +229,8 @@ const Index = () => {
           nagadNumber={settings?.nagad_number}
           rocketNumber={settings?.rocket_number}
           availableColors={(currentProduct as any).available_colors || []}
+          onOrderSuccess={() => trackEvent('Purchase', { value: currentProduct.price, currency: 'BDT', content_name: currentProduct.name })}
+          onOrderOpen={() => trackEvent('AddToCart', { value: currentProduct.price, currency: 'BDT', content_name: currentProduct.name })}
         />
       </Suspense>
       
