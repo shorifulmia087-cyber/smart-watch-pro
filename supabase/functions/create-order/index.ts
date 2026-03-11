@@ -76,6 +76,18 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
     )
 
+    // Try to get authenticated user_id
+    let userId: string | null = null
+    const authHeader = req.headers.get('Authorization')
+    if (authHeader) {
+      const anonClient = createClient(
+        Deno.env.get('SUPABASE_URL')!,
+        Deno.env.get('SUPABASE_ANON_KEY')!,
+      )
+      const { data: { user } } = await anonClient.auth.getUser(authHeader.replace('Bearer ', ''))
+      if (user) userId = user.id
+    }
+
     // Fetch product price from DB
     const { data: product, error: productErr } = await supabase
       .from('products')
