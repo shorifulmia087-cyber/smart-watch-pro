@@ -389,28 +389,143 @@ const AnalyticsPage = () => {
               </PieChart>
             </ResponsiveContainer>
             <div className="space-y-2">
-              {referrerData.map((d, i) => (
-                <div key={d.name} className="flex items-center gap-3 p-2.5 rounded-sm border border-border/20 bg-muted/5">
-                  <span className="w-3 h-3 rounded-full shrink-0" style={{ background: COLORS[i % COLORS.length] }} />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-foreground capitalize">{d.name}</p>
-                    <p className="text-[10px] text-muted-foreground">{toBengaliNum(d.count)} অর্ডার • ৳{formatBengaliPrice(d.revenue)}</p>
+              {referrerData.map((d, i) => {
+                const pct = Math.round((d.count / filteredOrders.length) * 100);
+                return (
+                  <div key={d.name} className="p-3 rounded-sm border border-border/20 bg-muted/5 hover:bg-muted/10 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <span className="w-3 h-3 rounded-full shrink-0" style={{ background: COLORS[i % COLORS.length] }} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium text-foreground capitalize">{d.name}</p>
+                      </div>
+                      <span className="text-xs font-semibold text-accent font-inter">{toBengaliNum(pct)}%</span>
+                    </div>
+                    <div className="mt-2 ml-6 grid grid-cols-2 gap-2">
+                      <div>
+                        <p className="text-[10px] text-muted-foreground">অর্ডার</p>
+                        <p className="text-xs font-semibold text-foreground font-inter">{toBengaliNum(d.count)}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-muted-foreground">রেভিনিউ</p>
+                        <p className="text-xs font-semibold text-success font-inter">৳{formatBengaliPrice(d.revenue)}</p>
+                      </div>
+                    </div>
+                    {/* Progress bar */}
+                    <div className="mt-2 ml-6 h-1.5 bg-muted/30 rounded-full overflow-hidden">
+                      <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: COLORS[i % COLORS.length] }} />
+                    </div>
                   </div>
-                  <span className="text-xs font-semibold text-accent font-inter">
-                    {toBengaliNum(Math.round((d.count / filteredOrders.length) * 100))}%
-                  </span>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
       </div>
 
-      {/* ===== CAMPAIGN PERFORMANCE ===== */}
-      {campaignData.length > 0 && (
+      {/* ===== SOURCE + MEDIUM COMBINED ===== */}
+      {sourceMediaData.length > 0 && (
         <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6">
           <div className="flex items-center gap-2 mb-1">
-            <TrendingUp className="h-4 w-4 text-success" />
+            <Monitor className="h-4 w-4 text-info" />
+            <h3 className="font-semibold text-sm text-foreground">সোর্স × মিডিয়াম বিশ্লেষণ</h3>
+          </div>
+          <p className="text-[11px] text-muted-foreground mb-5">কোন সোর্স + মিডিয়াম কম্বিনেশন থেকে বেশি অর্ডার</p>
+          <ResponsiveContainer width="100%" height={Math.max(200, sourceMediaData.length * 40)}>
+            <BarChart data={sourceMediaData} layout="vertical" margin={{ left: 10, right: 20 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" horizontal={false} />
+              <XAxis type="number" tick={{ fontSize: 11, fontFamily: 'Inter' }} stroke="hsl(var(--muted-foreground))" axisLine={false} tickLine={false} allowDecimals={false} />
+              <YAxis type="category" dataKey="name" tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" axisLine={false} tickLine={false} width={130} />
+              <Tooltip contentStyle={tooltipStyle} formatter={(value: number, name: string) => {
+                if (name === 'count') return [`${toBengaliNum(value)}`, 'অর্ডার'];
+                return [`৳${formatBengaliPrice(value)}`, 'রেভিনিউ'];
+              }} />
+              <Bar dataKey="count" fill="hsl(var(--info))" radius={[0, 4, 4, 0]} barSize={22} name="count" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+
+      {/* ===== MEDIUM BREAKDOWN ===== */}
+      {mediumData.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6">
+            <div className="flex items-center gap-2 mb-1">
+              <Monitor className="h-4 w-4 text-accent" />
+              <h3 className="font-semibold text-sm text-foreground">মিডিয়াম ব্রেকডাউন</h3>
+            </div>
+            <p className="text-[11px] text-muted-foreground mb-5">পেইড অ্যাড vs অর্গানিক vs অন্যান্য</p>
+            <ResponsiveContainer width="100%" height={220}>
+              <PieChart>
+                <Pie data={mediumData} cx="50%" cy="50%" innerRadius={45} outerRadius={80} paddingAngle={3} dataKey="count" nameKey="name">
+                  {mediumData.map((_, i) => <Cell key={i} fill={COLORS[(i + 2) % COLORS.length]} />)}
+                </Pie>
+                <Tooltip contentStyle={tooltipStyle} formatter={(value: number, name: string) => [`${toBengaliNum(value)} অর্ডার`, name]} />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="space-y-2 mt-3">
+              {mediumData.map((d, i) => (
+                <div key={d.name} className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: COLORS[(i + 2) % COLORS.length] }} />
+                    {d.name}
+                  </span>
+                  <div className="flex items-center gap-3">
+                    <span className="font-inter text-xs text-foreground">{toBengaliNum(d.count)}</span>
+                    <span className="font-inter text-xs text-success">৳{formatBengaliPrice(d.revenue)}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Campaign Performance */}
+          <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6">
+            <div className="flex items-center gap-2 mb-1">
+              <Megaphone className="h-4 w-4 text-success" />
+              <h3 className="font-semibold text-sm text-foreground">ক্যাম্পেইন পারফরম্যান্স</h3>
+            </div>
+            <p className="text-[11px] text-muted-foreground mb-5">কোন ক্যাম্পেইন থেকে কত অর্ডার ও রেভিনিউ</p>
+            {campaignData.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-10">কোনো ক্যাম্পেইন ডেটা নেই</p>
+            ) : (
+              <div className="space-y-2">
+                {campaignData.map((d, i) => (
+                  <div key={d.name} className="p-3 rounded-sm border border-border/20 bg-muted/5 hover:bg-muted/10 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <span className="w-6 h-6 rounded-sm bg-accent/10 flex items-center justify-center shrink-0">
+                        <span className="text-[10px] font-bold text-accent">{toBengaliNum(i + 1)}</span>
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium text-foreground truncate">{d.name}</p>
+                      </div>
+                    </div>
+                    <div className="mt-2 ml-9 grid grid-cols-3 gap-2">
+                      <div>
+                        <p className="text-[10px] text-muted-foreground">অর্ডার</p>
+                        <p className="text-xs font-semibold text-foreground font-inter">{toBengaliNum(d.count)}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-muted-foreground">রেভিনিউ</p>
+                        <p className="text-xs font-semibold text-success font-inter">৳{formatBengaliPrice(d.revenue)}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-muted-foreground">গড় মূল্য</p>
+                        <p className="text-xs font-semibold text-foreground font-inter">৳{formatBengaliPrice(Math.round(d.revenue / d.count))}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Fallback campaign section when no medium data */}
+      {mediumData.length === 0 && campaignData.length > 0 && (
+        <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6">
+          <div className="flex items-center gap-2 mb-1">
+            <Megaphone className="h-4 w-4 text-success" />
             <h3 className="font-semibold text-sm text-foreground">ক্যাম্পেইন পারফরম্যান্স</h3>
           </div>
           <p className="text-[11px] text-muted-foreground mb-5">কোন অ্যাড ক্যাম্পেইন থেকে কত অর্ডার ও রেভিনিউ</p>
