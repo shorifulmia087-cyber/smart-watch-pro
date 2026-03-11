@@ -112,10 +112,10 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Fetch delivery charges from settings
+    // Fetch delivery charges and email setting from settings
     const { data: settings } = await supabase
       .from('site_settings')
-      .select('delivery_charge_inside, delivery_charge_outside')
+      .select('delivery_charge_inside, delivery_charge_outside, order_email_enabled')
       .limit(1)
       .single()
 
