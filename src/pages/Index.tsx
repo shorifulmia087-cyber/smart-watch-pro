@@ -151,11 +151,17 @@ const Index = () => {
         <ReviewGallery />
       </Suspense>
       <Suspense fallback={null}>
+        <DeliveryChecker />
+      </Suspense>
+      <Suspense fallback={null}>
         <CollectionGrid
           currentProductId={currentProduct.id}
           onSelectProduct={handleSelectProduct}
           sectionTitle={settings?.collection_section_title}
         />
+      </Suspense>
+      <Suspense fallback={null}>
+        <StickyOrderForm />
       </Suspense>
 
       <section className="bg-ink py-12 px-4">
