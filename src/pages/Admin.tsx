@@ -25,6 +25,7 @@ const TeamPage = lazy(() => import('./admin/TeamPage'));
 const FraudCheckerPage = lazy(() => import('./admin/FraudCheckerPage'));
 const CouponsPage = lazy(() => import('./admin/CouponsPage'));
 const UtmBuilderPage = lazy(() => import('./admin/UtmBuilderPage'));
+const HelpGuidePage = lazy(() => import('./admin/HelpGuidePage'));
 
 const AdminPageLoader = () => (
   <div className="flex items-center justify-center py-20">
@@ -93,6 +94,7 @@ const Admin = () => {
         <Route path="pixel" element={<Suspense fallback={<AdminPageLoader />}><FacebookPixelPage /></Suspense>} />
         <Route path="settings" element={<Suspense fallback={<AdminPageLoader />}><SiteControlPage /></Suspense>} />
         <Route path="profile" element={<Suspense fallback={<AdminPageLoader />}><ProfileSettingsPage /></Suspense>} />
+        <Route path="guide" element={<Suspense fallback={<AdminPageLoader />}><HelpGuidePage /></Suspense>} />
       </Route>
     </Routes>
   );

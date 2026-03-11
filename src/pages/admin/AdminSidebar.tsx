@@ -4,7 +4,7 @@ import { useSettings } from '@/hooks/useSupabaseData';
 import {
   LayoutDashboard, ShoppingCart, Package, BarChart3, Settings2,
   LogOut, X, Star, CreditCard, UserCog, Users, Truck, Activity,
-  MessageSquare, UsersRound, Route, Wallet, Sparkles, ShieldCheck, Tag, Link2,
+  MessageSquare, UsersRound, Route, Wallet, Sparkles, ShieldCheck, Tag, Link2, BookOpen,
 } from 'lucide-react';
 import {
   Sidebar, SidebarContent, SidebarFooter, SidebarGroup,
@@ -39,6 +39,7 @@ const systemNav = [
   { title: 'FB Pixel', url: '/admin/pixel', icon: Activity },
   { title: 'সাইট কন্ট্রোল', url: '/admin/settings', icon: Settings2 },
   { title: 'প্রোফাইল', url: '/admin/profile', icon: UserCog },
+  { title: 'গাইড', url: '/admin/guide', icon: BookOpen },
 ];
 
 const AdminSidebar = () => {
