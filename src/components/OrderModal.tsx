@@ -562,6 +562,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
 
               {/* Upazila Selector */}
               <div>
+                <p className="text-[10px] text-muted-foreground mb-1">বাংলায় আপনার উপজেলার নাম লিখে সার্চ করুন</p>
                 <UpazilaCombobox value={selectedUpazila} onChange={setSelectedUpazila} hasError={touched && !!errors.upazila} />
                 <ErrorMessage error={errors.upazila} />
                 {selectedUpazila && (
