@@ -452,50 +452,174 @@ const OrdersPage = () => {
     toast({ title: '📄 PDF ইনভয়েস ডাউনলোড হয়েছে' });
   }, [toast, settings]);
 
-  const exportCSV = useCallback(async () => {
-    toast({ title: '⏳ CSV তৈরি হচ্ছে...' });
-    const { data: allOrders } = await supabase
+  const fetchAllOrders = useCallback(async () => {
+    const { data } = await supabase
       .from('orders')
       .select('*')
       .order('created_at', { ascending: false });
+    return data || [];
+  }, []);
 
-    if (!allOrders?.length) {
-      toast({ title: '❌ কোনো অর্ডার পাওয়া যায়নি', variant: 'destructive' });
-      return;
-    }
+  const statusLabelsEn: Record<string, string> = {
+    pending: 'Pending', processing: 'Processing', shipped: 'Shipped', completed: 'Completed', cancelled: 'Cancelled', returned: 'Returned',
+  };
 
-    const headers = ['ID', 'Name', 'Phone', 'Address', 'District', 'Division', 'Product', 'Qty', 'Total', 'Delivery', 'Payment', 'TrxID', 'Status', 'Courier', 'Tracking', 'Date'];
-    const rows = allOrders.map(o => [
-      o.id.slice(0, 8),
+  const exportExcel = useCallback(async () => {
+    toast({ title: '⏳ Excel তৈরি হচ্ছে...' });
+    const allOrders = await fetchAllOrders();
+    if (!allOrders.length) { toast({ title: '❌ কোনো অর্ডার নেই', variant: 'destructive' }); return; }
+
+    const headers = ['#', 'Order ID', 'Customer', 'Phone', 'Address', 'Upazila', 'District', 'Division', 'Product', 'Color', 'Qty', 'Price', 'Delivery', 'Total', 'Payment', 'TrxID', 'Advance', 'Coupon', 'Status', 'Courier', 'Tracking', 'Date'];
+    
+    const rows = allOrders.map((o, i) => [
+      i + 1,
+      o.id.slice(0, 8).toUpperCase(),
       o.customer_name,
       o.phone,
-      `"${o.address.replace(/"/g, '""')}"`,
+      o.address,
+      o.upazila || '',
       o.district || '',
       o.division || '',
       o.watch_model,
+      o.selected_color || '',
       o.quantity,
-      o.total_price,
+      o.total_price - o.delivery_charge,
       o.delivery_charge,
-      o.payment_method,
+      o.total_price,
+      o.payment_method === 'cod' ? 'COD' : o.payment_method.toUpperCase(),
       o.trx_id || '',
-      o.status,
+      o.advance_amount || 0,
+      o.coupon_code || '',
+      statusLabelsEn[o.status] || o.status,
       o.courier_provider || '',
       o.tracking_id || '',
       new Date(o.created_at).toLocaleDateString('en-GB'),
     ]);
 
-    const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+    // Build HTML table for Excel
+    const tableHtml = `
+      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+      <head><meta charset="UTF-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Orders</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head>
+      <body><table border="1" style="border-collapse:collapse;">
+        <thead><tr>${headers.map(h => `<th style="background:#f0f0f0;font-weight:bold;padding:6px 10px;border:1px solid #ccc;font-size:12px;">${h}</th>`).join('')}</tr></thead>
+        <tbody>${rows.map(r => `<tr>${r.map((c, ci) => `<td style="padding:5px 8px;border:1px solid #ddd;font-size:11px;${ci === 3 ? "mso-number-format:'\\@';" : ''}">${c}</td>`).join('')}</tr>`).join('')}</tbody>
+      </table></body></html>`;
+
+    const blob = new Blob(['\ufeff' + tableHtml], { type: 'application/vnd.ms-excel;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `orders-${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute('download', `orders-${new Date().toISOString().slice(0, 10)}.xls`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     setTimeout(() => URL.revokeObjectURL(url), 1000);
-    toast({ title: '✅ CSV ডাউনলোড সম্পন্ন!' });
-  }, [toast]);
+    toast({ title: '✅ Excel ডাউনলোড সম্পন্ন!' });
+  }, [toast, fetchAllOrders]);
+
+  const exportPDF = useCallback(async () => {
+    toast({ title: '⏳ PDF রিপোর্ট তৈরি হচ্ছে...' });
+    const allOrders = await fetchAllOrders();
+    if (!allOrders.length) { toast({ title: '❌ কোনো অর্ডার নেই', variant: 'destructive' }); return; }
+
+    const brandName = settings?.brand_name || 'Kronos Premium Watch';
+    const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'landscape' });
+
+    // Header
+    doc.setFillColor(10, 10, 10);
+    doc.rect(0, 0, 297, 25, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(14);
+    doc.text(brandName + ' — Order Report', 10, 15);
+    doc.setFontSize(8);
+    doc.text(`Generated: ${new Date().toLocaleDateString('en-GB')} | Total Orders: ${allOrders.length}`, 200, 15);
+
+    // Summary stats
+    const totalRevenue = allOrders.reduce((s, o) => s + o.total_price, 0);
+    const completedCount = allOrders.filter(o => o.status === 'completed').length;
+    const pendingCount = allOrders.filter(o => o.status === 'pending').length;
+
+    doc.setTextColor(60, 60, 60);
+    doc.setFontSize(9);
+    let y = 33;
+    doc.text(`Total Revenue: Tk ${totalRevenue.toLocaleString()}  |  Completed: ${completedCount}  |  Pending: ${pendingCount}  |  Cancelled: ${allOrders.filter(o => o.status === 'cancelled').length}`, 10, y);
+
+    // Table headers
+    y += 10;
+    const cols = ['#', 'Customer', 'Phone', 'Product', 'Qty', 'Total', 'Payment', 'Status', 'Courier', 'Tracking', 'Date'];
+    const colWidths = [8, 40, 30, 40, 10, 20, 20, 18, 20, 35, 22];
+    
+    doc.setFillColor(240, 240, 240);
+    doc.rect(8, y - 4, 278, 8, 'F');
+    doc.setTextColor(30, 30, 30);
+    doc.setFontSize(7);
+    let x = 10;
+    cols.forEach((col, i) => {
+      doc.text(col, x, y);
+      x += colWidths[i];
+    });
+
+    // Rows
+    y += 7;
+    doc.setTextColor(60, 60, 60);
+    doc.setFontSize(6.5);
+
+    allOrders.forEach((o, idx) => {
+      if (y > 195) {
+        doc.addPage();
+        y = 15;
+        // Re-draw header on new page
+        doc.setFillColor(240, 240, 240);
+        doc.rect(8, y - 4, 278, 8, 'F');
+        doc.setTextColor(30, 30, 30);
+        doc.setFontSize(7);
+        let hx = 10;
+        cols.forEach((col, i) => { doc.text(col, hx, y); hx += colWidths[i]; });
+        y += 7;
+        doc.setTextColor(60, 60, 60);
+        doc.setFontSize(6.5);
+      }
+
+      const row = [
+        String(idx + 1),
+        o.customer_name.substring(0, 22),
+        o.phone,
+        o.watch_model.substring(0, 22),
+        String(o.quantity),
+        `Tk ${o.total_price}`,
+        o.payment_method === 'cod' ? 'COD' : o.payment_method.toUpperCase(),
+        statusLabelsEn[o.status] || o.status,
+        o.courier_provider || '-',
+        o.tracking_id || '-',
+        new Date(o.created_at).toLocaleDateString('en-GB'),
+      ];
+
+      x = 10;
+      row.forEach((cell, i) => {
+        doc.text(cell, x, y);
+        x += colWidths[i];
+      });
+
+      // Alternating row bg
+      if (idx % 2 === 0) {
+        doc.setFillColor(250, 250, 250);
+        doc.rect(8, y - 3.5, 278, 5.5, 'F');
+        // Re-draw text on bg
+        x = 10;
+        row.forEach((cell, i) => { doc.text(cell, x, y); x += colWidths[i]; });
+      }
+
+      y += 5.5;
+    });
+
+    // Footer
+    doc.setFontSize(7);
+    doc.setTextColor(150, 150, 150);
+    doc.text(`${brandName} | Report generated on ${new Date().toLocaleDateString('en-GB')}`, 148, 200, { align: 'center' });
+
+    doc.save(`order-report-${new Date().toISOString().slice(0, 10)}.pdf`);
+    toast({ title: '✅ PDF রিপোর্ট ডাউনলোড সম্পন্ন!' });
+  }, [toast, fetchAllOrders, settings]);
 
   const paged = orders;
 
@@ -577,13 +701,20 @@ const OrdersPage = () => {
             <p className="text-[11px] text-muted-foreground mt-0.5">মোট {toBengaliNum(totalCount)} টি অর্ডার পাওয়া গেছে {isFetching && !isLoading ? '⟳' : ''}</p>
           </div>
           <div className="flex items-center gap-3 flex-wrap w-full lg:w-auto">
-            {/* CSV Export */}
+            {/* Export Buttons */}
             <button
-              onClick={exportCSV}
+              onClick={exportExcel}
               className="flex items-center gap-2 px-4 py-2.5 rounded-sm text-xs font-semibold border border-border/40 bg-muted/20 text-foreground hover:bg-muted/40 transition-all"
             >
               <Download className="h-4 w-4" />
-              CSV এক্সপোর্ট
+              Excel
+            </button>
+            <button
+              onClick={exportPDF}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-sm text-xs font-semibold border border-border/40 bg-muted/20 text-foreground hover:bg-muted/40 transition-all"
+            >
+              <FileText className="h-4 w-4" />
+              PDF রিপোর্ট
             </button>
             {/* Courier Provider */}
             <div className="flex items-center gap-2 bg-muted/30 border border-border/40 rounded-sm px-3 py-2.5">
