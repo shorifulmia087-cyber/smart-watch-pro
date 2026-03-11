@@ -4,7 +4,7 @@ import { useSettings } from '@/hooks/useSupabaseData';
 import {
   LayoutDashboard, ShoppingCart, Package, BarChart3, Settings2,
   LogOut, X, Star, CreditCard, UserCog, Users, Truck, Activity,
-  MessageSquare, UsersRound, Route, Wallet, Sparkles, ShieldCheck, Tag,
+  MessageSquare, UsersRound, Route, Wallet, Sparkles, ShieldCheck, Tag, Link2,
 } from 'lucide-react';
 import {
   Sidebar, SidebarContent, SidebarFooter, SidebarGroup,
