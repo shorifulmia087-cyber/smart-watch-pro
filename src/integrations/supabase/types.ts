@@ -333,21 +333,32 @@ export type Database = {
           created_at: string
           id: string
           image_url: string
+          product_id: string | null
           sort_order: number
         }
         Insert: {
           created_at?: string
           id?: string
           image_url: string
+          product_id?: string | null
           sort_order?: number
         }
         Update: {
           created_at?: string
           id?: string
           image_url?: string
+          product_id?: string | null
           sort_order?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "review_images_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       site_settings: {
         Row: {
