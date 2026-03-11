@@ -146,7 +146,7 @@ const Index = () => {
       </motion.div>
 
       <Suspense fallback={null}>
-        <ReviewGallery />
+        <ReviewGallery productId={currentProduct.id} />
       </Suspense>
       <Suspense fallback={null}>
         <CollectionGrid

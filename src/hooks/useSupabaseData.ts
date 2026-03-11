@@ -274,13 +274,17 @@ export const useUpdateSettings = () => {
 
 // ─── Review Images ───
 
-export const useReviewImages = () => {
+export const useReviewImages = (productId?: string | null) => {
   return useQuery({
-    queryKey: ['review_images'],
+    queryKey: ['review_images', productId ?? 'all'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('review_images' as any).select('*').order('sort_order');
+      let query = supabase.from('review_images' as any).select('*').order('sort_order');
+      if (productId) {
+        query = query.eq('product_id', productId);
+      }
+      const { data, error } = await query;
       if (error) throw error;
-      return data as unknown as { id: string; image_url: string; sort_order: number; created_at: string }[];
+      return data as unknown as { id: string; image_url: string; sort_order: number; product_id: string | null; created_at: string }[];
     },
     staleTime: 120_000,
   });
@@ -289,7 +293,7 @@ export const useReviewImages = () => {
 export const useUploadReviewImage = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ file, sort_order }: { file: File; sort_order: number }) => {
+    mutationFn: async ({ file, sort_order, product_id }: { file: File; sort_order: number; product_id?: string | null }) => {
       const compressed = await compressImage(file);
       const ext = compressed.name.split('.').pop() || 'webp';
       const filePath = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
@@ -297,7 +301,9 @@ export const useUploadReviewImage = () => {
       if (uploadError) throw uploadError;
       const { data: urlData } = supabase.storage.from('review-images').getPublicUrl(filePath);
       const image_url = urlData.publicUrl;
-      const { error } = await supabase.from('review_images' as any).insert({ image_url, sort_order } as any);
+      const insertData: any = { image_url, sort_order };
+      if (product_id) insertData.product_id = product_id;
+      const { error } = await supabase.from('review_images' as any).insert(insertData);
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['review_images'] }),
