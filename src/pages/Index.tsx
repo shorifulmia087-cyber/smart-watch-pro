@@ -141,6 +141,7 @@ const Index = () => {
           <VideoSection
             videoId={currentProduct.video_url || undefined}
             sectionTitle={settings?.video_section_title}
+            onOrderClick={() => setOrderOpen(true)}
           />
         </Suspense>
       </motion.div>
