@@ -24,6 +24,7 @@ const SmsSettingsPage = lazy(() => import('./admin/SmsSettingsPage'));
 const TeamPage = lazy(() => import('./admin/TeamPage'));
 const FraudCheckerPage = lazy(() => import('./admin/FraudCheckerPage'));
 const CouponsPage = lazy(() => import('./admin/CouponsPage'));
+const UtmBuilderPage = lazy(() => import('./admin/UtmBuilderPage'));
 
 const AdminPageLoader = () => (
   <div className="flex items-center justify-center py-20">
