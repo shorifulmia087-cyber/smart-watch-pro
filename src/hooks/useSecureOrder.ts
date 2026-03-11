@@ -34,15 +34,24 @@ interface SecureOrderData {
 export const useSecureOrder = () => {
   return useMutation({
     mutationFn: async (order: SecureOrderData) => {
+      console.log('[SecureOrder] Submitting order...');
       const { data, error } = await supabase.functions.invoke('create-order', {
         body: order,
       });
       if (error) {
-        throw new Error('অর্ডার তৈরিতে সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।');
+        console.error('[SecureOrder] Function invoke error:', error);
+        // Try to extract meaningful error message
+        let msg = 'অর্ডার তৈরিতে সমস্যা হয়েছে।';
+        if (error instanceof Error) {
+          msg += ` (${error.message})`;
+        }
+        throw new Error(msg);
       }
       if (data?.error) {
+        console.error('[SecureOrder] Server returned error:', data.error);
         throw new Error(data.error);
       }
+      console.log('[SecureOrder] Order created successfully:', data?.order?.id);
       return data;
     },
     retry: 1,
