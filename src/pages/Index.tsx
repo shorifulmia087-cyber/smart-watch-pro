@@ -18,8 +18,6 @@ const VideoSection = lazy(() => import('@/components/VideoSection'));
 const ReviewGallery = lazy(() => import('@/components/ReviewGallery'));
 const CollectionGrid = lazy(() => import('@/components/CollectionGrid'));
 const OrderModal = lazy(() => import('@/components/OrderModal'));
-const DeliveryChecker = lazy(() => import('@/components/DeliveryChecker'));
-const StickyOrderForm = lazy(() => import('@/components/StickyOrderForm'));
 
 type Product = Database['public']['Tables']['products']['Row'];
 
@@ -151,17 +149,11 @@ const Index = () => {
         <ReviewGallery />
       </Suspense>
       <Suspense fallback={null}>
-        <DeliveryChecker />
-      </Suspense>
-      <Suspense fallback={null}>
         <CollectionGrid
           currentProductId={currentProduct.id}
           onSelectProduct={handleSelectProduct}
           sectionTitle={settings?.collection_section_title}
         />
-      </Suspense>
-      <Suspense fallback={null}>
-        <StickyOrderForm />
       </Suspense>
 
       <section className="bg-ink py-12 px-4">
