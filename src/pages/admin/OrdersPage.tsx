@@ -217,6 +217,7 @@ const OrdersPage = () => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
   const [fraudCheckPhone, setFraudCheckPhone] = useState<string | null>(null);
+  const [notesOrderId, setNotesOrderId] = useState<string | null>(null);
 
   // Debounce search input (400ms)
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
