@@ -41,7 +41,10 @@ const SiteControlPage = () => {
   const save = () => {
     // Sanitize all text fields before saving
     const sanitizedForm: Record<string, unknown> = {};
+    // Fields managed by the database — never send in PATCH
+    const excludeKeys = new Set(['id', 'updated_at']);
     for (const [key, value] of Object.entries(form)) {
+      if (excludeKeys.has(key)) continue;
       // Non-super-admins can't change developer fields
       if (!isSuperAdmin && (key === 'developer_name' || key === 'developer_url')) {
         continue;
