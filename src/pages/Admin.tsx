@@ -89,6 +89,7 @@ const Admin = () => {
         <Route path="tracking" element={<Suspense fallback={<AdminPageLoader />}><TrackingDashboardPage /></Suspense>} />
         <Route path="sms" element={<Suspense fallback={<AdminPageLoader />}><SmsSettingsPage /></Suspense>} />
         <Route path="analytics" element={<Suspense fallback={<AdminPageLoader />}><AnalyticsPage /></Suspense>} />
+        <Route path="utm-builder" element={<Suspense fallback={<AdminPageLoader />}><UtmBuilderPage /></Suspense>} />
         <Route path="pixel" element={<Suspense fallback={<AdminPageLoader />}><FacebookPixelPage /></Suspense>} />
         <Route path="settings" element={<Suspense fallback={<AdminPageLoader />}><SiteControlPage /></Suspense>} />
         <Route path="profile" element={<Suspense fallback={<AdminPageLoader />}><ProfileSettingsPage /></Suspense>} />
