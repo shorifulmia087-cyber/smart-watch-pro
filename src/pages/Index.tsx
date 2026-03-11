@@ -2,7 +2,6 @@ import { useState, useCallback, useEffect, lazy, Suspense } from 'react';
 import AnnouncementBar from '@/components/AnnouncementBar';
 import HeroSlider from '@/components/HeroSlider';
 import LoadingOverlay from '@/components/LoadingOverlay';
-import StickyOrderForm from '@/components/StickyOrderForm';
 import WhatsAppButton from '@/components/WhatsAppButton';
 import Navbar from '@/components/Navbar';
 import { formatBengaliPrice } from '@/lib/bengali';
@@ -10,6 +9,7 @@ import { useSettings, useFeaturedProduct, useProducts } from '@/hooks/useSupabas
 import { motion } from 'framer-motion';
 import { useAntiScraping } from '@/hooks/useAntiScraping';
 import { addSecurityHeaders } from '@/lib/security';
+import { useFacebookPixel } from '@/hooks/useFacebookPixel';
 import type { Database } from '@/integrations/supabase/types';
 
 // Lazy load below-fold components
@@ -19,11 +19,13 @@ const ReviewGallery = lazy(() => import('@/components/ReviewGallery'));
 const CollectionGrid = lazy(() => import('@/components/CollectionGrid'));
 const OrderModal = lazy(() => import('@/components/OrderModal'));
 const DeliveryChecker = lazy(() => import('@/components/DeliveryChecker'));
+const StickyOrderForm = lazy(() => import('@/components/StickyOrderForm'));
 
 type Product = Database['public']['Tables']['products']['Row'];
 
 const Index = () => {
   useAntiScraping();
+  const { trackEvent } = useFacebookPixel();
   useEffect(() => { addSecurityHeaders(); }, []);
   const [orderOpen, setOrderOpen] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
@@ -149,11 +151,17 @@ const Index = () => {
         <ReviewGallery />
       </Suspense>
       <Suspense fallback={null}>
+        <DeliveryChecker />
+      </Suspense>
+      <Suspense fallback={null}>
         <CollectionGrid
           currentProductId={currentProduct.id}
           onSelectProduct={handleSelectProduct}
           sectionTitle={settings?.collection_section_title}
         />
+      </Suspense>
+      <Suspense fallback={null}>
+        <StickyOrderForm />
       </Suspense>
 
       <section className="bg-ink py-12 px-4">
@@ -221,6 +229,8 @@ const Index = () => {
           nagadNumber={settings?.nagad_number}
           rocketNumber={settings?.rocket_number}
           availableColors={(currentProduct as any).available_colors || []}
+          onOrderSuccess={() => trackEvent('Purchase', { value: currentProduct.price, currency: 'BDT', content_name: currentProduct.name })}
+          onOrderOpen={() => trackEvent('AddToCart', { value: currentProduct.price, currency: 'BDT', content_name: currentProduct.name })}
         />
       </Suspense>
       

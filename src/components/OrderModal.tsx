@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Minus, Plus, Loader2, Check, Copy, AlertCircle, ShieldAlert } from 'lucide-react';
 import { toBengaliNum, formatBengaliPrice } from '@/lib/bengali';
@@ -23,6 +24,8 @@ interface OrderModalProps {
   nagadNumber?: string;
   rocketNumber?: string;
   availableColors?: string[];
+  onOrderSuccess?: () => void;
+  onOrderOpen?: () => void;
 }
 
 interface FormErrors {
@@ -34,7 +37,7 @@ interface FormErrors {
   upazila?: string;
 }
 
-const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInside = 70, deliveryChargeOutside = 150, onlinePaymentEnabled = true, bkashNumber = '', nagadNumber = '', rocketNumber = '', availableColors = [] }: OrderModalProps) => {
+const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInside = 70, deliveryChargeOutside = 150, onlinePaymentEnabled = true, bkashNumber = '', nagadNumber = '', rocketNumber = '', availableColors = [], onOrderSuccess, onOrderOpen }: OrderModalProps) => {
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState<'cod' | 'online'>('cod');
   const [paymentType, setPaymentType] = useState<'full_payment' | 'delivery_charge_only'>('delivery_charge_only');
@@ -50,6 +53,11 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
   const [selectedColor, setSelectedColor] = useState('');
   const [errors, setErrors] = useState<FormErrors>({});
   const [selectedUpazila, setSelectedUpazila] = useState<Upazila | null>(null);
+  const [couponCode, setCouponCode] = useState('');
+  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [couponApplied, setCouponApplied] = useState(false);
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState('');
 
   // Auto-detect delivery zone from division
   useEffect(() => {
@@ -68,15 +76,72 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
   const fraudCheckedRef = useRef('');
 
   useEffect(() => {
+    if (isOpen && onOrderOpen) onOrderOpen();
+  }, [isOpen]);
+
+  useEffect(() => {
     if (!isOpen) {
       setQty(1); setTab('cod'); setPaymentType('delivery_charge_only'); setName(''); setEmail(''); setPhone(''); setAddress(''); setTxnId(''); setLoading(false); setSuccess(false); setLocation('dhaka'); setHoneypot(''); setHoneypot2(''); setSelectedColor(''); setErrors({}); setTouched(false); setSelectedUpazila(null);
+      setCouponCode(''); setCouponDiscount(0); setCouponApplied(false); setCouponError('');
       resetFraud(); fraudCheckedRef.current = '';
     }
   }, [isOpen]);
 
   const deliveryCharge = location === 'dhaka' ? deliveryChargeInside : deliveryChargeOutside;
   const subtotal = qty * unitPrice;
-  const grandTotal = subtotal + deliveryCharge;
+  const grandTotal = subtotal + deliveryCharge - couponDiscount;
+
+  const applyCoupon = useCallback(async () => {
+    if (!couponCode.trim()) return;
+    setCouponLoading(true);
+    setCouponError('');
+    try {
+      const { data, error } = await supabase
+        .from('coupons' as any)
+        .select('*')
+        .eq('code', couponCode.trim().toUpperCase())
+        .eq('is_active', true)
+        .maybeSingle();
+      if (error || !data) {
+        setCouponError('কুপন কোড সঠিক নয়');
+        setCouponDiscount(0);
+        setCouponApplied(false);
+        return;
+      }
+      const c = data as any;
+      // Check expiry
+      if (c.expires_at && new Date(c.expires_at) < new Date()) {
+        setCouponError('কুপনের মেয়াদ শেষ');
+        return;
+      }
+      // Check max uses
+      if (c.max_uses !== null && c.used_count >= c.max_uses) {
+        setCouponError('কুপন ব্যবহারের সীমা শেষ');
+        return;
+      }
+      // Check min order
+      const rawTotal = subtotal + deliveryCharge;
+      if (rawTotal < c.min_order_amount) {
+        setCouponError(`সর্বনিম্ন অর্ডার ৳${c.min_order_amount}`);
+        return;
+      }
+      // Calculate discount
+      let discount = 0;
+      if (c.discount_type === 'percentage') {
+        discount = Math.round(subtotal * c.discount_value / 100);
+      } else {
+        discount = c.discount_value;
+      }
+      // Don't let discount exceed subtotal
+      discount = Math.min(discount, subtotal);
+      setCouponDiscount(discount);
+      setCouponApplied(true);
+    } catch {
+      setCouponError('সমস্যা হয়েছে');
+    } finally {
+      setCouponLoading(false);
+    }
+  }, [couponCode, subtotal, deliveryCharge]);
 
   const validate = useCallback((): FormErrors => {
     const errs: FormErrors = {};
@@ -190,10 +255,13 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
         fraud_success_rate: fraudResult?.success_rate ?? undefined,
         fraud_flag: fraudResult?.flag ?? undefined,
         fraud_error_message: fraudResult?.error_message ?? undefined,
+        coupon_code: couponApplied ? couponCode.trim().toUpperCase() : undefined,
+        coupon_discount: couponDiscount,
       });
       setLoading(false);
       setSuccess(true);
       resetTurnstile();
+      if (onOrderSuccess) onOrderSuccess();
     } catch (err: any) {
       setLoading(false);
       console.error('Order submission failed:', err);
@@ -365,12 +433,55 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
                 )}
               </div>
 
+              {/* Coupon */}
+              <div className="border-t border-border/60 pt-3">
+                <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium mb-2">কুপন কোড</p>
+                <div className="flex gap-2">
+                  <input
+                    value={couponCode}
+                    onChange={e => { setCouponCode(e.target.value.toUpperCase()); setCouponApplied(false); setCouponDiscount(0); setCouponError(''); }}
+                    placeholder="SAVE20"
+                    disabled={couponApplied}
+                    className={`flex-1 bg-transparent border rounded-xl px-3 py-2.5 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-gold/20 ${couponApplied ? 'border-success/40 bg-success/5 text-success' : 'border-border/60'}`}
+                    maxLength={20}
+                  />
+                  {couponApplied ? (
+                    <button
+                      onClick={() => { setCouponApplied(false); setCouponDiscount(0); setCouponCode(''); }}
+                      className="px-3 py-2.5 rounded-xl border border-destructive/30 text-destructive text-sm font-medium hover:bg-destructive/5 transition-colors"
+                    >
+                      বাতিল
+                    </button>
+                  ) : (
+                    <button
+                      onClick={applyCoupon}
+                      disabled={couponLoading || !couponCode.trim()}
+                      className="px-4 py-2.5 rounded-xl gradient-gold text-surface text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+                    >
+                      {couponLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'অ্যাপ্লাই'}
+                    </button>
+                  )}
+                </div>
+                {couponError && <p className="text-xs text-destructive mt-1">{couponError}</p>}
+                {couponApplied && (
+                  <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-xs text-success mt-1.5">
+                    ✅ ৳{formatBengaliPrice(couponDiscount)} ছাড় প্রয়োগ হয়েছে!
+                  </motion.p>
+                )}
+              </div>
+
               {/* Total */}
               <div className="border-t border-border/60 pt-3">
                 <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
                   <span>ডেলিভারি চার্জ</span>
                   <span>৳{formatBengaliPrice(deliveryCharge)}</span>
                 </div>
+                {couponDiscount > 0 && (
+                  <div className="flex items-center justify-between text-xs text-success mb-1">
+                    <span>কুপন ছাড়</span>
+                    <span>-৳{formatBengaliPrice(couponDiscount)}</span>
+                  </div>
+                )}
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-semibold text-foreground">সর্বমোট</span>
                   <span className="text-2xl font-bold text-gold">৳{formatBengaliPrice(grandTotal)}</span>

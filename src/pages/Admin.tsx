@@ -23,6 +23,7 @@ const FacebookPixelPage = lazy(() => import('./admin/FacebookPixelPage'));
 const SmsSettingsPage = lazy(() => import('./admin/SmsSettingsPage'));
 const TeamPage = lazy(() => import('./admin/TeamPage'));
 const FraudCheckerPage = lazy(() => import('./admin/FraudCheckerPage'));
+const CouponsPage = lazy(() => import('./admin/CouponsPage'));
 
 const AdminPageLoader = () => (
   <div className="flex items-center justify-center py-20">
@@ -78,6 +79,7 @@ const Admin = () => {
         <Route path="customers" element={<Suspense fallback={<AdminPageLoader />}><CustomersPage /></Suspense>} />
         <Route path="reviews" element={<Suspense fallback={<AdminPageLoader />}><ReviewsPage /></Suspense>} />
         <Route path="fraud-checker" element={<Suspense fallback={<AdminPageLoader />}><FraudCheckerPage /></Suspense>} />
+        <Route path="coupons" element={<Suspense fallback={<AdminPageLoader />}><CouponsPage /></Suspense>} />
         <Route path="team" element={<Suspense fallback={<AdminPageLoader />}><TeamPage /></Suspense>} />
         <Route path="payment" element={<Suspense fallback={<AdminPageLoader />}><PaymentSettingsPage /></Suspense>} />
         <Route path="advance-payments" element={<Suspense fallback={<AdminPageLoader />}><AdvancePaymentsPage /></Suspense>} />
