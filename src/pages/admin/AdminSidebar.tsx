@@ -24,6 +24,7 @@ const managementNav = [
   { title: 'রিভিউ', url: '/admin/reviews', icon: Star },
   { title: 'টিম', url: '/admin/team', icon: UsersRound },
   { title: 'ফ্রড চেকার', url: '/admin/fraud-checker', icon: ShieldCheck },
+  { title: 'কুপন', url: '/admin/coupons', icon: Tag },
   { title: 'পেমেন্ট', url: '/admin/payment', icon: CreditCard },
   { title: 'অগ্রিম পেমেন্ট', url: '/admin/advance-payments', icon: Wallet },
   { title: 'কুরিয়ার', url: '/admin/courier', icon: Truck },

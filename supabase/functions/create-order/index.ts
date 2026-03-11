@@ -204,6 +204,7 @@ Deno.serve(async (req) => {
       fraud_error_message: typeof fraud_error_message === 'string' ? fraud_error_message : null,
       coupon_code: verifiedCouponCode,
       coupon_discount: verifiedCouponDiscount,
+      user_id: userId,
     }
 
     const { data: order, error: insertErr } = await supabase

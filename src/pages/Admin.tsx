@@ -79,6 +79,7 @@ const Admin = () => {
         <Route path="customers" element={<Suspense fallback={<AdminPageLoader />}><CustomersPage /></Suspense>} />
         <Route path="reviews" element={<Suspense fallback={<AdminPageLoader />}><ReviewsPage /></Suspense>} />
         <Route path="fraud-checker" element={<Suspense fallback={<AdminPageLoader />}><FraudCheckerPage /></Suspense>} />
+        <Route path="coupons" element={<Suspense fallback={<AdminPageLoader />}><CouponsPage /></Suspense>} />
         <Route path="team" element={<Suspense fallback={<AdminPageLoader />}><TeamPage /></Suspense>} />
         <Route path="payment" element={<Suspense fallback={<AdminPageLoader />}><PaymentSettingsPage /></Suspense>} />
         <Route path="advance-payments" element={<Suspense fallback={<AdminPageLoader />}><AdvancePaymentsPage /></Suspense>} />
