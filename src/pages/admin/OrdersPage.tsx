@@ -996,6 +996,22 @@ const OrdersPage = () => {
                       <TableCell className="text-[11px] text-foreground whitespace-nowrap">
                         {o.delivery_location === 'dhaka' ? 'ঢাকা' : 'ঢাকার বাইরে'}
                       </TableCell>
+                      <TableCell className="text-[11px] whitespace-nowrap">
+                        {(o as any).referrer_source ? (
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-sm text-[10px] font-medium border ${
+                            (o as any).referrer_source === 'facebook' ? 'bg-info/10 text-info border-info/20' :
+                            (o as any).referrer_source === 'google' ? 'bg-success/10 text-success border-success/20' :
+                            (o as any).referrer_source === 'tiktok' ? 'bg-accent/10 text-accent border-accent/20' :
+                            (o as any).referrer_source === 'youtube' ? 'bg-destructive/10 text-destructive border-destructive/20' :
+                            (o as any).referrer_source === 'direct' ? 'bg-muted/30 text-muted-foreground border-border/30' :
+                            'bg-warning/10 text-warning border-warning/20'
+                          }`}>
+                            {(o as any).referrer_source}
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground text-[10px]">—</span>
+                        )}
+                      </TableCell>
                       <TableCell className="text-[11px] text-muted-foreground font-inter tabular-nums whitespace-nowrap">
                         {new Date(o.created_at).toLocaleDateString('bn-BD')}
                       </TableCell>
