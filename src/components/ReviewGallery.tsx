@@ -3,9 +3,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight, Star, Quote } from 'lucide-react';
 import { useReviewImages } from '@/hooks/useSupabaseData';
 
-const ReviewGallery = () => {
+interface ReviewGalleryProps {
+  productId?: string | null;
+}
+
+const ReviewGallery = ({ productId }: ReviewGalleryProps) => {
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
-  const { data: images, isLoading } = useReviewImages();
+  const { data: images, isLoading } = useReviewImages(productId);
 
   if (isLoading || !images?.length) return null;
 
