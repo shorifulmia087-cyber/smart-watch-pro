@@ -19,6 +19,7 @@ const ReviewGallery = lazy(() => import('@/components/ReviewGallery'));
 const CollectionGrid = lazy(() => import('@/components/CollectionGrid'));
 const OrderModal = lazy(() => import('@/components/OrderModal'));
 const DeliveryChecker = lazy(() => import('@/components/DeliveryChecker'));
+const StickyOrderForm = lazy(() => import('@/components/StickyOrderForm'));
 
 type Product = Database['public']['Tables']['products']['Row'];
 
