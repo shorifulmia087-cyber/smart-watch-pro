@@ -522,7 +522,7 @@ export type Database = {
       remove_team_member: { Args: { _user_id: string }; Returns: Json }
     }
     Enums: {
-      app_role: "admin" | "user"
+      app_role: "admin" | "user" | "order_manager"
       order_status:
         | "pending"
         | "processing"
@@ -657,7 +657,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user"],
+      app_role: ["admin", "user", "order_manager"],
       order_status: [
         "pending",
         "processing",
