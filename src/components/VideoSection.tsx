@@ -6,12 +6,13 @@ interface VideoSectionProps {
   sectionTitle?: string;
 }
 
-const VideoSection = ({ videoId = 'dQw4w9WgXcQ', sectionTitle = 'Kronos — কাছ থেকে দেখুন' }: VideoSectionProps) => {
+const VideoSection = ({ videoId, sectionTitle = 'Kronos — কাছ থেকে দেখুন' }: VideoSectionProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const thumbUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+  const hasVideo = !!videoId?.trim();
+  const thumbUrl = hasVideo ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : '';
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -21,6 +22,8 @@ const VideoSection = ({ videoId = 'dQw4w9WgXcQ', sectionTitle = 'Kronos — ক�
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
   }, []);
+
+  if (!hasVideo) return null;
 
   return (
     <section
