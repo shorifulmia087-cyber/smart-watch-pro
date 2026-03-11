@@ -23,6 +23,7 @@ const FacebookPixelPage = lazy(() => import('./admin/FacebookPixelPage'));
 const SmsSettingsPage = lazy(() => import('./admin/SmsSettingsPage'));
 const TeamPage = lazy(() => import('./admin/TeamPage'));
 const FraudCheckerPage = lazy(() => import('./admin/FraudCheckerPage'));
+const CouponsPage = lazy(() => import('./admin/CouponsPage'));
 
 const AdminPageLoader = () => (
   <div className="flex items-center justify-center py-20">
