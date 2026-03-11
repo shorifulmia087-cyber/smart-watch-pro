@@ -2,7 +2,6 @@ import { useState, useCallback, useEffect, lazy, Suspense } from 'react';
 import AnnouncementBar from '@/components/AnnouncementBar';
 import HeroSlider from '@/components/HeroSlider';
 import LoadingOverlay from '@/components/LoadingOverlay';
-import StickyOrderForm from '@/components/StickyOrderForm';
 import WhatsAppButton from '@/components/WhatsAppButton';
 import Navbar from '@/components/Navbar';
 import { formatBengaliPrice } from '@/lib/bengali';
@@ -10,6 +9,7 @@ import { useSettings, useFeaturedProduct, useProducts } from '@/hooks/useSupabas
 import { motion } from 'framer-motion';
 import { useAntiScraping } from '@/hooks/useAntiScraping';
 import { addSecurityHeaders } from '@/lib/security';
+import { useFacebookPixel } from '@/hooks/useFacebookPixel';
 import type { Database } from '@/integrations/supabase/types';
 
 // Lazy load below-fold components
