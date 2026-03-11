@@ -76,15 +76,72 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
   const fraudCheckedRef = useRef('');
 
   useEffect(() => {
+    if (isOpen && onOrderOpen) onOrderOpen();
+  }, [isOpen]);
+
+  useEffect(() => {
     if (!isOpen) {
       setQty(1); setTab('cod'); setPaymentType('delivery_charge_only'); setName(''); setEmail(''); setPhone(''); setAddress(''); setTxnId(''); setLoading(false); setSuccess(false); setLocation('dhaka'); setHoneypot(''); setHoneypot2(''); setSelectedColor(''); setErrors({}); setTouched(false); setSelectedUpazila(null);
+      setCouponCode(''); setCouponDiscount(0); setCouponApplied(false); setCouponError('');
       resetFraud(); fraudCheckedRef.current = '';
     }
   }, [isOpen]);
 
   const deliveryCharge = location === 'dhaka' ? deliveryChargeInside : deliveryChargeOutside;
   const subtotal = qty * unitPrice;
-  const grandTotal = subtotal + deliveryCharge;
+  const grandTotal = subtotal + deliveryCharge - couponDiscount;
+
+  const applyCoupon = useCallback(async () => {
+    if (!couponCode.trim()) return;
+    setCouponLoading(true);
+    setCouponError('');
+    try {
+      const { data, error } = await supabase
+        .from('coupons' as any)
+        .select('*')
+        .eq('code', couponCode.trim().toUpperCase())
+        .eq('is_active', true)
+        .maybeSingle();
+      if (error || !data) {
+        setCouponError('কুপন কোড সঠিক নয়');
+        setCouponDiscount(0);
+        setCouponApplied(false);
+        return;
+      }
+      const c = data as any;
+      // Check expiry
+      if (c.expires_at && new Date(c.expires_at) < new Date()) {
+        setCouponError('কুপনের মেয়াদ শেষ');
+        return;
+      }
+      // Check max uses
+      if (c.max_uses !== null && c.used_count >= c.max_uses) {
+        setCouponError('কুপন ব্যবহারের সীমা শেষ');
+        return;
+      }
+      // Check min order
+      const rawTotal = subtotal + deliveryCharge;
+      if (rawTotal < c.min_order_amount) {
+        setCouponError(`সর্বনিম্ন অর্ডার ৳${c.min_order_amount}`);
+        return;
+      }
+      // Calculate discount
+      let discount = 0;
+      if (c.discount_type === 'percentage') {
+        discount = Math.round(subtotal * c.discount_value / 100);
+      } else {
+        discount = c.discount_value;
+      }
+      // Don't let discount exceed subtotal
+      discount = Math.min(discount, subtotal);
+      setCouponDiscount(discount);
+      setCouponApplied(true);
+    } catch {
+      setCouponError('সমস্যা হয়েছে');
+    } finally {
+      setCouponLoading(false);
+    }
+  }, [couponCode, subtotal, deliveryCharge]);
 
   const validate = useCallback((): FormErrors => {
     const errs: FormErrors = {};
