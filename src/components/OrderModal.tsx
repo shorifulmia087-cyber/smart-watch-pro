@@ -23,6 +23,8 @@ interface OrderModalProps {
   nagadNumber?: string;
   rocketNumber?: string;
   availableColors?: string[];
+  onOrderSuccess?: () => void;
+  onOrderOpen?: () => void;
 }
 
 interface FormErrors {
