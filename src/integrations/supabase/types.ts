@@ -188,6 +188,8 @@ export type Database = {
           trx_id: string | null
           upazila: string | null
           user_id: string | null
+          utm_campaign: string | null
+          utm_medium: string | null
           watch_model: string
         }
         Insert: {
@@ -223,6 +225,8 @@ export type Database = {
           trx_id?: string | null
           upazila?: string | null
           user_id?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
           watch_model: string
         }
         Update: {
@@ -258,6 +262,8 @@ export type Database = {
           trx_id?: string | null
           upazila?: string | null
           user_id?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
           watch_model?: string
         }
         Relationships: []
