@@ -187,18 +187,54 @@ const AnalyticsPage = () => {
   // ===== CAMPAIGN ANALYTICS =====
   const campaignData = useMemo(() => {
     if (!filteredOrders.length) return [];
-    const map: Record<string, { count: number; revenue: number }> = {};
+    const map: Record<string, { count: number; revenue: number; completed: number }> = {};
     filteredOrders.forEach(o => {
       const campaign = (o as any).utm_campaign;
       if (!campaign) return;
-      if (!map[campaign]) map[campaign] = { count: 0, revenue: 0 };
+      if (!map[campaign]) map[campaign] = { count: 0, revenue: 0, completed: 0 };
       map[campaign].count++;
       map[campaign].revenue += o.total_price;
+      if (o.status === 'completed') map[campaign].completed++;
     });
     return Object.entries(map)
       .sort((a, b) => b[1].count - a[1].count)
       .slice(0, 10)
+      .map(([name, { count, revenue, completed }]) => ({ name, count, revenue, completed, convRate: Math.round((completed / count) * 100) }));
+  }, [filteredOrders]);
+
+  // ===== MEDIUM ANALYTICS =====
+  const mediumData = useMemo(() => {
+    if (!filteredOrders.length) return [];
+    const map: Record<string, { count: number; revenue: number }> = {};
+    filteredOrders.forEach(o => {
+      const med = (o as any).utm_medium;
+      if (!med) return;
+      if (!map[med]) map[med] = { count: 0, revenue: 0 };
+      map[med].count++;
+      map[med].revenue += o.total_price;
+    });
+    return Object.entries(map)
+      .sort((a, b) => b[1].count - a[1].count)
       .map(([name, { count, revenue }]) => ({ name, count, revenue }));
+  }, [filteredOrders]);
+
+  // ===== SOURCE + MEDIUM COMBINED =====
+  const sourceMediaData = useMemo(() => {
+    if (!filteredOrders.length) return [];
+    const map: Record<string, { count: number; revenue: number; completed: number }> = {};
+    filteredOrders.forEach(o => {
+      const src = (o as any).referrer_source || 'direct';
+      const med = (o as any).utm_medium || '';
+      const key = med ? `${src} / ${med}` : src;
+      if (!map[key]) map[key] = { count: 0, revenue: 0, completed: 0 };
+      map[key].count++;
+      map[key].revenue += o.total_price;
+      if (o.status === 'completed') map[key].completed++;
+    });
+    return Object.entries(map)
+      .sort((a, b) => b[1].count - a[1].count)
+      .slice(0, 8)
+      .map(([name, { count, revenue, completed }]) => ({ name, count, revenue, completed }));
   }, [filteredOrders]);
 
   // ===== DIVISION-WISE ANALYTICS =====
