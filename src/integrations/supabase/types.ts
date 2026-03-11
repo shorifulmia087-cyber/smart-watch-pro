@@ -122,6 +122,38 @@ export type Database = {
         }
         Relationships: []
       }
+      order_notes: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          note: string
+          order_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          note: string
+          order_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          note?: string
+          order_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_notes_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           address: string
@@ -413,6 +445,39 @@ export type Database = {
           updated_at?: string
           video_section_title?: string
           whatsapp_number?: string
+        }
+        Relationships: []
+      }
+      sms_settings: {
+        Row: {
+          api_key: string
+          created_at: string
+          id: string
+          is_active: boolean
+          provider: string
+          sender_id: string
+          templates: Json
+          updated_at: string
+        }
+        Insert: {
+          api_key?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          provider?: string
+          sender_id?: string
+          templates?: Json
+          updated_at?: string
+        }
+        Update: {
+          api_key?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          provider?: string
+          sender_id?: string
+          templates?: Json
+          updated_at?: string
         }
         Relationships: []
       }
