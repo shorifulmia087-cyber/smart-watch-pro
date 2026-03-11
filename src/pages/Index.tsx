@@ -193,7 +193,16 @@ const Index = () => {
               Developed by{' '}
               {(settings as any)?.developer_url ? (
                 <a
-                  href={(settings as any).developer_url}
+                  href={(() => {
+                    const url = (settings as any).developer_url;
+                    // If it looks like a phone number, convert to WhatsApp link
+                    const cleanNum = url.replace(/[\s\-\+]/g, '');
+                    if (/^\d{10,15}$/.test(cleanNum) || /^88\d{11}$/.test(cleanNum)) {
+                      const waNum = cleanNum.startsWith('88') ? cleanNum : `88${cleanNum}`;
+                      return `https://wa.me/${waNum}`;
+                    }
+                    return url.startsWith('http') ? url : `https://${url}`;
+                  })()}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gold/60 hover:text-gold transition-colors duration-200 underline underline-offset-2"

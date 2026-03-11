@@ -151,7 +151,7 @@ const SiteControlPage = () => {
             {isSuperAdmin ? (
               <>
                 <Field label="ডেভেলপার নাম" value={(form as any).developer_name || ''} onChange={v => setForm({ ...form, developer_name: v } as any)} />
-                <Field label="ডেভেলপার লিংক (URL)" value={(form as any).developer_url || ''} onChange={v => setForm({ ...form, developer_url: v } as any)} />
+                <Field label="ডেভেলপার লিংক (নম্বর দিলে WhatsApp)" value={(form as any).developer_url || ''} onChange={v => setForm({ ...form, developer_url: v } as any)} />
               </>
             ) : (
               <>
@@ -165,7 +165,7 @@ const SiteControlPage = () => {
                 </div>
                 <div>
                   <label className="text-[11px] font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
-                    <Lock className="h-3 w-3" /> ডেভেলপার লিংক (URL)
+                    <Lock className="h-3 w-3" /> ডেভেলপার লিংক
                   </label>
                   <div className="w-full bg-muted/20 border border-border/30 rounded-sm px-3 py-2.5 text-sm text-muted-foreground cursor-not-allowed select-none truncate">
                     {(form as any).developer_url || '—'}
