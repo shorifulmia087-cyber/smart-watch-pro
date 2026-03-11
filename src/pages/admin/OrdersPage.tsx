@@ -869,6 +869,8 @@ const OrdersPage = () => {
                    <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">ট্র্যাক স্ট্যাটাস</TableHead>
                    <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">এলাকা</TableHead>
                    <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">সোর্স</TableHead>
+                   <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">মিডিয়াম</TableHead>
+                   <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">ক্যাম্পেইন</TableHead>
                    <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">তারিখ</TableHead>
                    <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">স্ট্যাটাস</TableHead>
                    <TableHead className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70 text-right whitespace-nowrap">অ্যাকশন</TableHead>
@@ -1011,10 +1013,28 @@ const OrdersPage = () => {
                         ) : (
                           <span className="text-muted-foreground text-[10px]">—</span>
                         )}
-                      </TableCell>
-                      <TableCell className="text-[11px] text-muted-foreground font-inter tabular-nums whitespace-nowrap">
-                        {new Date(o.created_at).toLocaleDateString('bn-BD')}
-                      </TableCell>
+                       </TableCell>
+                       <TableCell className="text-[11px] whitespace-nowrap">
+                         {(o as any).utm_medium ? (
+                           <span className="inline-flex items-center px-2 py-0.5 rounded-sm text-[10px] font-medium border bg-muted/30 text-muted-foreground border-border/30">
+                             {(o as any).utm_medium}
+                           </span>
+                         ) : (
+                           <span className="text-muted-foreground text-[10px]">—</span>
+                         )}
+                       </TableCell>
+                       <TableCell className="text-[11px] whitespace-nowrap">
+                         {(o as any).utm_campaign ? (
+                           <span className="inline-flex items-center px-2 py-0.5 rounded-sm text-[10px] font-medium border bg-primary/10 text-primary border-primary/20">
+                             {(o as any).utm_campaign}
+                           </span>
+                         ) : (
+                           <span className="text-muted-foreground text-[10px]">—</span>
+                         )}
+                       </TableCell>
+                       <TableCell className="text-[11px] text-muted-foreground font-inter tabular-nums whitespace-nowrap">
+                         {new Date(o.created_at).toLocaleDateString('bn-BD')}
+                       </TableCell>
                       <TableCell>
                         <select
                           value={o.status}
