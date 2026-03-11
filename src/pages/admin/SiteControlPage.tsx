@@ -209,6 +209,7 @@ const SiteControlPage = () => {
             </p>
           </div>
         </Section>
+      </div>
     </div>
   );
 };
