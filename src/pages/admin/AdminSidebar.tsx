@@ -39,6 +39,7 @@ const systemNav = [
   { title: 'FB Pixel', url: '/admin/pixel', icon: Activity },
   { title: 'সাইট কন্ট্রোল', url: '/admin/settings', icon: Settings2 },
   { title: 'প্রোফাইল', url: '/admin/profile', icon: UserCog },
+  { title: 'গাইড', url: '/admin/guide', icon: BookOpen },
 ];
 
 const AdminSidebar = () => {

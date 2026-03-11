@@ -94,6 +94,7 @@ const Admin = () => {
         <Route path="pixel" element={<Suspense fallback={<AdminPageLoader />}><FacebookPixelPage /></Suspense>} />
         <Route path="settings" element={<Suspense fallback={<AdminPageLoader />}><SiteControlPage /></Suspense>} />
         <Route path="profile" element={<Suspense fallback={<AdminPageLoader />}><ProfileSettingsPage /></Suspense>} />
+        <Route path="guide" element={<Suspense fallback={<AdminPageLoader />}><HelpGuidePage /></Suspense>} />
       </Route>
     </Routes>
   );
