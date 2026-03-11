@@ -151,7 +151,7 @@ const SiteControlPage = () => {
             {isSuperAdmin ? (
               <>
                 <Field label="ডেভেলপার নাম" value={(form as any).developer_name || ''} onChange={v => setForm({ ...form, developer_name: v } as any)} />
-                <Field label="ডেভেলপার লিংক (URL)" value={(form as any).developer_url || ''} onChange={v => setForm({ ...form, developer_url: v } as any)} />
+                <Field label="ডেভেলপার লিংক (নম্বর দিলে WhatsApp)" value={(form as any).developer_url || ''} onChange={v => setForm({ ...form, developer_url: v } as any)} placeholder="নম্বর বা URL দিন" />
               </>
             ) : (
               <>
