@@ -110,10 +110,10 @@ const Index = () => {
     // Data loaded but no products found
     return (
       <div className="min-h-screen bg-white flex items-center justify-center px-6">
-        <div className="text-center max-w-md">
+      <div className="text-center max-w-md">
           <div className="text-6xl mb-4">⌚</div>
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">শীঘ্রই আসছে!</h1>
-          <p className="text-gray-500 text-sm">
+          <h1 className="text-2xl font-bold text-foreground mb-2">শীঘ্রই আসছে!</h1>
+          <p className="text-muted-foreground text-sm">
             আমাদের কালেকশন প্রস্তুত হচ্ছে। অনুগ্রহ করে কিছুক্ষণ পর আবার ভিজিট করুন।
           </p>
         </div>
