@@ -51,7 +51,7 @@ const SmsSettingsPage = () => {
         sender_id: senderId,
         provider,
         is_active: isActive,
-        templates: templates,
+        templates: JSON.parse(JSON.stringify(templates)),
       };
 
       if (settingsId) {
