@@ -701,13 +701,20 @@ const OrdersPage = () => {
             <p className="text-[11px] text-muted-foreground mt-0.5">মোট {toBengaliNum(totalCount)} টি অর্ডার পাওয়া গেছে {isFetching && !isLoading ? '⟳' : ''}</p>
           </div>
           <div className="flex items-center gap-3 flex-wrap w-full lg:w-auto">
-            {/* CSV Export */}
+            {/* Export Buttons */}
             <button
-              onClick={exportCSV}
+              onClick={exportExcel}
               className="flex items-center gap-2 px-4 py-2.5 rounded-sm text-xs font-semibold border border-border/40 bg-muted/20 text-foreground hover:bg-muted/40 transition-all"
             >
               <Download className="h-4 w-4" />
-              CSV এক্সপোর্ট
+              Excel
+            </button>
+            <button
+              onClick={exportPDF}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-sm text-xs font-semibold border border-border/40 bg-muted/20 text-foreground hover:bg-muted/40 transition-all"
+            >
+              <FileText className="h-4 w-4" />
+              PDF রিপোর্ট
             </button>
             {/* Courier Provider */}
             <div className="flex items-center gap-2 bg-muted/30 border border-border/40 rounded-sm px-3 py-2.5">
