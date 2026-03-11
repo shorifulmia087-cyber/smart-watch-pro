@@ -201,7 +201,7 @@ const SiteControlPage = () => {
         <Section title="ইমেইল নোটিফিকেশন" icon={<Mail className="h-4 w-4 text-info" />}>
           <div className="space-y-3">
             <label className="flex items-center gap-2 text-sm cursor-pointer text-foreground">
-              <input type="checkbox" checked={(form as any).order_email_enabled ?? true} onChange={e => setForm({ ...form, order_email_enabled: e.target.checked } as any)} className="rounded-sm accent-accent" />
+              <input type="checkbox" checked={Boolean((form as any).order_email_enabled)} onChange={e => setForm({ ...form, order_email_enabled: e.target.checked } as any)} className="rounded-sm accent-accent" />
               অর্ডার কনফার্মেশন ইমেইল পাঠান
             </label>
             <p className="text-xs text-muted-foreground">
