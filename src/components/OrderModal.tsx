@@ -433,12 +433,55 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
                 )}
               </div>
 
+              {/* Coupon */}
+              <div className="border-t border-border/60 pt-3">
+                <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium mb-2">কুপন কোড</p>
+                <div className="flex gap-2">
+                  <input
+                    value={couponCode}
+                    onChange={e => { setCouponCode(e.target.value.toUpperCase()); setCouponApplied(false); setCouponDiscount(0); setCouponError(''); }}
+                    placeholder="SAVE20"
+                    disabled={couponApplied}
+                    className={`flex-1 bg-transparent border rounded-xl px-3 py-2.5 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-gold/20 ${couponApplied ? 'border-success/40 bg-success/5 text-success' : 'border-border/60'}`}
+                    maxLength={20}
+                  />
+                  {couponApplied ? (
+                    <button
+                      onClick={() => { setCouponApplied(false); setCouponDiscount(0); setCouponCode(''); }}
+                      className="px-3 py-2.5 rounded-xl border border-destructive/30 text-destructive text-sm font-medium hover:bg-destructive/5 transition-colors"
+                    >
+                      বাতিল
+                    </button>
+                  ) : (
+                    <button
+                      onClick={applyCoupon}
+                      disabled={couponLoading || !couponCode.trim()}
+                      className="px-4 py-2.5 rounded-xl gradient-gold text-surface text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+                    >
+                      {couponLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'অ্যাপ্লাই'}
+                    </button>
+                  )}
+                </div>
+                {couponError && <p className="text-xs text-destructive mt-1">{couponError}</p>}
+                {couponApplied && (
+                  <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-xs text-success mt-1.5">
+                    ✅ ৳{formatBengaliPrice(couponDiscount)} ছাড় প্রয়োগ হয়েছে!
+                  </motion.p>
+                )}
+              </div>
+
               {/* Total */}
               <div className="border-t border-border/60 pt-3">
                 <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
                   <span>ডেলিভারি চার্জ</span>
                   <span>৳{formatBengaliPrice(deliveryCharge)}</span>
                 </div>
+                {couponDiscount > 0 && (
+                  <div className="flex items-center justify-between text-xs text-success mb-1">
+                    <span>কুপন ছাড়</span>
+                    <span>-৳{formatBengaliPrice(couponDiscount)}</span>
+                  </div>
+                )}
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-semibold text-foreground">সর্বমোট</span>
                   <span className="text-2xl font-bold text-gold">৳{formatBengaliPrice(grandTotal)}</span>
