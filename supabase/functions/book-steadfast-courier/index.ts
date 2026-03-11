@@ -117,8 +117,18 @@ serve(async (req) => {
       body: JSON.stringify(steadfastPayload),
     });
 
-    const steadfastData = await steadfastResponse.json();
-    console.log("Steadfast response:", JSON.stringify(steadfastData), "Status:", steadfastResponse.status);
+    const responseText = await steadfastResponse.text();
+    console.log("Steadfast response:", responseText, "Status:", steadfastResponse.status);
+
+    let steadfastData: any;
+    try {
+      steadfastData = JSON.parse(responseText);
+    } catch {
+      return new Response(
+        JSON.stringify({ error: "Steadfast API error", details: responseText, status_code: steadfastResponse.status, mode: isSandbox ? "sandbox" : "production" }),
+        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     if (!steadfastResponse.ok || steadfastData?.status !== 200) {
       return new Response(
