@@ -3,7 +3,7 @@ import { useSettings, useUpdateSettings } from '@/hooks/useSupabaseData';
 import { useAuth } from '@/hooks/useAuth';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
-  Globe, Megaphone, Type, FileText, Save, Loader2, CheckCircle2, MessageCircle, Upload, X, Lock, ShieldCheck,
+  Globe, Megaphone, Type, FileText, Save, Loader2, CheckCircle2, MessageCircle, Upload, X, Lock, ShieldCheck, Mail,
 } from 'lucide-react';
 import type { Database } from '@/integrations/supabase/types';
 import { supabase } from '@/integrations/supabase/client';
@@ -194,6 +194,18 @@ const SiteControlPage = () => {
             />
             <p className="text-xs text-muted-foreground">
               এই হারের নিচে থাকলে ক্যাশ অন ডেলিভারি ব্লক হবে এবং কাস্টমারকে অগ্রিম পেমেন্ট করতে বলা হবে। ডিফল্ট: ৬০%
+            </p>
+          </div>
+        </Section>
+
+        <Section title="ইমেইল নোটিফিকেশন" icon={<Mail className="h-4 w-4 text-info" />}>
+          <div className="space-y-3">
+            <label className="flex items-center gap-2 text-sm cursor-pointer text-foreground">
+              <input type="checkbox" checked={(form as any).order_email_enabled ?? true} onChange={e => setForm({ ...form, order_email_enabled: e.target.checked } as any)} className="rounded-sm accent-accent" />
+              অর্ডার কনফার্মেশন ইমেইল পাঠান
+            </label>
+            <p className="text-xs text-muted-foreground">
+              চালু থাকলে প্রতিটি নতুন অর্ডারের পর কাস্টমার ও অ্যাডমিনকে স্বয়ংক্রিয়ভাবে ইমেইল পাঠানো হবে। বন্ধ করলে কোনো ইমেইল যাবে না।
             </p>
           </div>
         </Section>
