@@ -20,6 +20,7 @@ Deno.serve(async (req) => {
       fraud_total_parcels, fraud_total_delivered, fraud_total_cancel,
       fraud_success_rate, fraud_flag, fraud_error_message,
       coupon_code, coupon_discount,
+      referrer_source,
     } = body
 
     // === Input validation ===
