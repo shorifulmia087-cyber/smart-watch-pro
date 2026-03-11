@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useOrdersLite, useProductsLite } from '@/hooks/useSupabaseData';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
 import { Skeleton } from '@/components/ui/skeleton';
-import { TrendingUp, Users, Wallet, Crown, MapPin, ArrowUp, ArrowDown, Minus, Package, Globe } from 'lucide-react';
+import { TrendingUp, Users, Wallet, Crown, MapPin, ArrowUp, ArrowDown, Minus, Package, Globe, Megaphone, Monitor } from 'lucide-react';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, PieChart, Pie, Cell, Legend,
