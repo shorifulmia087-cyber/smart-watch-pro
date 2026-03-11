@@ -289,7 +289,9 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
         fraud_error_message: fraudResult?.error_message ?? undefined,
         coupon_code: couponApplied ? couponCode.trim().toUpperCase() : undefined,
         coupon_discount: couponDiscount,
-        referrer_source: referrerSource,
+        referrer_source: utmData.source,
+        utm_medium: utmData.medium,
+        utm_campaign: utmData.campaign,
       });
       setLoading(false);
       setSuccess(true);

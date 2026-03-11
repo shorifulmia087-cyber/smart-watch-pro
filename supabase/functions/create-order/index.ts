@@ -207,6 +207,8 @@ Deno.serve(async (req) => {
       coupon_discount: verifiedCouponDiscount,
       user_id: userId,
       referrer_source: typeof referrer_source === 'string' ? referrer_source.substring(0, 50) : null,
+      utm_medium: typeof utm_medium === 'string' ? utm_medium.substring(0, 50) : null,
+      utm_campaign: typeof utm_campaign === 'string' ? utm_campaign.substring(0, 100) : null,
     }
 
     const { data: order, error: insertErr } = await supabase
