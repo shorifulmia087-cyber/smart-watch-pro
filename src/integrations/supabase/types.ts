@@ -394,6 +394,7 @@ export type Database = {
           offer_end_at: string | null
           offer_start_at: string | null
           online_payment_enabled: boolean
+          order_email_enabled: boolean
           primary_color: string
           product_type: string
           rocket_number: string
@@ -426,6 +427,7 @@ export type Database = {
           offer_end_at?: string | null
           offer_start_at?: string | null
           online_payment_enabled?: boolean
+          order_email_enabled?: boolean
           primary_color?: string
           product_type?: string
           rocket_number?: string
@@ -458,6 +460,7 @@ export type Database = {
           offer_end_at?: string | null
           offer_start_at?: string | null
           online_payment_enabled?: boolean
+          order_email_enabled?: boolean
           primary_color?: string
           product_type?: string
           rocket_number?: string
