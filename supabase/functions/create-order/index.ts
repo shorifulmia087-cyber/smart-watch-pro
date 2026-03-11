@@ -190,6 +190,8 @@ Deno.serve(async (req) => {
       fraud_success_rate: typeof fraud_success_rate === 'number' ? fraud_success_rate : null,
       fraud_flag: typeof fraud_flag === 'string' ? fraud_flag : null,
       fraud_error_message: typeof fraud_error_message === 'string' ? fraud_error_message : null,
+      coupon_code: verifiedCouponCode,
+      coupon_discount: verifiedCouponDiscount,
     }
 
     const { data: order, error: insertErr } = await supabase
