@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { Users, Shield, UserPlus, Loader2, Crown, Trash2 } from 'lucide-react';
+import { Users, Shield, UserPlus, Loader2, Crown, Trash2, ShieldCheck } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
@@ -17,11 +17,11 @@ type TeamMember = {
 };
 
 const TeamPage = () => {
-  const { user } = useAuth();
+  const { user, isSuperAdmin, isAdmin } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [newEmail, setNewEmail] = useState('');
-  const [newRole, setNewRole] = useState<'admin' | 'user'>('user');
+  const [newRole, setNewRole] = useState<string>('order_manager');
   const [adding, setAdding] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
 
@@ -39,26 +39,36 @@ const TeamPage = () => {
     ?.filter(m => m.role === 'admin')
     .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())[0]?.user_id;
 
+  // Available roles based on caller's role
+  const availableRoles = isSuperAdmin
+    ? [
+        { value: 'admin', label: 'অ্যাডমিন' },
+        { value: 'order_manager', label: 'অর্ডার ম্যানেজার' },
+      ]
+    : [
+        { value: 'order_manager', label: 'অর্ডার ম্যানেজার' },
+      ];
+
   const handleInvite = async () => {
     if (!newEmail.trim()) return;
     setAdding(true);
     try {
       const { data, error } = await supabase.rpc('add_team_member', {
         _email: newEmail.trim(),
-        _role: newRole,
+        _role: newRole as any,
       });
 
       if (error) throw error;
 
       const result = data as { success: boolean; error?: string; user_id?: string };
+      const roleLabel = newRole === 'admin' ? 'অ্যাডমিন' : 'অর্ডার ম্যানেজার';
 
       if (result.success) {
         toast({
           title: '✅ সফলভাবে যোগ করা হয়েছে',
-          description: `${newEmail} কে ${newRole === 'admin' ? 'ফুল অ্যাডমিন' : 'অর্ডার ম্যানেজার'} হিসেবে যোগ করা হয়েছে।`,
+          description: `${newEmail} কে ${roleLabel} হিসেবে যোগ করা হয়েছে।`,
         });
         setNewEmail('');
-        // Refetch team members
         queryClient.invalidateQueries({ queryKey: ['team-members'] });
       } else if (result.error === 'user_not_found') {
         toast({
@@ -74,7 +84,9 @@ const TeamPage = () => {
       } else if (result.error === 'permission_denied') {
         toast({
           title: '❌ অনুমতি নেই',
-          description: 'শুধু সুপার অ্যাডমিন টিম মেম্বার যোগ করতে পারেন।',
+          description: isSuperAdmin
+            ? 'কিছু একটা সমস্যা হয়েছে।'
+            : 'শুধু সুপার অ্যাডমিন অ্যাডমিন যোগ করতে পারেন। আপনি শুধু অর্ডার ম্যানেজার যোগ করতে পারেন।',
           variant: 'destructive',
         });
       }
@@ -99,8 +111,10 @@ const TeamPage = () => {
       if (result.success) {
         toast({ title: '✅ সফলভাবে রিমুভ করা হয়েছে' });
         queryClient.invalidateQueries({ queryKey: ['team-members'] });
-      } else if (result.error === 'cannot_remove_self') {
-        toast({ title: '❌ নিজেকে রিমুভ করা যাবে না', variant: 'destructive' });
+      } else if (result.error === 'cannot_remove_super_admin') {
+        toast({ title: '❌ সুপার অ্যাডমিন রিমুভ করা যাবে না', variant: 'destructive' });
+      } else if (result.error === 'permission_denied') {
+        toast({ title: '❌ অনুমতি নেই', description: 'আপনি শুধু অর্ডার ম্যানেজার রিমুভ করতে পারেন।', variant: 'destructive' });
       } else {
         toast({ title: '❌ ত্রুটি', description: result.error, variant: 'destructive' });
       }
@@ -111,12 +125,55 @@ const TeamPage = () => {
     }
   };
 
+  const getRoleBadge = (m: TeamMember) => {
+    if (m.user_id === superAdminId) {
+      return (
+        <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2.5 py-1 rounded-sm border bg-gold/10 text-gold border-gold/20">
+          <Crown className="h-3 w-3" /> সুপার অ্যাডমিন
+        </span>
+      );
+    }
+    if (m.role === 'admin') {
+      return (
+        <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2.5 py-1 rounded-sm border bg-accent/10 text-accent border-accent/20">
+          <ShieldCheck className="h-3 w-3" /> অ্যাডমিন
+        </span>
+      );
+    }
+    if (m.role === 'order_manager') {
+      return (
+        <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2.5 py-1 rounded-sm border bg-info/10 text-info border-info/20">
+          <Shield className="h-3 w-3" /> অর্ডার ম্যানেজার
+        </span>
+      );
+    }
+    return (
+      <span className="text-[10px] font-medium px-2.5 py-1 rounded-sm border bg-muted/20 text-muted-foreground border-border/30">
+        ইউজার
+      </span>
+    );
+  };
+
+  const canRemove = (m: TeamMember) => {
+    // Can't remove super admin
+    if (m.user_id === superAdminId) return false;
+    // Can't remove yourself
+    if (m.user_id === user?.id) return false;
+    // Super admin can remove anyone (except themselves)
+    if (isSuperAdmin) return true;
+    // Admin can only remove order_managers
+    if (isAdmin && m.role === 'order_manager') return true;
+    return false;
+  };
+
   return (
     <div className="space-y-5 w-full">
-      {/* Bento Header */}
+      {/* Header */}
       <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-4 md:p-5">
         <h2 className="text-lg font-bold text-foreground">টিম ম্যানেজমেন্ট</h2>
-        <p className="text-[11px] text-muted-foreground mt-0.5">সাব-অ্যাডমিন যোগ করুন ও পারমিশন নিয়ন্ত্রণ করুন</p>
+        <p className="text-[11px] text-muted-foreground mt-0.5">
+          {isSuperAdmin ? 'অ্যাডমিন ও অর্ডার ম্যানেজার যোগ করুন' : 'অর্ডার ম্যানেজার যোগ করুন ও পারমিশন নিয়ন্ত্রণ করুন'}
+        </p>
       </div>
 
       {/* Add Member */}
@@ -132,11 +189,12 @@ const TeamPage = () => {
             className="flex-1 bg-muted/30 border border-border/40 rounded-sm px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-gold/20 transition-all"
           />
           <select
-            value={newRole} onChange={e => setNewRole(e.target.value as 'admin' | 'user')}
+            value={newRole} onChange={e => setNewRole(e.target.value)}
             className="bg-muted/30 border border-border/40 rounded-sm px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-gold/20 transition-all"
           >
-            <option value="admin">ফুল অ্যাডমিন</option>
-            <option value="user">অর্ডার ম্যানেজার</option>
+            {availableRoles.map(r => (
+              <option key={r.value} value={r.value}>{r.label}</option>
+            ))}
           </select>
           <button
             onClick={handleInvite}
@@ -151,20 +209,27 @@ const TeamPage = () => {
       </div>
 
       {/* Role Descriptions */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 space-y-2">
           <div className="flex items-center gap-2">
             <Crown className="h-4 w-4 text-gold" />
-            <h4 className="font-semibold text-sm text-foreground">ফুল অ্যাডমিন</h4>
+            <h4 className="font-semibold text-sm text-foreground">সুপার অ্যাডমিন</h4>
           </div>
-          <p className="text-[11px] text-muted-foreground">সব ফিচারে সম্পূর্ণ অ্যাক্সেস — প্রোডাক্ট, অর্ডার, সেটিংস, টিম।</p>
+          <p className="text-[11px] text-muted-foreground">সম্পূর্ণ নিয়ন্ত্রণ — অ্যাডমিন ও অর্ডার ম্যানেজার যোগ/রিমুভ, ডেভেলপার ফিল্ড এডিট। পরিবর্তন অযোগ্য।</p>
+        </div>
+        <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 space-y-2">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="h-4 w-4 text-accent" />
+            <h4 className="font-semibold text-sm text-foreground">অ্যাডমিন</h4>
+          </div>
+          <p className="text-[11px] text-muted-foreground">সব ফিচারে অ্যাক্সেস — প্রোডাক্ট, অর্ডার, সেটিংস। অর্ডার ম্যানেজার যোগ/রিমুভ করতে পারবেন।</p>
         </div>
         <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 space-y-2">
           <div className="flex items-center gap-2">
             <Shield className="h-4 w-4 text-info" />
             <h4 className="font-semibold text-sm text-foreground">অর্ডার ম্যানেজার</h4>
           </div>
-          <p className="text-[11px] text-muted-foreground">শুধু অর্ডার দেখা ও স্ট্যাটাস আপডেট করতে পারবেন। অন্য কিছু পরিবর্তন করতে পারবেন না।</p>
+          <p className="text-[11px] text-muted-foreground">শুধু অর্ডার দেখা, স্ট্যাটাস আপডেট ও ট্র্যাকিং। অন্য কিছু পরিবর্তন করতে পারবেন না।</p>
         </div>
       </div>
 
@@ -193,14 +258,7 @@ const TeamPage = () => {
               {members.map(m => (
                 <TableRow key={m.id} className="hover:bg-gold/[0.03] border-b border-border/30">
                   <TableCell className="font-mono text-xs text-foreground">{m.user_id.slice(0, 8)}...</TableCell>
-                  <TableCell>
-                    <span className={`text-[10px] font-medium px-2.5 py-1 rounded-sm border ${
-                      m.user_id === superAdminId ? 'bg-gold/10 text-gold border-gold/20' :
-                      m.role === 'admin' ? 'bg-accent/10 text-accent border-accent/20' : 'bg-info/10 text-info border-info/20'
-                    }`}>
-                      {m.user_id === superAdminId ? '👑 সুপার অ্যাডমিন' : m.role === 'admin' ? 'ফুল অ্যাডমিন' : 'অর্ডার ম্যানেজার'}
-                    </span>
-                  </TableCell>
+                  <TableCell>{getRoleBadge(m)}</TableCell>
                   <TableCell className="text-center">
                     {m.user_id === user?.id ? (
                       <span className="text-[10px] text-success font-medium">আপনি</span>
@@ -209,7 +267,7 @@ const TeamPage = () => {
                     )}
                   </TableCell>
                   <TableCell className="text-center">
-                    {m.user_id !== superAdminId && user?.id === superAdminId && (
+                    {canRemove(m) && (
                       <button
                         onClick={() => handleRemove(m.user_id)}
                         disabled={removingId === m.user_id}

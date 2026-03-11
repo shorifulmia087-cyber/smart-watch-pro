@@ -2,7 +2,7 @@ import { useState, useEffect, createContext, useContext } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { Session, User } from '@supabase/supabase-js';
 
-type AppRole = 'admin' | 'user' | null;
+type AppRole = 'admin' | 'order_manager' | 'user' | null;
 
 interface AuthContextType {
   session: Session | null;
@@ -28,14 +28,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const checkRole = async (userId: string) => {
     try {
+      // Check admin first
       const { data: isAdmin } = await supabase.rpc('has_role', { _user_id: userId, _role: 'admin' });
       if (isAdmin) {
         setUserRole('admin');
-        // Check super admin
         const { data: isSA } = await supabase.rpc('is_super_admin', { _user_id: userId });
         setIsSuperAdmin(!!isSA);
         return;
       }
+      // Check order_manager
+      const { data: isOM } = await supabase.rpc('has_role', { _user_id: userId, _role: 'order_manager' as any });
+      if (isOM) {
+        setUserRole('order_manager');
+        setIsSuperAdmin(false);
+        return;
+      }
+      // Check user
       const { data: isUser } = await supabase.rpc('has_role', { _user_id: userId, _role: 'user' });
       if (isUser) {
         setUserRole('user');
@@ -108,7 +116,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const isAdmin = userRole === 'admin';
   const isSuperAdmin = isSuperAdminState;
-  const isOrderManager = userRole === 'user';
+  const isOrderManager = userRole === 'order_manager';
   const hasAdminAccess = isAdmin || isOrderManager;
 
   return (
