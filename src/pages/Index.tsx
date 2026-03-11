@@ -25,6 +25,7 @@ type Product = Database['public']['Tables']['products']['Row'];
 
 const Index = () => {
   useAntiScraping();
+  const { trackEvent } = useFacebookPixel();
   useEffect(() => { addSecurityHeaders(); }, []);
   const [orderOpen, setOrderOpen] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
