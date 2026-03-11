@@ -110,8 +110,43 @@ Deno.serve(async (req) => {
       ? (settings?.delivery_charge_inside ?? 70)
       : (settings?.delivery_charge_outside ?? 150)
 
+    // Validate and apply coupon server-side
+    let verifiedCouponDiscount = 0
+    let verifiedCouponCode: string | null = null
+    if (coupon_code && typeof coupon_code === 'string') {
+      const { data: coupon } = await supabase
+        .from('coupons')
+        .select('*')
+        .eq('code', coupon_code.trim().toUpperCase())
+        .eq('is_active', true)
+        .maybeSingle()
+      
+      if (coupon) {
+        const notExpired = !coupon.expires_at || new Date(coupon.expires_at) > new Date()
+        const notUsedUp = coupon.max_uses === null || coupon.used_count < coupon.max_uses
+        const rawTotal = (product.price * quantity) + deliveryCharge
+        const meetsMin = rawTotal >= coupon.min_order_amount
+
+        if (notExpired && notUsedUp && meetsMin) {
+          if (coupon.discount_type === 'percentage') {
+            verifiedCouponDiscount = Math.round(product.price * quantity * coupon.discount_value / 100)
+          } else {
+            verifiedCouponDiscount = coupon.discount_value
+          }
+          verifiedCouponDiscount = Math.min(verifiedCouponDiscount, product.price * quantity)
+          verifiedCouponCode = coupon.code
+
+          // Increment used_count
+          await supabase
+            .from('coupons')
+            .update({ used_count: coupon.used_count + 1 })
+            .eq('id', coupon.id)
+        }
+      }
+    }
+
     // Calculate verified total server-side
-    const verifiedTotal = (product.price * quantity) + deliveryCharge
+    const verifiedTotal = (product.price * quantity) + deliveryCharge - verifiedCouponDiscount
 
     // Sanitize inputs
     const sanitize = (s: string) => s.replace(/<[^>]*>/g, '').trim()
