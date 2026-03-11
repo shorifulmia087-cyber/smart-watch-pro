@@ -183,6 +183,23 @@ const AnalyticsPage = () => {
       .map(([name, { count, revenue }]) => ({ name, count, revenue }));
   }, [filteredOrders]);
 
+  // ===== CAMPAIGN ANALYTICS =====
+  const campaignData = useMemo(() => {
+    if (!filteredOrders.length) return [];
+    const map: Record<string, { count: number; revenue: number }> = {};
+    filteredOrders.forEach(o => {
+      const campaign = (o as any).utm_campaign;
+      if (!campaign) return;
+      if (!map[campaign]) map[campaign] = { count: 0, revenue: 0 };
+      map[campaign].count++;
+      map[campaign].revenue += o.total_price;
+    });
+    return Object.entries(map)
+      .sort((a, b) => b[1].count - a[1].count)
+      .slice(0, 10)
+      .map(([name, { count, revenue }]) => ({ name, count, revenue }));
+  }, [filteredOrders]);
+
   // ===== DIVISION-WISE ANALYTICS =====
   const divisionData = useMemo(() => {
     if (!filteredOrders.length) return [];
