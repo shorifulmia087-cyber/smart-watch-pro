@@ -7,7 +7,7 @@ interface VideoSectionProps {
   onOrderClick?: () => void;
 }
 
-const VideoSection = ({ videoId, sectionTitle = 'Kronos — কাছ থেকে দেখুন' }: VideoSectionProps) => {
+const VideoSection = ({ videoId, sectionTitle = 'Kronos — কাছ থেকে দেখুন', onOrderClick }: VideoSectionProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
