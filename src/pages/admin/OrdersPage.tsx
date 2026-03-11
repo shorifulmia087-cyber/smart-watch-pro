@@ -452,6 +452,49 @@ const OrdersPage = () => {
     toast({ title: '📄 PDF ইনভয়েস ডাউনলোড হয়েছে' });
   }, [toast, settings]);
 
+  const exportCSV = useCallback(async () => {
+    toast({ title: '⏳ CSV তৈরি হচ্ছে...' });
+    const { data: allOrders } = await supabase
+      .from('orders')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (!allOrders?.length) {
+      toast({ title: '❌ কোনো অর্ডার পাওয়া যায়নি', variant: 'destructive' });
+      return;
+    }
+
+    const headers = ['ID', 'Name', 'Phone', 'Address', 'District', 'Division', 'Product', 'Qty', 'Total', 'Delivery', 'Payment', 'TrxID', 'Status', 'Courier', 'Tracking', 'Date'];
+    const rows = allOrders.map(o => [
+      o.id.slice(0, 8),
+      o.customer_name,
+      o.phone,
+      `"${o.address.replace(/"/g, '""')}"`,
+      o.district || '',
+      o.division || '',
+      o.watch_model,
+      o.quantity,
+      o.total_price,
+      o.delivery_charge,
+      o.payment_method,
+      o.trx_id || '',
+      o.status,
+      o.courier_provider || '',
+      o.tracking_id || '',
+      new Date(o.created_at).toLocaleDateString('en-GB'),
+    ]);
+
+    const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `orders-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast({ title: '✅ CSV ডাউনলোড সম্পন্ন!' });
+  }, [toast]);
+
   const paged = orders;
 
   const allPageSelected = paged.length > 0 && paged.every(o => selectedIds.has(o.id));
