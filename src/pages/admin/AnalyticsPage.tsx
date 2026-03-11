@@ -168,6 +168,21 @@ const AnalyticsPage = () => {
     return Object.entries(map).map(([name, value]) => ({ name, value }));
   }, [filteredOrders]);
 
+  // ===== REFERRER SOURCE ANALYTICS =====
+  const referrerData = useMemo(() => {
+    if (!filteredOrders.length) return [];
+    const map: Record<string, { count: number; revenue: number }> = {};
+    filteredOrders.forEach(o => {
+      const src = (o as any).referrer_source || 'অজানা';
+      if (!map[src]) map[src] = { count: 0, revenue: 0 };
+      map[src].count++;
+      map[src].revenue += o.total_price;
+    });
+    return Object.entries(map)
+      .sort((a, b) => b[1].count - a[1].count)
+      .map(([name, { count, revenue }]) => ({ name, count, revenue }));
+  }, [filteredOrders]);
+
   // ===== DIVISION-WISE ANALYTICS =====
   const divisionData = useMemo(() => {
     if (!filteredOrders.length) return [];
