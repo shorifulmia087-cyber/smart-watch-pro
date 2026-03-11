@@ -91,13 +91,19 @@ const VideoSection = ({ videoId, sectionTitle = 'Kronos — কাছ থেক�
             viewport={{ once: true }}
             className="flex justify-center mt-8"
           >
-            <button
+            <motion.button
               onClick={onOrderClick}
-              className="gradient-gold text-white font-bold px-10 py-3.5 rounded-sm text-base hover:opacity-90 transition-all shadow-lg animate-pulse-gold"
-              style={{ boxShadow: '0 6px 20px -6px hsl(var(--gold) / 0.4)' }}
+              className="gradient-gold text-surface font-semibold px-8 py-3.5 rounded-xl text-base hover:opacity-90 transition-opacity"
+              style={{ boxShadow: '0 4px 16px -4px hsl(var(--gold) / 0.4)' }}
+              initial={{ scale: 1, rotateZ: 0 }}
+              animate={{ 
+                scale: [1, 1.08, 1.08, 1],
+                rotateZ: [0, -2, 2, -2, 2, 0],
+              }}
+              transition={{ duration: 1.2, ease: 'easeInOut', repeat: Infinity, repeatDelay: 1.8 }}
             >
               এখনই কিনুন
-            </button>
+            </motion.button>
           </motion.div>
         )}
       </div>
