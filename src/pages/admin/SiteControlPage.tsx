@@ -30,13 +30,22 @@ const SiteControlPage = () => {
   const { isSuperAdmin } = useAuth();
   const updateSettings = useUpdateSettings();
   const [form, setForm] = useState<Partial<SettingsRow>>({});
-  const [initialized, setInitialized] = useState(false);
   const [saved, setSaved] = useState(false);
+  const settingsIdRef = useRef<string | null>(null);
 
-  if (settings && !initialized) {
-    setForm({ ...settings });
-    setInitialized(true);
-  }
+  // Sync form with settings data whenever it changes
+  useEffect(() => {
+    if (settings) {
+      setForm(prev => {
+        // Only re-sync if settings ID changed (first load) or after a successful save
+        if (settingsIdRef.current !== settings.id) {
+          settingsIdRef.current = settings.id;
+          return { ...settings };
+        }
+        return prev;
+      });
+    }
+  }, [settings]);
 
   const save = () => {
     // Sanitize all text fields before saving
@@ -58,7 +67,14 @@ const SiteControlPage = () => {
     updateSettings.mutate(sanitizedForm as any, {
       onSuccess: () => {
         setSaved(true);
+        // Force re-sync form with fresh data on next refetch
+        settingsIdRef.current = null;
+        toast.success('সেটিংস সফলভাবে সংরক্ষিত হয়েছে!');
         setTimeout(() => setSaved(false), 2000);
+      },
+      onError: (err) => {
+        console.error('Settings save error:', err);
+        toast.error('সেটিংস সংরক্ষণে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
       },
     });
   };
