@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useOrdersLite, useProductsLite } from '@/hooks/useSupabaseData';
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
 import { Skeleton } from '@/components/ui/skeleton';
-import { TrendingUp, Users, Wallet, Crown, MapPin, ArrowUp, ArrowDown, Minus, Package } from 'lucide-react';
+import { TrendingUp, Users, Wallet, Crown, MapPin, ArrowUp, ArrowDown, Minus, Package, Globe } from 'lucide-react';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, PieChart, Pie, Cell, Legend,
@@ -168,6 +168,21 @@ const AnalyticsPage = () => {
     return Object.entries(map).map(([name, value]) => ({ name, value }));
   }, [filteredOrders]);
 
+  // ===== REFERRER SOURCE ANALYTICS =====
+  const referrerData = useMemo(() => {
+    if (!filteredOrders.length) return [];
+    const map: Record<string, { count: number; revenue: number }> = {};
+    filteredOrders.forEach(o => {
+      const src = (o as any).referrer_source || 'অজানা';
+      if (!map[src]) map[src] = { count: 0, revenue: 0 };
+      map[src].count++;
+      map[src].revenue += o.total_price;
+    });
+    return Object.entries(map)
+      .sort((a, b) => b[1].count - a[1].count)
+      .map(([name, { count, revenue }]) => ({ name, count, revenue }));
+  }, [filteredOrders]);
+
   // ===== DIVISION-WISE ANALYTICS =====
   const divisionData = useMemo(() => {
     if (!filteredOrders.length) return [];
@@ -293,6 +308,43 @@ const AnalyticsPage = () => {
                     <p className="text-xs font-medium text-foreground truncate">{p.fullName}</p>
                     <p className="text-[10px] text-muted-foreground">{toBengaliNum(p.sold)} পিস বিক্রি</p>
                   </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ===== REFERRER SOURCE ANALYTICS ===== */}
+      <div className="bg-surface dark:bg-card rounded-sm border border-border/30 shadow-sm p-5 md:p-6">
+        <div className="flex items-center gap-2 mb-1">
+          <Globe className="h-4 w-4 text-accent" />
+          <h3 className="font-semibold text-sm text-foreground">ট্র্যাফিক সোর্স</h3>
+        </div>
+        <p className="text-[11px] text-muted-foreground mb-5">অর্ডার কোন সোর্স থেকে এসেছে</p>
+        {isLoading ? <Skeleton className="h-[320px] rounded-sm" /> : referrerData.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-10">ডেটা নেই</p>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <ResponsiveContainer width="100%" height={260}>
+              <PieChart>
+                <Pie data={referrerData} cx="50%" cy="50%" innerRadius={50} outerRadius={90} paddingAngle={3} dataKey="count" nameKey="name">
+                  {referrerData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                </Pie>
+                <Tooltip contentStyle={tooltipStyle} formatter={(value: number, name: string) => [`${toBengaliNum(value)} অর্ডার`, name]} />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="space-y-2">
+              {referrerData.map((d, i) => (
+                <div key={d.name} className="flex items-center gap-3 p-2.5 rounded-sm border border-border/20 bg-muted/5">
+                  <span className="w-3 h-3 rounded-full shrink-0" style={{ background: COLORS[i % COLORS.length] }} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-foreground capitalize">{d.name}</p>
+                    <p className="text-[10px] text-muted-foreground">{toBengaliNum(d.count)} অর্ডার • ৳{formatBengaliPrice(d.revenue)}</p>
+                  </div>
+                  <span className="text-xs font-semibold text-accent font-inter">
+                    {toBengaliNum(Math.round((d.count / filteredOrders.length) * 100))}%
+                  </span>
                 </div>
               ))}
             </div>

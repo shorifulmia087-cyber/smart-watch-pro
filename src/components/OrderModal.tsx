@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Minus, Plus, Loader2, Check, Copy, AlertCircle, ShieldAlert } from 'lucide-react';
@@ -58,6 +58,29 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
   const [couponApplied, setCouponApplied] = useState(false);
   const [couponLoading, setCouponLoading] = useState(false);
   const [couponError, setCouponError] = useState('');
+
+  // Capture referrer source on page load
+  const referrerSource = useMemo(() => {
+    const params = new URLSearchParams(window.location.search);
+    const utmSource = params.get('utm_source');
+    if (utmSource) return utmSource;
+    
+    const ref = document.referrer;
+    if (!ref) return 'direct';
+    try {
+      const host = new URL(ref).hostname.toLowerCase();
+      if (host.includes('facebook.com') || host.includes('fb.com') || host.includes('fb.me')) return 'facebook';
+      if (host.includes('tiktok.com')) return 'tiktok';
+      if (host.includes('youtube.com') || host.includes('youtu.be')) return 'youtube';
+      if (host.includes('instagram.com')) return 'instagram';
+      if (host.includes('google.com') || host.includes('google.com.bd')) return 'google';
+      if (host.includes('bing.com')) return 'bing';
+      if (host.includes('twitter.com') || host.includes('x.com')) return 'twitter';
+      if (host.includes('whatsapp.com') || host.includes('wa.me')) return 'whatsapp';
+      if (host === window.location.hostname) return 'direct';
+      return host;
+    } catch { return 'direct'; }
+  }, []);
 
   // Auto-detect delivery zone from division
   useEffect(() => {
@@ -257,6 +280,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
         fraud_error_message: fraudResult?.error_message ?? undefined,
         coupon_code: couponApplied ? couponCode.trim().toUpperCase() : undefined,
         coupon_discount: couponDiscount,
+        referrer_source: referrerSource,
       });
       setLoading(false);
       setSuccess(true);

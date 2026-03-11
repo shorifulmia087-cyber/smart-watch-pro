@@ -180,6 +180,7 @@ export type Database = {
           payment_type: string
           phone: string
           quantity: number
+          referrer_source: string | null
           selected_color: string | null
           status: Database["public"]["Enums"]["order_status"]
           total_price: number
@@ -214,6 +215,7 @@ export type Database = {
           payment_type?: string
           phone: string
           quantity?: number
+          referrer_source?: string | null
           selected_color?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           total_price: number
@@ -248,6 +250,7 @@ export type Database = {
           payment_type?: string
           phone?: string
           quantity?: number
+          referrer_source?: string | null
           selected_color?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           total_price?: number

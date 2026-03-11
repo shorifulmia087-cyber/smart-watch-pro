@@ -26,6 +26,7 @@ interface SecureOrderData {
   fraud_error_message?: string;
   coupon_code?: string;
   coupon_discount?: number;
+  referrer_source?: string | null;
 }
 
 export const useSecureOrder = () => {
