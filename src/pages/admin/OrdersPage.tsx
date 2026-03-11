@@ -906,9 +906,26 @@ const OrdersPage = () => {
                           >
                             <FileText className="h-4 w-4" />
                           </button>
+                          <button
+                            onClick={() => setNotesOrderId(notesOrderId === o.id ? null : o.id)}
+                            className="p-1.5 rounded-sm text-gold/70 hover:text-gold hover:bg-gold/10 transition-all"
+                            title="নোট"
+                          >
+                            <MessageSquare className="h-4 w-4" />
+                          </button>
                         </div>
                       </TableCell>
                     </TableRow>
+                    {/* Notes Panel */}
+                    {notesOrderId === o.id && (
+                      <TableRow className="bg-muted/5 hover:bg-muted/5">
+                        <TableCell colSpan={17} className="py-4 px-6">
+                          <div className="max-w-lg">
+                            <OrderNotesPanel orderId={o.id} />
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
                     {/* Expandable Live Tracking Row */}
                     {expandedOrderId === o.id && (
                       <TableRow className="bg-muted/10 hover:bg-muted/10">
