@@ -167,8 +167,10 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: 'Failed to create order' }), { status: 500, headers: corsHeaders })
     }
 
-    // Send email notification (non-blocking)
-    supabase.functions.invoke('send-order-email', { body: orderData }).catch(() => {})
+    // Send email notification (non-blocking) - only if enabled
+    if (settings?.order_email_enabled !== false) {
+      supabase.functions.invoke('send-order-email', { body: orderData }).catch(() => {})
+    }
 
     return new Response(JSON.stringify({ success: true, order }), {
       status: 200,
