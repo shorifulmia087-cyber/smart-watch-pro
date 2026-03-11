@@ -255,10 +255,13 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
         fraud_success_rate: fraudResult?.success_rate ?? undefined,
         fraud_flag: fraudResult?.flag ?? undefined,
         fraud_error_message: fraudResult?.error_message ?? undefined,
+        coupon_code: couponApplied ? couponCode.trim().toUpperCase() : undefined,
+        coupon_discount: couponDiscount,
       });
       setLoading(false);
       setSuccess(true);
       resetTurnstile();
+      if (onOrderSuccess) onOrderSuccess();
     } catch (err: any) {
       setLoading(false);
       console.error('Order submission failed:', err);
