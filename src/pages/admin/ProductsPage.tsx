@@ -64,7 +64,7 @@ const ProductsPage = () => {
       discount_percent: 0, product_type: 'watch', is_featured: false,
       image_urls: [], description_list: [],
       features: [], sourcing_cost: 0, meta_title: '', meta_description: '',
-      available_colors: [],
+      available_colors: [], color_variants: [],
     });
     setNewDesc('');
     setNewFeature({ icon: '', title: '', desc: '' });
