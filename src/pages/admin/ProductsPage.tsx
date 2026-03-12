@@ -524,25 +524,41 @@ const ProductsPage = () => {
                   </div>
                 </BentoCard>
 
-                {/* Color Variants */}
-                <BentoCard title="কালার ভ্যারিয়েন্ট" icon={<Palette className="w-4 h-4" />}>
-                  <div className="flex flex-wrap gap-2 min-h-[32px]">
-                    {form.available_colors.map((color, i) => (
-                      <motion.span key={i} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="inline-flex items-center gap-2 bg-surface dark:bg-muted/30 border border-border/40 rounded-full px-3 py-1.5 text-sm group hover:border-gold/30 transition-all shadow-sm">
-                        <span className="w-3 h-3 rounded-full border border-border shrink-0 shadow-inner" style={{ backgroundColor: color.toLowerCase().includes('গোল্ড') || color.toLowerCase().includes('gold') ? '#b8963e' : color.toLowerCase().includes('সিলভার') || color.toLowerCase().includes('silver') ? '#c0c0c0' : color.toLowerCase().includes('কালো') || color.toLowerCase().includes('black') ? '#1a1a1a' : color.toLowerCase().includes('সাদা') || color.toLowerCase().includes('white') ? '#f5f5f5' : '#888' }} />
-                        <span className="font-medium text-foreground text-xs">{color}</span>
-                        <button onClick={() => setForm(prev => ({ ...prev, available_colors: prev.available_colors.filter((_, idx) => idx !== i) }))} className="text-muted-foreground/30 hover:text-destructive opacity-0 group-hover:opacity-100 transition-all ml-0.5">
-                          <X className="w-3 h-3" />
+                {/* Color Variants with Images */}
+                <BentoCard title="কালার ভ্যারিয়েন্ট (ছবিসহ)" icon={<Palette className="w-4 h-4" />} badge="প্রতিটি কালারে আলাদা ছবি">
+                  <div className="space-y-3">
+                    {form.color_variants.map((variant, i) => (
+                      <motion.div key={i} initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex items-center gap-3 bg-muted/20 border border-border/30 rounded-sm p-2.5 group hover:border-border/60 transition-all">
+                        <div className="w-14 h-14 rounded-sm overflow-hidden border border-border/40 shrink-0">
+                          <img src={variant.image_url} alt={variant.color} className="w-full h-full object-cover" />
+                        </div>
+                        <span className="w-5 h-5 rounded-full border-2 border-border shrink-0 shadow-inner" style={{ backgroundColor: variant.hex }} />
+                        <span className="font-medium text-sm text-foreground flex-1">{variant.color}</span>
+                        <button onClick={() => setForm(prev => ({ ...prev, color_variants: prev.color_variants.filter((_, idx) => idx !== i) }))} className="text-muted-foreground/30 hover:text-destructive opacity-0 group-hover:opacity-100 transition-all">
+                          <X className="w-4 h-4" />
                         </button>
-                      </motion.span>
+                      </motion.div>
                     ))}
-                    {form.available_colors.length === 0 && <p className="text-[11px] text-muted-foreground/50 italic">কোনো কালার যোগ করা হয়নি</p>}
+                    {form.color_variants.length === 0 && <p className="text-[11px] text-muted-foreground/50 italic">কোনো কালার ভ্যারিয়েন্ট যোগ করা হয়নি</p>}
                   </div>
-                  <div className="flex gap-2">
-                    <input value={newColor} onChange={e => setNewColor(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && newColor.trim()) { setForm(prev => ({ ...prev, available_colors: [...prev.available_colors, newColor.trim()] })); setNewColor(''); } }} placeholder="কালার নাম (যেমন: কালো)" className="flex-1 bg-transparent border border-border/60 rounded-sm px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-gold/20 focus:border-gold/40 transition-all placeholder:text-muted-foreground" />
-                    <button onClick={() => { if (newColor.trim()) { setForm(prev => ({ ...prev, available_colors: [...prev.available_colors, newColor.trim()] })); setNewColor(''); } }} className="px-3.5 py-2.5 rounded-sm gradient-gold text-white text-sm hover:opacity-90 transition-all shadow-sm">
-                      <Plus className="w-4 h-4" />
+                  <div className="space-y-2 p-3.5 border border-dashed border-border/40 rounded-sm bg-muted/10">
+                    <div className="grid grid-cols-[1fr_60px] gap-2">
+                      <input value={newVariantColor} onChange={e => setNewVariantColor(e.target.value)} placeholder="কালারের নাম (যেমন: কালো)" className="bg-transparent border border-border/60 rounded-sm px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-gold/20 transition-all placeholder:text-muted-foreground" />
+                      <input type="color" value={newVariantHex} onChange={e => setNewVariantHex(e.target.value)} className="w-full h-[42px] rounded-sm border border-border/60 cursor-pointer bg-transparent" title="কালার পিক করুন" />
+                    </div>
+                    <button
+                      onClick={() => colorFileRef.current?.click()}
+                      disabled={colorVariantUploading || !newVariantColor.trim()}
+                      className="w-full py-6 rounded-sm border-2 border-dashed border-border/40 hover:border-gold/50 flex flex-col items-center justify-center gap-1.5 transition-all text-muted-foreground hover:text-gold hover:bg-gold/5 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      {colorVariantUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
+                        <>
+                          <ImagePlus className="w-5 h-5" />
+                          <span className="text-xs font-medium">এই কালারের ছবি আপলোড করুন</span>
+                        </>
+                      )}
                     </button>
+                    <input ref={colorFileRef} type="file" accept="image/*" className="hidden" onChange={e => { if (e.target.files?.[0]) uploadColorVariantImage(e.target.files[0]); e.target.value = ''; }} />
                   </div>
                 </BentoCard>
               </div>
