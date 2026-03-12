@@ -151,6 +151,32 @@ const ProductsPage = () => {
     setForm(prev => ({ ...prev, features: prev.features.filter((_, i) => i !== index) }));
   };
 
+  const uploadColorVariantImage = async (file: File) => {
+    if (!newVariantColor.trim()) {
+      toast({ title: 'কালারের নাম দিন', variant: 'destructive' });
+      return;
+    }
+    setColorVariantUploading(true);
+    try {
+      const compressed = await compressImage(file);
+      const ext = compressed.name.split('.').pop() || 'webp';
+      const path = `colors/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error } = await supabase.storage.from(BUCKET).upload(path, compressed);
+      if (error) { toast({ title: 'আপলোড ত্রুটি', description: error.message, variant: 'destructive' }); return; }
+      const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(path);
+      setForm(prev => ({
+        ...prev,
+        color_variants: [...prev.color_variants, { color: newVariantColor.trim(), hex: newVariantHex, image_url: urlData.publicUrl }],
+      }));
+      setNewVariantColor('');
+      setNewVariantHex('#000000');
+    } catch {
+      toast({ title: 'কম্প্রেশন ত্রুটি', variant: 'destructive' });
+    } finally {
+      setColorVariantUploading(false);
+    }
+  };
+
   const saveProduct = () => {
     if (!form.name || !form.price) return;
     upsertProduct.mutate({
@@ -170,6 +196,7 @@ const ProductsPage = () => {
       meta_title: form.meta_title ? sanitizeForDisplay(form.meta_title) : null,
       meta_description: form.meta_description ? sanitizeForDisplay(form.meta_description) : null,
       available_colors: form.available_colors.map(c => sanitizeForDisplay(c)),
+      color_variants: form.color_variants as any,
       ...(editingId ? { id: editingId } : {}),
     } as any, {
       onSuccess: () => {
