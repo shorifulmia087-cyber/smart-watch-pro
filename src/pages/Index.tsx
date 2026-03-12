@@ -149,6 +149,7 @@ const Index = () => {
           tagline={settings?.brand_tagline || 'প্রিমিয়াম ক্রাফটসম্যানশিপ, অতুলনীয় ডিজাইন।'}
           price={currentProduct.price}
           discountPercent={currentProduct.discount_percent}
+          colorVariants={Array.isArray((currentProduct as any).color_variants) ? (currentProduct as any).color_variants : []}
         />
         <Suspense fallback={null}>
           <FeatureList
