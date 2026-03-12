@@ -3,6 +3,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { formatBengaliPrice } from '@/lib/bengali';
 
+interface ColorVariant {
+  color: string;
+  hex: string;
+  image_url: string;
+}
+
 interface HeroSliderProps {
   onOrderClick: () => void;
   images: { src: string; label: string }[];
@@ -10,41 +16,57 @@ interface HeroSliderProps {
   tagline?: string;
   price?: number;
   discountPercent?: number;
+  colorVariants?: ColorVariant[];
 }
 
-const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিমিয়াম ক্রাফটসম্যানশিপ, অতুলনীয় ডিজাইন।', price = 0, discountPercent = 0 }: HeroSliderProps) => {
+const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিমিয়াম ক্রাফটসম্যানশিপ, অতুলনীয় ডিজাইন।', price = 0, discountPercent = 0, colorVariants = [] }: HeroSliderProps) => {
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(1);
+  const [selectedColorIdx, setSelectedColorIdx] = useState<number | null>(null);
   const autoSlideRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const originalPrice = discountPercent > 0 ? Math.round(price / (1 - discountPercent / 100)) : price;
 
+  // When a color is selected, show that color's image; otherwise show from images array
+  const displayImages = selectedColorIdx !== null && colorVariants[selectedColorIdx]
+    ? [{ src: colorVariants[selectedColorIdx].image_url, label: colorVariants[selectedColorIdx].color }]
+    : images;
+
   const resetAutoSlide = useCallback(() => {
     if (autoSlideRef.current) clearInterval(autoSlideRef.current);
-    if (images.length > 1) {
+    if (displayImages.length > 1) {
       autoSlideRef.current = setInterval(() => {
         setDirection(1);
-        setCurrent((c) => (c + 1) % images.length);
+        setCurrent((c) => (c + 1) % displayImages.length);
       }, 3000);
     }
-  }, [images.length]);
+  }, [displayImages.length]);
 
   const next = useCallback(() => {
     setDirection(1);
-    setCurrent((c) => (c + 1) % images.length);
+    setCurrent((c) => (c + 1) % displayImages.length);
     resetAutoSlide();
-  }, [images.length, resetAutoSlide]);
+  }, [displayImages.length, resetAutoSlide]);
 
   const prev = useCallback(() => {
     setDirection(-1);
-    setCurrent((c) => (c - 1 + images.length) % images.length);
+    setCurrent((c) => (c - 1 + displayImages.length) % displayImages.length);
     resetAutoSlide();
-  }, [images.length, resetAutoSlide]);
+  }, [displayImages.length, resetAutoSlide]);
 
   useEffect(() => {
     resetAutoSlide();
     return () => { if (autoSlideRef.current) clearInterval(autoSlideRef.current); };
   }, [resetAutoSlide]);
+
+  // Reset slider index when color changes
+  useEffect(() => {
+    setCurrent(0);
+  }, [selectedColorIdx]);
+
+  const handleColorSelect = (idx: number) => {
+    setSelectedColorIdx(prev => prev === idx ? null : idx);
+  };
 
   return (
     <section className="bg-surface relative" style={{
@@ -69,9 +91,9 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
         <div className="relative aspect-[4/3] md:aspect-[16/9] rounded-xl overflow-hidden bg-muted border border-border/40 shadow-lg">
           <AnimatePresence mode="wait" initial={false}>
             <motion.img
-              key={`${images[current]?.src}-${current}`}
-              src={images[current]?.src}
-              alt={images[current]?.label}
+              key={`${displayImages[current]?.src}-${current}-${selectedColorIdx}`}
+              src={displayImages[current]?.src}
+              alt={displayImages[current]?.label}
               className="absolute inset-0 w-full h-full object-cover"
               loading={current === 0 ? 'eager' : 'lazy'}
               decoding="async"
@@ -86,31 +108,36 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
 
           <div className="absolute bottom-4 left-4 md:bottom-6 md:left-6">
             <motion.span
-              key={`label-${current}`}
+              key={`label-${current}-${selectedColorIdx}`}
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               className="inline-block bg-ink/80 backdrop-blur-sm text-surface text-xs md:text-sm px-3 py-1.5 rounded-lg font-medium"
             >
-              {images[current]?.label}
+              {displayImages[current]?.label}
             </motion.span>
           </div>
 
-          <button
-            onClick={prev}
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-surface/80 backdrop-blur-sm flex items-center justify-center hover:bg-surface transition-colors border border-border/30 shadow-md"
-          >
-            <ChevronLeft className="w-5 h-5 text-ink" />
-          </button>
-          <button
-            onClick={next}
-            className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-surface/80 backdrop-blur-sm flex items-center justify-center hover:bg-surface transition-colors border border-border/30 shadow-md"
-          >
-            <ChevronRight className="w-5 h-5 text-ink" />
-          </button>
+          {displayImages.length > 1 && (
+            <>
+              <button
+                onClick={prev}
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-surface/80 backdrop-blur-sm flex items-center justify-center hover:bg-surface transition-colors border border-border/30 shadow-md"
+              >
+                <ChevronLeft className="w-5 h-5 text-ink" />
+              </button>
+              <button
+                onClick={next}
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-surface/80 backdrop-blur-sm flex items-center justify-center hover:bg-surface transition-colors border border-border/30 shadow-md"
+              >
+                <ChevronRight className="w-5 h-5 text-ink" />
+              </button>
+            </>
+          )}
         </div>
 
+        {/* Dots */}
         <div className="flex justify-center gap-2 mt-4">
-          {images.map((_, i) => (
+          {displayImages.map((_, i) => (
             <button
               key={i}
               onClick={() => setCurrent(i)}
@@ -120,6 +147,37 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
             />
           ))}
         </div>
+
+        {/* Color Swatches */}
+        {colorVariants.length > 0 && (
+          <div className="flex items-center justify-center gap-3 mt-4">
+            <span className="text-xs text-muted-foreground font-medium">কালার:</span>
+            <div className="flex items-center gap-2">
+              {colorVariants.map((variant, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleColorSelect(idx)}
+                  title={variant.color}
+                  className={`w-7 h-7 rounded-full border-2 transition-all duration-200 shadow-sm hover:scale-110 ${
+                    selectedColorIdx === idx
+                      ? 'border-gold ring-2 ring-gold/30 scale-110'
+                      : 'border-border/60 hover:border-gold/40'
+                  }`}
+                  style={{ backgroundColor: variant.hex }}
+                />
+              ))}
+            </div>
+            {selectedColorIdx !== null && (
+              <motion.span
+                initial={{ opacity: 0, x: -5 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="text-xs text-gold font-medium"
+              >
+                {colorVariants[selectedColorIdx].color}
+              </motion.span>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pb-10 px-4">
