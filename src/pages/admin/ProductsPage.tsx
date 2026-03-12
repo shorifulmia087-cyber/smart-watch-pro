@@ -77,6 +77,9 @@ const ProductsPage = () => {
     const features = Array.isArray(p.features) ? p.features.map((f: any) => ({
       icon: f.icon || '', title: f.title || '', desc: f.desc || '',
     })) : [];
+    const colorVariants = Array.isArray(p.color_variants) ? p.color_variants.map((v: any) => ({
+      color: v.color || '', hex: v.hex || '#000000', image_url: v.image_url || '',
+    })) : [];
     setForm({
       name: p.name, price: p.price, subtitle: p.subtitle || '',
       video_url: p.video_url || '', stock_status: p.stock_status,
@@ -87,6 +90,7 @@ const ProductsPage = () => {
       features, sourcing_cost: (p as any).sourcing_cost || 0,
       meta_title: (p as any).meta_title || '', meta_description: (p as any).meta_description || '',
       available_colors: (p as any).available_colors || [],
+      color_variants: colorVariants,
     });
     setNewDesc('');
     setNewFeature({ icon: '', title: '', desc: '' });
