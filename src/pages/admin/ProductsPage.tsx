@@ -47,12 +47,16 @@ const ProductsPage = () => {
     features: [] as { icon: string; title: string; desc: string }[],
     sourcing_cost: 0, meta_title: '', meta_description: '',
     available_colors: [] as string[],
+    color_variants: [] as { color: string; hex: string; image_url: string }[],
   });
 
   const [newDesc, setNewDesc] = useState('');
   const [newFeature, setNewFeature] = useState({ icon: '', title: '', desc: '' });
   const [newColor, setNewColor] = useState('');
-
+  const [colorVariantUploading, setColorVariantUploading] = useState(false);
+  const [newVariantColor, setNewVariantColor] = useState('');
+  const [newVariantHex, setNewVariantHex] = useState('#000000');
+  const colorFileRef = useRef<HTMLInputElement>(null);
   const openNew = () => {
     setEditingId(null);
     setForm({
