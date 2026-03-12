@@ -271,6 +271,7 @@ export type Database = {
       products: {
         Row: {
           available_colors: string[]
+          color_variants: Json
           created_at: string
           description_list: string[]
           discount_percent: number
@@ -293,6 +294,7 @@ export type Database = {
         }
         Insert: {
           available_colors?: string[]
+          color_variants?: Json
           created_at?: string
           description_list?: string[]
           discount_percent?: number
@@ -315,6 +317,7 @@ export type Database = {
         }
         Update: {
           available_colors?: string[]
+          color_variants?: Json
           created_at?: string
           description_list?: string[]
           discount_percent?: number
