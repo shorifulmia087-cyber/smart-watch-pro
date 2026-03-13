@@ -123,15 +123,10 @@ const ProductsPage = () => {
       const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(path);
       const publicUrl = urlData.publicUrl;
 
-      if (singleUploadIsColor && singleUploadColor.trim()) {
-        // Add as color variant (NOT to image_urls gallery)
-        setForm(prev => ({
-          ...prev,
-          color_variants: [...prev.color_variants, { color: singleUploadColor.trim(), hex: singleUploadHex, image_url: publicUrl }],
-        }));
-        setSingleUploadColor('');
-        setSingleUploadHex('#000000');
-        toast({ title: 'কালার ভ্যারিয়েন্ট যোগ হয়েছে' });
+      if (singleUploadIsColor) {
+        // Store URL as pending — wait for user to click Save
+        setPendingVariantUrl(publicUrl);
+        toast({ title: 'ছবি আপলোড হয়েছে — সেভ করুন' });
       } else {
         // Add as regular gallery image
         setForm(prev => ({ ...prev, image_urls: [...prev.image_urls, publicUrl] }));
