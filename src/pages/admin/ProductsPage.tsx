@@ -58,6 +58,7 @@ const ProductsPage = () => {
   const [singleUploadColor, setSingleUploadColor] = useState('');
   const [singleUploadHex, setSingleUploadHex] = useState('#000000');
   const [singleUploadIsColor, setSingleUploadIsColor] = useState(false);
+  const [pendingVariantUrl, setPendingVariantUrl] = useState<string | null>(null);
   const singleFileRef = useRef<HTMLInputElement>(null);
 
   const openNew = () => {
@@ -122,15 +123,10 @@ const ProductsPage = () => {
       const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(path);
       const publicUrl = urlData.publicUrl;
 
-      if (singleUploadIsColor && singleUploadColor.trim()) {
-        // Add as color variant (NOT to image_urls gallery)
-        setForm(prev => ({
-          ...prev,
-          color_variants: [...prev.color_variants, { color: singleUploadColor.trim(), hex: singleUploadHex, image_url: publicUrl }],
-        }));
-        setSingleUploadColor('');
-        setSingleUploadHex('#000000');
-        toast({ title: 'কালার ভ্যারিয়েন্ট যোগ হয়েছে' });
+      if (singleUploadIsColor) {
+        // Store URL as pending — wait for user to click Save
+        setPendingVariantUrl(publicUrl);
+        toast({ title: 'ছবি আপলোড হয়েছে — সেভ করুন' });
       } else {
         // Add as regular gallery image
         setForm(prev => ({ ...prev, image_urls: [...prev.image_urls, publicUrl] }));
@@ -562,20 +558,68 @@ const ProductsPage = () => {
                             title="কালার পিক করুন"
                           />
                         </div>
+
+                        {/* Pending variant preview */}
+                        {pendingVariantUrl && (
+                          <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex items-center gap-2.5 bg-gold/5 border border-gold/30 rounded-sm p-2.5">
+                            <div className="w-14 h-14 rounded-sm overflow-hidden border border-border/40 shrink-0">
+                              <img src={pendingVariantUrl} alt="preview" className="w-full h-full object-cover" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-foreground truncate">{singleUploadColor || 'কালার নাম দিন'}</p>
+                              <div className="flex items-center gap-1.5 mt-0.5">
+                                <span className="w-3.5 h-3.5 rounded-full border border-border shadow-inner" style={{ backgroundColor: singleUploadHex }} />
+                                <span className="text-[10px] text-muted-foreground">{singleUploadHex}</span>
+                              </div>
+                            </div>
+                            <div className="flex gap-1.5 shrink-0">
+                              <button
+                                onClick={() => {
+                                  setPendingVariantUrl(null);
+                                }}
+                                className="p-2 rounded-sm border border-border/40 text-muted-foreground hover:text-destructive hover:border-destructive/40 transition-all"
+                                title="বাতিল"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                onClick={() => {
+                                  if (!singleUploadColor.trim()) {
+                                    toast({ title: 'কালারের নাম লিখুন', variant: 'destructive' });
+                                    return;
+                                  }
+                                  setForm(prev => ({
+                                    ...prev,
+                                    color_variants: [...prev.color_variants, { color: singleUploadColor.trim(), hex: singleUploadHex, image_url: pendingVariantUrl! }],
+                                  }));
+                                  setPendingVariantUrl(null);
+                                  setSingleUploadColor('');
+                                  setSingleUploadHex('#000000');
+                                  toast({ title: 'কালার ভ্যারিয়েন্ট সেভ হয়েছে ✓' });
+                                }}
+                                className="px-3 py-2 rounded-sm gradient-gold text-white text-xs font-semibold hover:opacity-90 transition-all shadow-sm flex items-center gap-1.5"
+                              >
+                                <Save className="w-3.5 h-3.5" /> সেভ
+                              </button>
+                            </div>
+                          </motion.div>
+                        )}
                       </motion.div>
                     )}
 
                     {/* Upload button */}
                     <button
                       onClick={() => singleFileRef.current?.click()}
-                      disabled={uploading || (singleUploadIsColor && !singleUploadColor.trim())}
+                      disabled={uploading || (singleUploadIsColor && !!pendingVariantUrl)}
                       className="w-full py-7 rounded-sm border-2 border-dashed border-border/40 hover:border-gold/50 flex flex-col items-center justify-center gap-1.5 transition-all text-muted-foreground hover:text-gold hover:bg-gold/5 disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       {uploading ? <Loader2 className="w-6 h-6 animate-spin" /> : (
                         <>
                           {singleUploadIsColor ? <Palette className="w-6 h-6" /> : <Upload className="w-6 h-6" />}
                           <span className="text-xs font-medium">
-                            {singleUploadIsColor ? 'এই কালারের ছবি আপলোড করুন' : 'গ্যালারি ছবি আপলোড করুন'}
+                            {singleUploadIsColor
+                              ? (pendingVariantUrl ? 'প্রথমে সেভ করুন ↑' : 'এই কালারের ছবি আপলোড করুন')
+                              : 'গ্যালারি ছবি আপলোড করুন'}
                           </span>
                           <span className="text-[10px] text-muted-foreground/60">PNG, JPG, WebP</span>
                         </>
