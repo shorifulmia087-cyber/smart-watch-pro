@@ -254,7 +254,7 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
             {/* Close button */}
             <motion.button
               className="absolute top-4 right-4 z-10 bg-surface/20 backdrop-blur-sm text-surface p-2 rounded-full hover:bg-surface/40 transition-colors"
-              onClick={() => { setZoomedImage(null); setZoomLevel(1); }}
+              onClick={() => { setZoomedImage(null); setZoomLevel(1); setDragPos({ x: 0, y: 0 }); }}
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1 }}
