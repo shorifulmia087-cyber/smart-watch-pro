@@ -1,6 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { formatBengaliPrice } from '@/lib/bengali';
 
 interface ColorVariant {
@@ -21,51 +20,56 @@ interface HeroSliderProps {
 
 const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিমিয়াম ক্রাফটসম্যানশিপ, অতুলনীয় ডিজাইন।', price = 0, discountPercent = 0, colorVariants = [] }: HeroSliderProps) => {
   const [current, setCurrent] = useState(0);
-  const [direction, setDirection] = useState(1);
   const [selectedColorIdx, setSelectedColorIdx] = useState<number | null>(null);
   const autoSlideRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const originalPrice = discountPercent > 0 ? Math.round(price / (1 - discountPercent / 100)) : price;
 
-  // When a color is selected, show that color's image; otherwise show from images array
-  const displayImages = selectedColorIdx !== null && colorVariants[selectedColorIdx]
-    ? [{ src: colorVariants[selectedColorIdx].image_url, label: colorVariants[selectedColorIdx].color }]
-    : images;
+  // Build all displayable images: product images + color variant images as thumbnails
+  const allImages = [
+    ...images,
+    ...colorVariants.map(v => ({ src: v.image_url, label: v.color })),
+  ];
+
+  // When a color is selected, jump to that variant's image
+  const displayImages = allImages.length > 0 ? allImages : images;
 
   const resetAutoSlide = useCallback(() => {
     if (autoSlideRef.current) clearInterval(autoSlideRef.current);
     if (displayImages.length > 1) {
       autoSlideRef.current = setInterval(() => {
-        setDirection(1);
         setCurrent((c) => (c + 1) % displayImages.length);
-      }, 3000);
+      }, 4000);
     }
   }, [displayImages.length]);
-
-  const next = useCallback(() => {
-    setDirection(1);
-    setCurrent((c) => (c + 1) % displayImages.length);
-    resetAutoSlide();
-  }, [displayImages.length, resetAutoSlide]);
-
-  const prev = useCallback(() => {
-    setDirection(-1);
-    setCurrent((c) => (c - 1 + displayImages.length) % displayImages.length);
-    resetAutoSlide();
-  }, [displayImages.length, resetAutoSlide]);
 
   useEffect(() => {
     resetAutoSlide();
     return () => { if (autoSlideRef.current) clearInterval(autoSlideRef.current); };
   }, [resetAutoSlide]);
 
-  // Reset slider index when color changes
-  useEffect(() => {
-    setCurrent(0);
-  }, [selectedColorIdx]);
-
   const handleColorSelect = (idx: number) => {
-    setSelectedColorIdx(prev => prev === idx ? null : idx);
+    // Color variant images start after the product images
+    const imageIndex = images.length + idx;
+    if (selectedColorIdx === idx) {
+      setSelectedColorIdx(null);
+      setCurrent(0);
+    } else {
+      setSelectedColorIdx(idx);
+      setCurrent(imageIndex);
+    }
+    resetAutoSlide();
+  };
+
+  const handleThumbnailClick = (idx: number) => {
+    setCurrent(idx);
+    // If clicking a color variant thumbnail, highlight the swatch
+    if (idx >= images.length) {
+      setSelectedColorIdx(idx - images.length);
+    } else {
+      setSelectedColorIdx(null);
+    }
+    resetAutoSlide();
   };
 
   return (
@@ -73,7 +77,8 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
       backgroundImage: `linear-gradient(hsl(var(--border) / 0.18) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--border) / 0.18) 1px, transparent 1px)`,
       backgroundSize: '32px 32px',
     }}>
-      <div className="text-center pt-10 pb-6 px-4">
+      {/* Title */}
+      <div className="text-center pt-8 pb-4 px-4">
         <motion.p
           key={subtitle}
           initial={{ opacity: 0, y: 20 }}
@@ -83,118 +88,140 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
         >
           <span className="text-gold drop-shadow-[0_0_8px_hsl(var(--gold)/0.3)]">{subtitle}</span>
           <br />
-          <span className="text-muted-foreground font-normal">{tagline}</span>
+          <span className="text-muted-foreground font-normal text-base">{tagline}</span>
         </motion.p>
       </div>
 
-      <div className="relative max-w-6xl mx-auto px-4 pb-6">
-        <div className="relative aspect-[4/3] md:aspect-[16/9] rounded-xl overflow-hidden bg-muted border border-border/40 shadow-lg">
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.img
-              key={`${displayImages[current]?.src}-${current}-${selectedColorIdx}`}
-              src={displayImages[current]?.src}
-              alt={displayImages[current]?.label}
-              className="absolute inset-0 w-full h-full object-cover"
-              loading={current === 0 ? 'eager' : 'lazy'}
-              decoding="async"
-              width={1200}
-              height={675}
-              initial={{ opacity: 0, x: direction > 0 ? '30%' : '-30%' }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: direction > 0 ? '-15%' : '15%' }}
-              transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
-            />
-          </AnimatePresence>
+      <div className="relative max-w-5xl mx-auto px-4 pb-4">
+        {/* Main Image + Color Swatches side by side */}
+        <div className="flex gap-3">
+          {/* Main Image */}
+          <div className="flex-1 relative aspect-[4/3] md:aspect-[4/3] rounded-xl overflow-hidden bg-muted border border-border/40 shadow-lg">
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.img
+                key={`${displayImages[current]?.src}-${current}`}
+                src={displayImages[current]?.src}
+                alt={displayImages[current]?.label}
+                className="absolute inset-0 w-full h-full object-cover"
+                loading={current === 0 ? 'eager' : 'lazy'}
+                decoding="async"
+                initial={{ opacity: 0, scale: 1.03 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.97 }}
+                transition={{ duration: 0.3, ease: 'easeOut' }}
+              />
+            </AnimatePresence>
 
-          <div className="absolute bottom-4 left-4 md:bottom-6 md:left-6">
-            <motion.span
-              key={`label-${current}-${selectedColorIdx}`}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="inline-block bg-ink/80 backdrop-blur-sm text-surface text-xs md:text-sm px-3 py-1.5 rounded-lg font-medium"
-            >
-              {displayImages[current]?.label}
-            </motion.span>
+            {/* Label badge */}
+            <div className="absolute bottom-3 left-3">
+              <motion.span
+                key={`label-${current}`}
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="inline-block bg-ink/75 backdrop-blur-sm text-surface text-[10px] md:text-xs px-2.5 py-1 rounded-lg font-medium"
+              >
+                {displayImages[current]?.label}
+              </motion.span>
+            </div>
           </div>
 
-          {displayImages.length > 1 && (
-            <>
-              <button
-                onClick={prev}
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-surface/80 backdrop-blur-sm flex items-center justify-center hover:bg-surface transition-colors border border-border/30 shadow-md"
-              >
-                <ChevronLeft className="w-5 h-5 text-ink" />
-              </button>
-              <button
-                onClick={next}
-                className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-surface/80 backdrop-blur-sm flex items-center justify-center hover:bg-surface transition-colors border border-border/30 shadow-md"
-              >
-                <ChevronRight className="w-5 h-5 text-ink" />
-              </button>
-            </>
-          )}
-        </div>
-
-        {/* Dots */}
-        <div className="flex justify-center gap-2 mt-4">
-          {displayImages.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrent(i)}
-              className={`h-1.5 rounded-full transition-all duration-300 ${
-                i === current ? 'bg-gold w-6' : 'bg-border w-2'
-              }`}
-            />
-          ))}
-        </div>
-
-        {/* Color Swatches */}
-        {colorVariants.length > 0 && (
-          <div className="flex items-center justify-center gap-3 mt-4">
-            <span className="text-xs text-muted-foreground font-medium">কালার:</span>
-            <div className="flex items-center gap-2">
+          {/* Color Swatches - Vertical strip beside image */}
+          {colorVariants.length > 0 && (
+            <div className="flex flex-col items-center justify-center gap-2.5 py-2">
+              <span className="text-[10px] text-muted-foreground font-medium mb-1 writing-vertical hidden md:block" style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}>
+                কালার
+              </span>
               {colorVariants.map((variant, idx) => (
-                <button
+                <motion.button
                   key={idx}
                   onClick={() => handleColorSelect(idx)}
                   title={variant.color}
-                  className={`w-7 h-7 rounded-full border-2 transition-all duration-200 shadow-sm hover:scale-110 ${
+                  whileHover={{ scale: 1.15 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`w-8 h-8 md:w-9 md:h-9 rounded-full border-2 transition-all duration-200 shadow-sm relative ${
                     selectedColorIdx === idx
-                      ? 'border-gold ring-2 ring-gold/30 scale-110'
-                      : 'border-border/60 hover:border-gold/40'
+                      ? 'border-gold ring-2 ring-gold/40 scale-110'
+                      : 'border-border/50 hover:border-gold/50'
                   }`}
                   style={{ backgroundColor: variant.hex }}
-                />
+                >
+                  {selectedColorIdx === idx && (
+                    <motion.div
+                      layoutId="color-check"
+                      className="absolute inset-0 flex items-center justify-center"
+                    >
+                      <svg className="w-4 h-4 text-surface drop-shadow-md" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </motion.div>
+                  )}
+                </motion.button>
               ))}
+              {selectedColorIdx !== null && (
+                <motion.span
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-[10px] text-gold font-semibold text-center max-w-[40px] leading-tight"
+                >
+                  {colorVariants[selectedColorIdx].color}
+                </motion.span>
+              )}
             </div>
-            {selectedColorIdx !== null && (
-              <motion.span
-                initial={{ opacity: 0, x: -5 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="text-xs text-gold font-medium"
-              >
-                {colorVariants[selectedColorIdx].color}
-              </motion.span>
-            )}
+          )}
+        </div>
+
+        {/* Thumbnail Gallery */}
+        {displayImages.length > 1 && (
+          <div className="flex items-center gap-2 mt-3 overflow-x-auto pb-1 scrollbar-hide">
+            {displayImages.map((img, i) => {
+              const isColorVariant = i >= images.length;
+              const colorIdx = isColorVariant ? i - images.length : null;
+              return (
+                <button
+                  key={i}
+                  onClick={() => handleThumbnailClick(i)}
+                  className={`relative flex-shrink-0 w-14 h-14 md:w-16 md:h-16 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
+                    i === current
+                      ? 'border-gold shadow-md ring-1 ring-gold/30'
+                      : 'border-border/40 hover:border-gold/40 opacity-70 hover:opacity-100'
+                  }`}
+                >
+                  <img
+                    src={img.src}
+                    alt={img.label}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                  {/* Color dot indicator on variant thumbnails */}
+                  {isColorVariant && colorIdx !== null && colorVariants[colorIdx] && (
+                    <div
+                      className="absolute bottom-0.5 right-0.5 w-3 h-3 rounded-full border border-surface/80 shadow-sm"
+                      style={{ backgroundColor: colorVariants[colorIdx].hex }}
+                    />
+                  )}
+                </button>
+              );
+            })}
           </div>
         )}
       </div>
 
+      {/* Price & CTA */}
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pb-10 px-4">
         <div className="relative w-full sm:w-auto">
-            <motion.button
-              onClick={onOrderClick}
-              className="gradient-gold text-surface font-semibold px-8 py-3.5 rounded-xl text-base hover:opacity-90 transition-opacity w-full sm:w-auto"
-              style={{ boxShadow: '0 4px 16px -4px hsl(var(--gold) / 0.4)' }}
-              initial={{ scale: 1, rotateZ: 0 }}
-              animate={{ 
-                scale: [1, 1.08, 1.08, 1],
-                rotateZ: [0, -2, 2, -2, 2, 0],
-              }}
-              transition={{ duration: 1.2, ease: 'easeInOut', repeat: Infinity, repeatDelay: 1.8 }}
-            >
-              এখনই কিনুন — ৳{formatBengaliPrice(price)}
-            </motion.button>
+          <motion.button
+            onClick={onOrderClick}
+            className="gradient-gold text-surface font-semibold px-8 py-3.5 rounded-xl text-base hover:opacity-90 transition-opacity w-full sm:w-auto"
+            style={{ boxShadow: '0 4px 16px -4px hsl(var(--gold) / 0.4)' }}
+            initial={{ scale: 1, rotateZ: 0 }}
+            animate={{
+              scale: [1, 1.08, 1.08, 1],
+              rotateZ: [0, -2, 2, -2, 2, 0],
+            }}
+            transition={{ duration: 1.2, ease: 'easeInOut', repeat: Infinity, repeatDelay: 1.8 }}
+          >
+            এখনই কিনুন — ৳{formatBengaliPrice(price)}
+          </motion.button>
         </div>
         {discountPercent > 0 ? (
           <motion.div
