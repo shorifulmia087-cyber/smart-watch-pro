@@ -287,26 +287,23 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
 
             {/* Image */}
             <motion.div
-              className="max-w-full max-h-[85vh] overflow-auto flex items-center justify-center"
+              className="overflow-auto flex items-center justify-center"
+              style={{ maxWidth: '100%', maxHeight: '85vh', cursor: zoomLevel > 1 ? 'grab' : 'default' }}
               onClick={e => e.stopPropagation()}
-              style={{ cursor: zoomLevel > 1 ? 'grab' : 'default' }}
             >
               <motion.img
                 src={zoomedImage}
                 alt="Zoomed"
                 className="rounded-lg shadow-2xl select-none"
                 style={{
-                  transform: `scale(${zoomLevel})`,
-                  transformOrigin: 'center center',
                   maxWidth: '90vw',
                   maxHeight: '85vh',
                   objectFit: 'contain',
-                  transition: 'transform 0.2s ease-out',
                 }}
                 initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
+                animate={{ scale: zoomLevel, opacity: 1 }}
                 exit={{ scale: 0.8, opacity: 0 }}
-                transition={{ duration: 0.25, ease: 'easeOut' }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
                 draggable={false}
               />
             </motion.div>
