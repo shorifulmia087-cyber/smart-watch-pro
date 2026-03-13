@@ -289,28 +289,56 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
               </button>
             </motion.div>
 
-            {/* Image */}
-            <motion.div
-              className="overflow-auto flex items-center justify-center"
-              style={{ maxWidth: '100%', maxHeight: '85vh', cursor: zoomLevel > 1 ? 'grab' : 'default' }}
+            {/* Image — scrollable container for panning when zoomed */}
+            <div
+              ref={scrollContainerRef}
+              className="overflow-auto"
+              style={{
+                width: '100%',
+                height: '85vh',
+                cursor: zoomLevel > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default',
+                display: 'flex',
+                alignItems: zoomLevel <= 1 ? 'center' : 'flex-start',
+                justifyContent: zoomLevel <= 1 ? 'center' : 'flex-start',
+              }}
               onClick={e => e.stopPropagation()}
+              onMouseDown={e => {
+                if (zoomLevel <= 1) return;
+                setIsDragging(true);
+                dragStart.current = {
+                  x: e.clientX,
+                  y: e.clientY,
+                  scrollLeft: scrollContainerRef.current?.scrollLeft || 0,
+                  scrollTop: scrollContainerRef.current?.scrollTop || 0,
+                };
+              }}
+              onMouseMove={e => {
+                if (!isDragging || !scrollContainerRef.current) return;
+                const dx = e.clientX - dragStart.current.x;
+                const dy = e.clientY - dragStart.current.y;
+                scrollContainerRef.current.scrollLeft = dragStart.current.scrollLeft - dx;
+                scrollContainerRef.current.scrollTop = dragStart.current.scrollTop - dy;
+              }}
+              onMouseUp={() => setIsDragging(false)}
+              onMouseLeave={() => setIsDragging(false)}
             >
               <motion.img
                 src={zoomedImage}
                 alt="Zoomed"
-                className="rounded-lg shadow-2xl select-none"
+                className="rounded-lg shadow-2xl select-none block"
                 style={{
-                  maxWidth: '90vw',
-                  maxHeight: '85vh',
-                  objectFit: 'contain',
+                  width: `${90 * zoomLevel}vw`,
+                  maxWidth: 'none',
+                  height: 'auto',
+                  flexShrink: 0,
                 }}
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: zoomLevel, opacity: 1 }}
-                exit={{ scale: 0.8, opacity: 0 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
                 transition={{ duration: 0.2, ease: 'easeOut' }}
                 draggable={false}
               />
-            </motion.div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
