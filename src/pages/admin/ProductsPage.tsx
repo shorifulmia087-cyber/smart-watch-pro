@@ -110,6 +110,13 @@ const ProductsPage = () => {
 
   // Unified single image upload — optionally with color
   const uploadSingleImage = async (file: File) => {
+    if (uploading) return;
+
+    if (singleUploadIsColor && pendingVariantUrl) {
+      toast({ title: 'আগের ছবির কালার আগে সেভ বা বাতিল করুন', variant: 'destructive' });
+      return;
+    }
+
     setUploading(true);
     try {
       const compressed = await compressImage(file);
@@ -126,7 +133,7 @@ const ProductsPage = () => {
       if (singleUploadIsColor) {
         // Store URL as pending — wait for user to click Save
         setPendingVariantUrl(publicUrl);
-        toast({ title: 'ছবি আপলোড হয়েছে — সেভ করুন' });
+        toast({ title: 'ছবি আপলোড হয়েছে — এখন কালার দিয়ে সেভ করুন' });
       } else {
         // Add as regular gallery image
         setForm(prev => ({ ...prev, image_urls: [...prev.image_urls, publicUrl] }));
