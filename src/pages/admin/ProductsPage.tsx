@@ -102,7 +102,6 @@ const ProductsPage = () => {
     setNewColor('');
     setSingleUploadColor('');
     setSingleUploadHex('#000000');
-    setSingleUploadIsColor(false);
     setSheetOpen(true);
   };
 
