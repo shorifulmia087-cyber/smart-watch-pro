@@ -22,6 +22,7 @@ interface HeroSliderProps {
 const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিমিয়াম ক্রাফটসম্যানশিপ, অতুলনীয় ডিজাইন।', price = 0, discountPercent = 0, colorVariants = [] }: HeroSliderProps) => {
   const [current, setCurrent] = useState(0);
   const [selectedColorIdx, setSelectedColorIdx] = useState<number | null>(null);
+  const [zoomedImage, setZoomedImage] = useState<string | null>(null);
   const autoSlideRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const originalPrice = discountPercent > 0 ? Math.round(price / (1 - discountPercent / 100)) : price;
