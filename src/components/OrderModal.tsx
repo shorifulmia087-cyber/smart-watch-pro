@@ -12,6 +12,12 @@ import { useFraudCheck, type FraudResult } from '@/hooks/useFraudCheck';
 import UpazilaCombobox from '@/components/UpazilaCombobox';
 import type { Upazila } from '@/data/bangladeshLocations';
 
+interface ColorVariant {
+  color: string;
+  hex: string;
+  image_url: string;
+}
+
 interface OrderModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -24,6 +30,7 @@ interface OrderModalProps {
   nagadNumber?: string;
   rocketNumber?: string;
   availableColors?: string[];
+  colorVariants?: ColorVariant[];
   onOrderSuccess?: () => void;
   onOrderOpen?: () => void;
 }
