@@ -536,19 +536,63 @@ const ProductsPage = () => {
                       </button>
                     </div>
 
-                    {/* Color fields — only when color mode selected */}
-                    {singleUploadIsColor && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        className="space-y-2"
+                    {/* Color fields — show AFTER image is uploaded in color mode */}
+                    {singleUploadIsColor && !pendingVariantUrl && (
+                      <div className="text-center text-xs text-muted-foreground py-2">
+                        প্রথমে ছবি আপলোড করুন, তারপর কালার সেট করুন
+                      </div>
+                    )}
+
+                    {/* Upload button — always visible unless pending variant exists */}
+                    {!pendingVariantUrl && (
+                      <button
+                        onClick={() => singleFileRef.current?.click()}
+                        disabled={uploading}
+                        className="w-full py-7 rounded-sm border-2 border-dashed border-border/40 hover:border-gold/50 flex flex-col items-center justify-center gap-1.5 transition-all text-muted-foreground hover:text-gold hover:bg-gold/5 disabled:opacity-40 disabled:cursor-not-allowed"
                       >
+                        {uploading ? <Loader2 className="w-6 h-6 animate-spin" /> : (
+                          <>
+                            {singleUploadIsColor ? <Palette className="w-6 h-6" /> : <Upload className="w-6 h-6" />}
+                            <span className="text-xs font-medium">
+                              {singleUploadIsColor ? 'কালার ভ্যারিয়েন্টের ছবি আপলোড করুন' : 'গ্যালারি ছবি আপলোড করুন'}
+                            </span>
+                            <span className="text-[10px] text-muted-foreground/60">PNG, JPG, WebP</span>
+                          </>
+                        )}
+                      </button>
+                    )}
+
+                    {/* Pending variant: image uploaded, now fill color + save */}
+                    {singleUploadIsColor && pendingVariantUrl && (
+                      <motion.div
+                        initial={{ scale: 0.95, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className="space-y-3 p-3 bg-gold/5 border border-gold/30 rounded-sm"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-16 h-16 rounded-sm overflow-hidden border border-border/40 shrink-0">
+                            <img src={pendingVariantUrl} alt="preview" className="w-full h-full object-cover" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-semibold text-gold mb-1">✓ ছবি আপলোড হয়েছে</p>
+                            <p className="text-[11px] text-muted-foreground">এখন কালার নাম ও কোড দিন</p>
+                          </div>
+                          <button
+                            onClick={() => setPendingVariantUrl(null)}
+                            className="p-1.5 rounded-sm border border-border/40 text-muted-foreground hover:text-destructive hover:border-destructive/40 transition-all shrink-0"
+                            title="বাতিল"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+
                         <div className="grid grid-cols-[1fr_52px] gap-2">
                           <input
                             value={singleUploadColor}
                             onChange={e => setSingleUploadColor(e.target.value)}
                             placeholder="কালারের নাম (যেমন: কালো)"
                             className="bg-transparent border border-border/60 rounded-sm px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-gold/20 transition-all placeholder:text-muted-foreground"
+                            autoFocus
                           />
                           <input
                             type="color"
@@ -559,72 +603,28 @@ const ProductsPage = () => {
                           />
                         </div>
 
-                        {/* Pending variant preview */}
-                        {pendingVariantUrl && (
-                          <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex items-center gap-2.5 bg-gold/5 border border-gold/30 rounded-sm p-2.5">
-                            <div className="w-14 h-14 rounded-sm overflow-hidden border border-border/40 shrink-0">
-                              <img src={pendingVariantUrl} alt="preview" className="w-full h-full object-cover" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-semibold text-foreground truncate">{singleUploadColor || 'কালার নাম দিন'}</p>
-                              <div className="flex items-center gap-1.5 mt-0.5">
-                                <span className="w-3.5 h-3.5 rounded-full border border-border shadow-inner" style={{ backgroundColor: singleUploadHex }} />
-                                <span className="text-[10px] text-muted-foreground">{singleUploadHex}</span>
-                              </div>
-                            </div>
-                            <div className="flex gap-1.5 shrink-0">
-                              <button
-                                onClick={() => {
-                                  setPendingVariantUrl(null);
-                                }}
-                                className="p-2 rounded-sm border border-border/40 text-muted-foreground hover:text-destructive hover:border-destructive/40 transition-all"
-                                title="বাতিল"
-                              >
-                                <X className="w-3.5 h-3.5" />
-                              </button>
-                              <button
-                                onClick={() => {
-                                  if (!singleUploadColor.trim()) {
-                                    toast({ title: 'কালারের নাম লিখুন', variant: 'destructive' });
-                                    return;
-                                  }
-                                  setForm(prev => ({
-                                    ...prev,
-                                    color_variants: [...prev.color_variants, { color: singleUploadColor.trim(), hex: singleUploadHex, image_url: pendingVariantUrl! }],
-                                  }));
-                                  setPendingVariantUrl(null);
-                                  setSingleUploadColor('');
-                                  setSingleUploadHex('#000000');
-                                  toast({ title: 'কালার ভ্যারিয়েন্ট সেভ হয়েছে ✓' });
-                                }}
-                                className="px-3 py-2 rounded-sm gradient-gold text-white text-xs font-semibold hover:opacity-90 transition-all shadow-sm flex items-center gap-1.5"
-                              >
-                                <Save className="w-3.5 h-3.5" /> সেভ
-                              </button>
-                            </div>
-                          </motion.div>
-                        )}
+                        <button
+                          onClick={() => {
+                            if (!singleUploadColor.trim()) {
+                              toast({ title: 'কালারের নাম লিখুন', variant: 'destructive' });
+                              return;
+                            }
+                            setForm(prev => ({
+                              ...prev,
+                              color_variants: [...prev.color_variants, { color: singleUploadColor.trim(), hex: singleUploadHex, image_url: pendingVariantUrl! }],
+                            }));
+                            setPendingVariantUrl(null);
+                            setSingleUploadColor('');
+                            setSingleUploadHex('#000000');
+                            toast({ title: 'কালার ভ্যারিয়েন্ট সেভ হয়েছে ✓' });
+                          }}
+                          className="w-full py-2.5 rounded-sm gradient-gold text-white text-sm font-semibold hover:opacity-90 transition-all shadow-sm flex items-center justify-center gap-2"
+                        >
+                          <Save className="w-4 h-4" /> সেভ করুন
+                        </button>
                       </motion.div>
                     )}
 
-                    {/* Upload button */}
-                    <button
-                      onClick={() => singleFileRef.current?.click()}
-                      disabled={uploading || (singleUploadIsColor && !!pendingVariantUrl)}
-                      className="w-full py-7 rounded-sm border-2 border-dashed border-border/40 hover:border-gold/50 flex flex-col items-center justify-center gap-1.5 transition-all text-muted-foreground hover:text-gold hover:bg-gold/5 disabled:opacity-40 disabled:cursor-not-allowed"
-                    >
-                      {uploading ? <Loader2 className="w-6 h-6 animate-spin" /> : (
-                        <>
-                          {singleUploadIsColor ? <Palette className="w-6 h-6" /> : <Upload className="w-6 h-6" />}
-                          <span className="text-xs font-medium">
-                            {singleUploadIsColor
-                              ? (pendingVariantUrl ? 'প্রথমে সেভ করুন ↑' : 'এই কালারের ছবি আপলোড করুন')
-                              : 'গ্যালারি ছবি আপলোড করুন'}
-                          </span>
-                          <span className="text-[10px] text-muted-foreground/60">PNG, JPG, WebP</span>
-                        </>
-                      )}
-                    </button>
                     <input
                       ref={singleFileRef}
                       type="file"
