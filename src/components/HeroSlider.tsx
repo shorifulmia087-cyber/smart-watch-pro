@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatBengaliPrice } from '@/lib/bengali';
-import { X, ZoomIn } from 'lucide-react';
+import { X, ZoomIn, Plus, Minus } from 'lucide-react';
 
 interface ColorVariant {
   color: string;
