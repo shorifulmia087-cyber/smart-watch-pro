@@ -92,7 +92,10 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
 
       <div className="relative max-w-5xl mx-auto px-4 pb-4">
         {/* Main Image */}
-        <div className="relative aspect-[4/3] md:aspect-[16/9] rounded-xl overflow-hidden bg-muted border border-border/40 shadow-lg">
+        <div
+          className="relative aspect-[4/3] md:aspect-[16/9] rounded-xl overflow-hidden bg-muted border border-border/40 shadow-lg cursor-zoom-in group"
+          onClick={() => setZoomedImage(displayImages[current]?.src)}
+        >
           <AnimatePresence mode="wait" initial={false}>
             <motion.img
               key={`${displayImages[current]?.src}-${current}`}
@@ -116,6 +119,9 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
             >
               {displayImages[current]?.label}
             </motion.span>
+          </div>
+          <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity bg-ink/50 backdrop-blur-sm text-surface p-1.5 rounded-full">
+            <ZoomIn className="w-4 h-4" />
           </div>
         </div>
 
