@@ -577,9 +577,11 @@ const ProductsPage = () => {
                                 nextVariants.push(payload);
                               }
 
+                              const syncedImages = Array.from(new Set(nextVariants.map(v => v.image_url)));
                               return {
                                 ...prev,
                                 color_variants: nextVariants,
+                                image_urls: syncedImages,
                               };
                             });
 
