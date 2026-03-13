@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatBengaliPrice } from '@/lib/bengali';
+import { X, ZoomIn } from 'lucide-react';
 
 interface ColorVariant {
   color: string;
@@ -21,6 +22,7 @@ interface HeroSliderProps {
 const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিমিয়াম ক্রাফটসম্যানশিপ, অতুলনীয় ডিজাইন।', price = 0, discountPercent = 0, colorVariants = [] }: HeroSliderProps) => {
   const [current, setCurrent] = useState(0);
   const [selectedColorIdx, setSelectedColorIdx] = useState<number | null>(null);
+  const [zoomedImage, setZoomedImage] = useState<string | null>(null);
   const autoSlideRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const originalPrice = discountPercent > 0 ? Math.round(price / (1 - discountPercent / 100)) : price;
@@ -90,7 +92,10 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
 
       <div className="relative max-w-5xl mx-auto px-4 pb-4">
         {/* Main Image */}
-        <div className="relative aspect-[4/3] md:aspect-[16/9] rounded-xl overflow-hidden bg-muted border border-border/40 shadow-lg">
+        <div
+          className="relative aspect-[4/3] md:aspect-[16/9] rounded-xl overflow-hidden bg-muted border border-border/40 shadow-lg cursor-zoom-in group"
+          onClick={() => setZoomedImage(displayImages[current]?.src)}
+        >
           <AnimatePresence mode="wait" initial={false}>
             <motion.img
               key={`${displayImages[current]?.src}-${current}`}
@@ -114,6 +119,9 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
             >
               {displayImages[current]?.label}
             </motion.span>
+          </div>
+          <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity bg-ink/50 backdrop-blur-sm text-surface p-1.5 rounded-full">
+            <ZoomIn className="w-4 h-4" />
           </div>
         </div>
 
@@ -227,6 +235,39 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
           </div>
         )}
       </div>
+      {/* Zoom Modal */}
+      <AnimatePresence>
+        {zoomedImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[100] bg-ink/90 backdrop-blur-sm flex items-center justify-center p-4"
+            onClick={() => setZoomedImage(null)}
+          >
+            <motion.button
+              className="absolute top-4 right-4 z-10 bg-surface/20 backdrop-blur-sm text-surface p-2 rounded-full hover:bg-surface/40 transition-colors"
+              onClick={() => setZoomedImage(null)}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.1 }}
+            >
+              <X className="w-5 h-5" />
+            </motion.button>
+            <motion.img
+              src={zoomedImage}
+              alt="Zoomed"
+              className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
+              onClick={e => e.stopPropagation()}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 };
