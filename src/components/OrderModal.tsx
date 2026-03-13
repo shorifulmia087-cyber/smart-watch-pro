@@ -197,7 +197,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
     if (!cleanAddress) errs.address = 'ঠিকানা লিখুন';
     else if (cleanAddress.length < 10) errs.address = 'সম্পূর্ণ ঠিকানা দিন (কমপক্ষে ১০ অক্ষর)';
 
-    if (availableColors.length > 0 && !selectedColor) errs.color = 'একটি কালার সিলেক্ট করুন';
+    if ((availableColors.length > 0 || colorVariants.length > 0) && !selectedColor) errs.color = 'একটি কালার সিলেক্ট করুন';
 
     if (!selectedUpazila) errs.upazila = 'উপজেলা নির্বাচন করুন';
 
