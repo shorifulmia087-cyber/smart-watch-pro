@@ -159,14 +159,20 @@ const ProductsPage = () => {
 
   const saveProduct = () => {
     if (!form.name || !form.price) return;
+
+    const colorVariantImageUrls = Array.from(
+      new Set(form.color_variants.map(v => v.image_url).filter(Boolean))
+    );
+    const effectiveImageUrls = colorVariantImageUrls.length > 0 ? colorVariantImageUrls : form.image_urls;
+
     upsertProduct.mutate({
       name: sanitizeForDisplay(form.name), price: form.price,
       subtitle: form.subtitle ? sanitizeForDisplay(form.subtitle) : null,
       video_url: form.video_url || null, stock_status: form.stock_status,
       discount_percent: form.discount_percent, product_type: form.product_type,
-      is_featured: form.is_featured, image_urls: form.image_urls,
+      is_featured: form.is_featured, image_urls: effectiveImageUrls,
       description_list: form.description_list.map(d => sanitizeForDisplay(d)),
-      thumbnail_url: form.image_urls[0] || null,
+      thumbnail_url: effectiveImageUrls[0] || null,
       features: form.features.map(f => ({
         icon: sanitizeForDisplay(f.icon),
         title: sanitizeForDisplay(f.title),
