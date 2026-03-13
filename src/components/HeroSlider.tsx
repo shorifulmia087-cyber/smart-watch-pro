@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatBengaliPrice } from '@/lib/bengali';
-import { X, ZoomIn } from 'lucide-react';
+import { X, ZoomIn, Plus, Minus } from 'lucide-react';
 
 interface ColorVariant {
   color: string;
@@ -23,6 +23,7 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
   const [current, setCurrent] = useState(0);
   const [selectedColorIdx, setSelectedColorIdx] = useState<number | null>(null);
   const [zoomedImage, setZoomedImage] = useState<string | null>(null);
+  const [zoomLevel, setZoomLevel] = useState(1);
   const autoSlideRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const originalPrice = discountPercent > 0 ? Math.round(price / (1 - discountPercent / 100)) : price;
@@ -244,27 +245,71 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             className="fixed inset-0 z-[100] bg-ink/90 backdrop-blur-sm flex items-center justify-center p-4"
-            onClick={() => setZoomedImage(null)}
+            onClick={() => { setZoomedImage(null); setZoomLevel(1); }}
           >
+            {/* Close button */}
             <motion.button
               className="absolute top-4 right-4 z-10 bg-surface/20 backdrop-blur-sm text-surface p-2 rounded-full hover:bg-surface/40 transition-colors"
-              onClick={() => setZoomedImage(null)}
+              onClick={() => { setZoomedImage(null); setZoomLevel(1); }}
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1 }}
             >
               <X className="w-5 h-5" />
             </motion.button>
-            <motion.img
-              src={zoomedImage}
-              alt="Zoomed"
-              className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ duration: 0.25, ease: 'easeOut' }}
+
+            {/* Zoom controls */}
+            <motion.div
+              className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1 bg-ink/70 backdrop-blur-md rounded-full px-1.5 py-1.5 border border-surface/10 shadow-xl"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
               onClick={e => e.stopPropagation()}
-            />
+            >
+              <button
+                onClick={() => setZoomLevel(z => Math.max(0.5, z - 0.25))}
+                disabled={zoomLevel <= 0.5}
+                className="p-2 rounded-full text-surface hover:bg-surface/20 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                <Minus className="w-5 h-5" />
+              </button>
+              <span className="text-surface text-xs font-semibold min-w-[40px] text-center tabular-nums">
+                {Math.round(zoomLevel * 100)}%
+              </span>
+              <button
+                onClick={() => setZoomLevel(z => Math.min(3, z + 0.25))}
+                disabled={zoomLevel >= 3}
+                className="p-2 rounded-full text-surface hover:bg-surface/20 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                <Plus className="w-5 h-5" />
+              </button>
+            </motion.div>
+
+            {/* Image */}
+            <motion.div
+              className="max-w-full max-h-[85vh] overflow-auto flex items-center justify-center"
+              onClick={e => e.stopPropagation()}
+              style={{ cursor: zoomLevel > 1 ? 'grab' : 'default' }}
+            >
+              <motion.img
+                src={zoomedImage}
+                alt="Zoomed"
+                className="rounded-lg shadow-2xl select-none"
+                style={{
+                  transform: `scale(${zoomLevel})`,
+                  transformOrigin: 'center center',
+                  maxWidth: '90vw',
+                  maxHeight: '85vh',
+                  objectFit: 'contain',
+                  transition: 'transform 0.2s ease-out',
+                }}
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                transition={{ duration: 0.25, ease: 'easeOut' }}
+                draggable={false}
+              />
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
