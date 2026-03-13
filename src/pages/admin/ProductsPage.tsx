@@ -487,40 +487,10 @@ const ProductsPage = () => {
                     </div>
                   )}
 
-                  {/* Upload area — toggle between gallery & color */}
+                  {/* Upload area — color variant only */}
                   <div className="space-y-3 p-3.5 border border-dashed border-border/40 rounded-sm bg-muted/10">
-                    {/* Toggle: gallery vs color variant */}
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => {
-                          if (singleUploadIsColor && pendingVariantUrl) {
-                            toast({ title: 'আগের কালারটি আগে সেভ বা বাতিল করুন', variant: 'destructive' });
-                            return;
-                          }
-                          setSingleUploadIsColor(false);
-                        }}
-                        className={`flex-1 py-2 rounded-sm text-xs font-semibold text-center transition-all border ${
-                          !singleUploadIsColor
-                            ? 'gradient-gold text-white border-gold/40 shadow-sm'
-                            : 'bg-transparent text-muted-foreground border-border/40 hover:border-gold/30'
-                        }`}
-                      >
-                        📷 গ্যালারি ছবি
-                      </button>
-                      <button
-                        onClick={() => setSingleUploadIsColor(true)}
-                        className={`flex-1 py-2 rounded-sm text-xs font-semibold text-center transition-all border ${
-                          singleUploadIsColor
-                            ? 'gradient-gold text-white border-gold/40 shadow-sm'
-                            : 'bg-transparent text-muted-foreground border-border/40 hover:border-gold/30'
-                        }`}
-                      >
-                        🎨 কালার ভ্যারিয়েন্ট
-                      </button>
-                    </div>
-
-                    {/* Upload button — hidden when a color variant image is pending save */}
-                    {!(singleUploadIsColor && pendingVariantUrl) && (
+                    {/* Upload button — hidden when an image is pending save */}
+                    {!pendingVariantUrl && (
                       <button
                         onClick={() => singleFileRef.current?.click()}
                         disabled={uploading}
@@ -528,10 +498,8 @@ const ProductsPage = () => {
                       >
                         {uploading ? <Loader2 className="w-6 h-6 animate-spin" /> : (
                           <>
-                            {singleUploadIsColor ? <Palette className="w-6 h-6" /> : <Upload className="w-6 h-6" />}
-                            <span className="text-xs font-medium">
-                              {singleUploadIsColor ? 'কালার ভ্যারিয়েন্টের ছবি আপলোড করুন' : 'গ্যালারি ছবি আপলোড করুন'}
-                            </span>
+                            <Palette className="w-6 h-6" />
+                            <span className="text-xs font-medium">কালার ভ্যারিয়েন্টের ছবি আপলোড করুন</span>
                             <span className="text-[10px] text-muted-foreground/60">PNG, JPG, WebP</span>
                           </>
                         )}
@@ -539,7 +507,7 @@ const ProductsPage = () => {
                     )}
 
                     {/* Pending variant: image uploaded, now fill color + save */}
-                    {singleUploadIsColor && pendingVariantUrl && (
+                    {pendingVariantUrl && (
                       <motion.div
                         initial={{ scale: 0.95, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
