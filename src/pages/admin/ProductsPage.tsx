@@ -54,7 +54,7 @@ const ProductsPage = () => {
   const [newFeature, setNewFeature] = useState({ icon: '', title: '', desc: '' });
   const [newColor, setNewColor] = useState('');
 
-  // Single image upload state — each image can optionally have a color
+  // Single image upload state — color variant only
   const [singleUploadColor, setSingleUploadColor] = useState('');
   const [singleUploadHex, setSingleUploadHex] = useState('#000000');
   const [pendingVariantUrl, setPendingVariantUrl] = useState<string | null>(null);
