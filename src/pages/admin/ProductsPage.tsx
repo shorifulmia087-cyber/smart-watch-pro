@@ -57,7 +57,6 @@ const ProductsPage = () => {
   // Single image upload state — each image can optionally have a color
   const [singleUploadColor, setSingleUploadColor] = useState('');
   const [singleUploadHex, setSingleUploadHex] = useState('#000000');
-  const [singleUploadIsColor, setSingleUploadIsColor] = useState(false);
   const [pendingVariantUrl, setPendingVariantUrl] = useState<string | null>(null);
   const singleFileRef = useRef<HTMLInputElement>(null);
 
