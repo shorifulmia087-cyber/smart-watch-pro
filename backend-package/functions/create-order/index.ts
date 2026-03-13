@@ -19,6 +19,8 @@ Deno.serve(async (req) => {
       upazila, district, division,
       fraud_total_parcels, fraud_total_delivered, fraud_total_cancel,
       fraud_success_rate, fraud_flag, fraud_error_message,
+      coupon_code, coupon_discount,
+      referrer_source, utm_medium, utm_campaign,
     } = body
 
     // === Input validation ===
@@ -75,6 +77,18 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
     )
 
+    // Try to get authenticated user_id
+    let userId: string | null = null
+    const authHeader = req.headers.get('Authorization')
+    if (authHeader) {
+      const anonClient = createClient(
+        Deno.env.get('SUPABASE_URL')!,
+        Deno.env.get('SUPABASE_ANON_KEY')!,
+      )
+      const { data: { user } } = await anonClient.auth.getUser(authHeader.replace('Bearer ', ''))
+      if (user) userId = user.id
+    }
+
     // Fetch product price from DB
     const { data: product, error: productErr } = await supabase
       .from('products')
@@ -109,8 +123,43 @@ Deno.serve(async (req) => {
       ? (settings?.delivery_charge_inside ?? 70)
       : (settings?.delivery_charge_outside ?? 150)
 
+    // Validate and apply coupon server-side
+    let verifiedCouponDiscount = 0
+    let verifiedCouponCode: string | null = null
+    if (coupon_code && typeof coupon_code === 'string') {
+      const { data: coupon } = await supabase
+        .from('coupons')
+        .select('*')
+        .eq('code', coupon_code.trim().toUpperCase())
+        .eq('is_active', true)
+        .maybeSingle()
+      
+      if (coupon) {
+        const notExpired = !coupon.expires_at || new Date(coupon.expires_at) > new Date()
+        const notUsedUp = coupon.max_uses === null || coupon.used_count < coupon.max_uses
+        const rawTotal = (product.price * quantity) + deliveryCharge
+        const meetsMin = rawTotal >= coupon.min_order_amount
+
+        if (notExpired && notUsedUp && meetsMin) {
+          if (coupon.discount_type === 'percentage') {
+            verifiedCouponDiscount = Math.round(product.price * quantity * coupon.discount_value / 100)
+          } else {
+            verifiedCouponDiscount = coupon.discount_value
+          }
+          verifiedCouponDiscount = Math.min(verifiedCouponDiscount, product.price * quantity)
+          verifiedCouponCode = coupon.code
+
+          // Increment used_count
+          await supabase
+            .from('coupons')
+            .update({ used_count: coupon.used_count + 1 })
+            .eq('id', coupon.id)
+        }
+      }
+    }
+
     // Calculate verified total server-side
-    const verifiedTotal = (product.price * quantity) + deliveryCharge
+    const verifiedTotal = (product.price * quantity) + deliveryCharge - verifiedCouponDiscount
 
     // Sanitize inputs
     const sanitize = (s: string) => s.replace(/<[^>]*>/g, '').trim()
@@ -154,6 +203,12 @@ Deno.serve(async (req) => {
       fraud_success_rate: typeof fraud_success_rate === 'number' ? fraud_success_rate : null,
       fraud_flag: typeof fraud_flag === 'string' ? fraud_flag : null,
       fraud_error_message: typeof fraud_error_message === 'string' ? fraud_error_message : null,
+      coupon_code: verifiedCouponCode,
+      coupon_discount: verifiedCouponDiscount,
+      user_id: userId,
+      referrer_source: typeof referrer_source === 'string' ? referrer_source.substring(0, 50) : null,
+      utm_medium: typeof utm_medium === 'string' ? utm_medium.substring(0, 50) : null,
+      utm_campaign: typeof utm_campaign === 'string' ? utm_campaign.substring(0, 100) : null,
     }
 
     const { data: order, error: insertErr } = await supabase
@@ -167,7 +222,7 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: 'Failed to create order' }), { status: 500, headers: corsHeaders })
     }
 
-    // Send email notification (non-blocking) - only if enabled
+    // Send email notification (non-blocking) - only if enabled in settings
     if (settings?.order_email_enabled !== false) {
       supabase.functions.invoke('send-order-email', { body: orderData }).catch(() => {})
     }
