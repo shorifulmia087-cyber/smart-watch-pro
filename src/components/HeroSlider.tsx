@@ -25,13 +25,11 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
 
   const originalPrice = discountPercent > 0 ? Math.round(price / (1 - discountPercent / 100)) : price;
 
-  // Build all displayable images: product images + color variant images as thumbnails
+  // All images: product gallery + color variant images
   const allImages = [
     ...images,
     ...colorVariants.map(v => ({ src: v.image_url, label: v.color })),
   ];
-
-  // When a color is selected, jump to that variant's image
   const displayImages = allImages.length > 0 ? allImages : images;
 
   const resetAutoSlide = useCallback(() => {
@@ -49,7 +47,6 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
   }, [resetAutoSlide]);
 
   const handleColorSelect = (idx: number) => {
-    // Color variant images start after the product images
     const imageIndex = images.length + idx;
     if (selectedColorIdx === idx) {
       setSelectedColorIdx(null);
@@ -63,7 +60,6 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
 
   const handleThumbnailClick = (idx: number) => {
     setCurrent(idx);
-    // If clicking a color variant thumbnail, highlight the swatch
     if (idx >= images.length) {
       setSelectedColorIdx(idx - images.length);
     } else {
@@ -93,81 +89,32 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
       </div>
 
       <div className="relative max-w-5xl mx-auto px-4 pb-4">
-        {/* Main Image + Color Swatches side by side */}
-        <div className="flex gap-3">
-          {/* Main Image */}
-          <div className="flex-1 relative aspect-[4/3] md:aspect-[4/3] rounded-xl overflow-hidden bg-muted border border-border/40 shadow-lg">
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.img
-                key={`${displayImages[current]?.src}-${current}`}
-                src={displayImages[current]?.src}
-                alt={displayImages[current]?.label}
-                className="absolute inset-0 w-full h-full object-cover"
-                loading={current === 0 ? 'eager' : 'lazy'}
-                decoding="async"
-                initial={{ opacity: 0, scale: 1.03 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.97 }}
-                transition={{ duration: 0.3, ease: 'easeOut' }}
-              />
-            </AnimatePresence>
-
-            {/* Label badge */}
-            <div className="absolute bottom-3 left-3">
-              <motion.span
-                key={`label-${current}`}
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="inline-block bg-ink/75 backdrop-blur-sm text-surface text-[10px] md:text-xs px-2.5 py-1 rounded-lg font-medium"
-              >
-                {displayImages[current]?.label}
-              </motion.span>
-            </div>
+        {/* Main Image */}
+        <div className="relative aspect-[4/3] md:aspect-[16/9] rounded-xl overflow-hidden bg-muted border border-border/40 shadow-lg">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.img
+              key={`${displayImages[current]?.src}-${current}`}
+              src={displayImages[current]?.src}
+              alt={displayImages[current]?.label}
+              className="absolute inset-0 w-full h-full object-cover"
+              loading={current === 0 ? 'eager' : 'lazy'}
+              decoding="async"
+              initial={{ opacity: 0, scale: 1.03 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.97 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+            />
+          </AnimatePresence>
+          <div className="absolute bottom-3 left-3">
+            <motion.span
+              key={`label-${current}`}
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="inline-block bg-ink/75 backdrop-blur-sm text-surface text-[10px] md:text-xs px-2.5 py-1 rounded-lg font-medium"
+            >
+              {displayImages[current]?.label}
+            </motion.span>
           </div>
-
-          {/* Color Swatches - Vertical strip beside image */}
-          {colorVariants.length > 0 && (
-            <div className="flex flex-col items-center justify-center gap-2.5 py-2">
-              <span className="text-[10px] text-muted-foreground font-medium mb-1 writing-vertical hidden md:block" style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}>
-                কালার
-              </span>
-              {colorVariants.map((variant, idx) => (
-                <motion.button
-                  key={idx}
-                  onClick={() => handleColorSelect(idx)}
-                  title={variant.color}
-                  whileHover={{ scale: 1.15 }}
-                  whileTap={{ scale: 0.95 }}
-                  className={`w-8 h-8 md:w-9 md:h-9 rounded-full border-2 transition-all duration-200 shadow-sm relative ${
-                    selectedColorIdx === idx
-                      ? 'border-gold ring-2 ring-gold/40 scale-110'
-                      : 'border-border/50 hover:border-gold/50'
-                  }`}
-                  style={{ backgroundColor: variant.hex }}
-                >
-                  {selectedColorIdx === idx && (
-                    <motion.div
-                      layoutId="color-check"
-                      className="absolute inset-0 flex items-center justify-center"
-                    >
-                      <svg className="w-4 h-4 text-surface drop-shadow-md" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                    </motion.div>
-                  )}
-                </motion.button>
-              ))}
-              {selectedColorIdx !== null && (
-                <motion.span
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="text-[10px] text-gold font-semibold text-center max-w-[40px] leading-tight"
-                >
-                  {colorVariants[selectedColorIdx].color}
-                </motion.span>
-              )}
-            </div>
-          )}
         </div>
 
         {/* Thumbnail Gallery */}
@@ -186,13 +133,7 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
                       : 'border-border/40 hover:border-gold/40 opacity-70 hover:opacity-100'
                   }`}
                 >
-                  <img
-                    src={img.src}
-                    alt={img.label}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                  {/* Color dot indicator on variant thumbnails */}
+                  <img src={img.src} alt={img.label} className="w-full h-full object-cover" loading="lazy" />
                   {isColorVariant && colorIdx !== null && colorVariants[colorIdx] && (
                     <div
                       className="absolute bottom-0.5 right-0.5 w-3 h-3 rounded-full border border-surface/80 shadow-sm"
@@ -202,6 +143,47 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
                 </button>
               );
             })}
+          </div>
+        )}
+
+        {/* Color Swatches — below thumbnails */}
+        {colorVariants.length > 0 && (
+          <div className="flex items-center gap-3 mt-3 justify-center">
+            <span className="text-[11px] text-muted-foreground font-medium">কালার:</span>
+            <div className="flex items-center gap-2">
+              {colorVariants.map((variant, idx) => (
+                <motion.button
+                  key={idx}
+                  onClick={() => handleColorSelect(idx)}
+                  title={variant.color}
+                  whileHover={{ scale: 1.15 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`w-7 h-7 md:w-8 md:h-8 rounded-full border-2 transition-all duration-200 shadow-sm relative ${
+                    selectedColorIdx === idx
+                      ? 'border-gold ring-2 ring-gold/40 scale-110'
+                      : 'border-border/50 hover:border-gold/50'
+                  }`}
+                  style={{ backgroundColor: variant.hex }}
+                >
+                  {selectedColorIdx === idx && (
+                    <motion.div layoutId="color-check" className="absolute inset-0 flex items-center justify-center">
+                      <svg className="w-3.5 h-3.5 text-surface drop-shadow-md" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </motion.div>
+                  )}
+                </motion.button>
+              ))}
+            </div>
+            {selectedColorIdx !== null && (
+              <motion.span
+                initial={{ opacity: 0, x: -5 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="text-xs text-gold font-semibold"
+              >
+                {colorVariants[selectedColorIdx].color}
+              </motion.span>
+            )}
           </div>
         )}
       </div>
