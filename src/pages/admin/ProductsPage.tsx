@@ -461,24 +461,10 @@ const ProductsPage = () => {
               {/* ─── Secondary Column (Right 2/5) ─── */}
               <div className="lg:col-span-2 space-y-4">
                 {/* Unified Image Upload */}
-                <BentoCard title="ছবি আপলোড" icon={<Camera className="w-4 h-4" />} badge="গ্যালারি + কালার">
-                  {/* Existing gallery images */}
-                  {form.image_urls.length > 0 && (
-                    <div>
-                      <p className="text-[11px] font-medium text-muted-foreground mb-2">গ্যালারি ছবি</p>
-                      <div className="grid grid-cols-3 gap-2">
-                        {form.image_urls.map((url, i) => (
-                          <div key={i} className="relative group aspect-square rounded-sm overflow-hidden bg-muted border border-border/30 hover:shadow-lg transition-all">
-                            <img src={url} alt={`Product ${i + 1}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                            <button onClick={() => removeImage(i)} className="absolute top-1 right-1 w-5 h-5 bg-destructive text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100 shadow-lg">
-                              <X className="w-3 h-3" />
-                            </button>
-                            {i === 0 && <span className="absolute bottom-1 left-1 text-[8px] gradient-gold text-white px-1.5 py-0.5 rounded-sm font-medium shadow-sm">থাম্বনেইল</span>}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                <BentoCard title="ছবি আপলোড" icon={<Camera className="w-4 h-4" />} badge="শুধু কালার ভ্যারিয়েন্ট">
+                  <div className="text-[11px] rounded-sm border border-border/40 bg-muted/20 px-3 py-2 text-muted-foreground">
+                    এখানে শুধু কালার ভ্যারিয়েন্টের ছবি আপলোড হবে, আলাদা গ্যালারি ছবি নয়।
+                  </div>
 
                   {/* Existing color variants */}
                   {form.color_variants.length > 0 && (
