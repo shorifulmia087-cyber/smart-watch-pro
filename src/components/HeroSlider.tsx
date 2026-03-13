@@ -24,6 +24,10 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
   const [selectedColorIdx, setSelectedColorIdx] = useState<number | null>(null);
   const [zoomedImage, setZoomedImage] = useState<string | null>(null);
   const [zoomLevel, setZoomLevel] = useState(1);
+  const [dragPos, setDragPos] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStart = useRef({ x: 0, y: 0, scrollLeft: 0, scrollTop: 0 });
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const autoSlideRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const originalPrice = discountPercent > 0 ? Math.round(price / (1 - discountPercent / 100)) : price;
