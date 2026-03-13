@@ -136,9 +136,6 @@ const ProductsPage = () => {
     }
   };
 
-  const removeImage = (index: number) => {
-    setForm(prev => ({ ...prev, image_urls: prev.image_urls.filter((_, i) => i !== index) }));
-  };
 
   const addDescription = () => {
     if (!newDesc.trim()) return;
