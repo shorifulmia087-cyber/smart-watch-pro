@@ -6,7 +6,7 @@ import {
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
 import {
   Plus, Trash2, Save, Star, StarOff, ToggleLeft, ToggleRight, Pencil, Loader2, Search,
-  Upload, X, ImagePlus, GripVertical, Package, Palette, Globe, Camera, ListChecks, Sparkles, Tag,
+  X, ImagePlus, GripVertical, Package, Palette, Globe, Camera, ListChecks, Sparkles, Tag,
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import AdminPagination from '@/components/admin/AdminPagination';
@@ -20,7 +20,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import DeleteProductDialog from '@/components/admin/DeleteProductDialog';
 import { motion } from 'framer-motion';
-import { compressImage, generateThumbnail } from '@/lib/imageCompressor';
+import { compressImage } from '@/lib/imageCompressor';
 
 const BUCKET = 'product-images';
 
