@@ -23,6 +23,7 @@ const HeroSlider = ({ onOrderClick, images, subtitle, tagline = 'প্রিম
   const [current, setCurrent] = useState(0);
   const [selectedColorIdx, setSelectedColorIdx] = useState<number | null>(null);
   const [zoomedImage, setZoomedImage] = useState<string | null>(null);
+  const [zoomLevel, setZoomLevel] = useState(1);
   const autoSlideRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const originalPrice = discountPercent > 0 ? Math.round(price / (1 - discountPercent / 100)) : price;
