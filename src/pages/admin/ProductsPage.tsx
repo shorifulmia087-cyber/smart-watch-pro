@@ -6,7 +6,7 @@ import {
 import { formatBengaliPrice, toBengaliNum } from '@/lib/bengali';
 import {
   Plus, Trash2, Save, Star, StarOff, ToggleLeft, ToggleRight, Pencil, Loader2, Search,
-  Upload, X, ImagePlus, GripVertical, Package, Palette, Globe, Camera, ListChecks, Sparkles, Tag,
+  X, ImagePlus, GripVertical, Package, Palette, Globe, Camera, ListChecks, Sparkles, Tag,
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import AdminPagination from '@/components/admin/AdminPagination';
@@ -20,7 +20,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import DeleteProductDialog from '@/components/admin/DeleteProductDialog';
 import { motion } from 'framer-motion';
-import { compressImage, generateThumbnail } from '@/lib/imageCompressor';
+import { compressImage } from '@/lib/imageCompressor';
 
 const BUCKET = 'product-images';
 
@@ -54,10 +54,9 @@ const ProductsPage = () => {
   const [newFeature, setNewFeature] = useState({ icon: '', title: '', desc: '' });
   const [newColor, setNewColor] = useState('');
 
-  // Single image upload state — each image can optionally have a color
+  // Single image upload state — color variant only
   const [singleUploadColor, setSingleUploadColor] = useState('');
   const [singleUploadHex, setSingleUploadHex] = useState('#000000');
-  const [singleUploadIsColor, setSingleUploadIsColor] = useState(false);
   const [pendingVariantUrl, setPendingVariantUrl] = useState<string | null>(null);
   const singleFileRef = useRef<HTMLInputElement>(null);
 
@@ -75,7 +74,6 @@ const ProductsPage = () => {
     setNewColor('');
     setSingleUploadColor('');
     setSingleUploadHex('#000000');
-    setSingleUploadIsColor(false);
     setSheetOpen(true);
   };
 
@@ -104,15 +102,14 @@ const ProductsPage = () => {
     setNewColor('');
     setSingleUploadColor('');
     setSingleUploadHex('#000000');
-    setSingleUploadIsColor(false);
     setSheetOpen(true);
   };
 
-  // Unified single image upload — optionally with color
+  // Single flow: image upload only for color variants
   const uploadSingleImage = async (file: File) => {
     if (uploading) return;
 
-    if (singleUploadIsColor && pendingVariantUrl) {
+    if (pendingVariantUrl) {
       toast({ title: 'আগের ছবির কালার আগে সেভ বা বাতিল করুন', variant: 'destructive' });
       return;
     }
@@ -121,7 +118,7 @@ const ProductsPage = () => {
     try {
       const compressed = await compressImage(file);
       const ext = compressed.name.split('.').pop() || 'webp';
-      const path = `${singleUploadIsColor ? 'colors/' : ''}${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const path = `colors/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
       const { error } = await supabase.storage.from(BUCKET).upload(path, compressed);
       if (error) {
         toast({ title: 'আপলোড ত্রুটি', description: error.message, variant: 'destructive' });
@@ -130,21 +127,8 @@ const ProductsPage = () => {
       const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(path);
       const publicUrl = urlData.publicUrl;
 
-      if (singleUploadIsColor) {
-        // Store URL as pending — wait for user to click Save
-        setPendingVariantUrl(publicUrl);
-        toast({ title: 'ছবি আপলোড হয়েছে — এখন কালার দিয়ে সেভ করুন' });
-      } else {
-        // Add as regular gallery image
-        setForm(prev => ({ ...prev, image_urls: [...prev.image_urls, publicUrl] }));
-
-        // Generate thumbnail
-        try {
-          const thumb = await generateThumbnail(file);
-          const thumbPath = `thumbs/${path}`;
-          await supabase.storage.from(BUCKET).upload(thumbPath, thumb);
-        } catch { /* ignore thumb error */ }
-      }
+      setPendingVariantUrl(publicUrl);
+      toast({ title: 'ছবি আপলোড হয়েছে — এখন কালার দিয়ে সেভ করুন' });
     } catch {
       toast({ title: 'কম্প্রেশন ত্রুটি', variant: 'destructive' });
     } finally {
@@ -152,9 +136,6 @@ const ProductsPage = () => {
     }
   };
 
-  const removeImage = (index: number) => {
-    setForm(prev => ({ ...prev, image_urls: prev.image_urls.filter((_, i) => i !== index) }));
-  };
 
   const addDescription = () => {
     if (!newDesc.trim()) return;
@@ -178,14 +159,20 @@ const ProductsPage = () => {
 
   const saveProduct = () => {
     if (!form.name || !form.price) return;
+
+    const colorVariantImageUrls = Array.from(
+      new Set(form.color_variants.map(v => v.image_url).filter(Boolean))
+    );
+    const effectiveImageUrls = colorVariantImageUrls.length > 0 ? colorVariantImageUrls : form.image_urls;
+
     upsertProduct.mutate({
       name: sanitizeForDisplay(form.name), price: form.price,
       subtitle: form.subtitle ? sanitizeForDisplay(form.subtitle) : null,
       video_url: form.video_url || null, stock_status: form.stock_status,
       discount_percent: form.discount_percent, product_type: form.product_type,
-      is_featured: form.is_featured, image_urls: form.image_urls,
+      is_featured: form.is_featured, image_urls: effectiveImageUrls,
       description_list: form.description_list.map(d => sanitizeForDisplay(d)),
-      thumbnail_url: form.image_urls[0] || null,
+      thumbnail_url: effectiveImageUrls[0] || null,
       features: form.features.map(f => ({
         icon: sanitizeForDisplay(f.icon),
         title: sanitizeForDisplay(f.title),
@@ -477,24 +464,10 @@ const ProductsPage = () => {
               {/* ─── Secondary Column (Right 2/5) ─── */}
               <div className="lg:col-span-2 space-y-4">
                 {/* Unified Image Upload */}
-                <BentoCard title="ছবি আপলোড" icon={<Camera className="w-4 h-4" />} badge="গ্যালারি + কালার">
-                  {/* Existing gallery images */}
-                  {form.image_urls.length > 0 && (
-                    <div>
-                      <p className="text-[11px] font-medium text-muted-foreground mb-2">গ্যালারি ছবি</p>
-                      <div className="grid grid-cols-3 gap-2">
-                        {form.image_urls.map((url, i) => (
-                          <div key={i} className="relative group aspect-square rounded-sm overflow-hidden bg-muted border border-border/30 hover:shadow-lg transition-all">
-                            <img src={url} alt={`Product ${i + 1}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                            <button onClick={() => removeImage(i)} className="absolute top-1 right-1 w-5 h-5 bg-destructive text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100 shadow-lg">
-                              <X className="w-3 h-3" />
-                            </button>
-                            {i === 0 && <span className="absolute bottom-1 left-1 text-[8px] gradient-gold text-white px-1.5 py-0.5 rounded-sm font-medium shadow-sm">থাম্বনেইল</span>}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                <BentoCard title="ছবি আপলোড" icon={<Camera className="w-4 h-4" />} badge="শুধু কালার ভ্যারিয়েন্ট">
+                  <div className="text-[11px] rounded-sm border border-border/40 bg-muted/20 px-3 py-2 text-muted-foreground">
+                    এখানে শুধু কালার ভ্যারিয়েন্টের ছবি আপলোড হবে, আলাদা গ্যালারি ছবি নয়।
+                  </div>
 
                   {/* Existing color variants */}
                   {form.color_variants.length > 0 && (
@@ -517,40 +490,10 @@ const ProductsPage = () => {
                     </div>
                   )}
 
-                  {/* Upload area — toggle between gallery & color */}
+                  {/* Upload area — color variant only */}
                   <div className="space-y-3 p-3.5 border border-dashed border-border/40 rounded-sm bg-muted/10">
-                    {/* Toggle: gallery vs color variant */}
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => {
-                          if (singleUploadIsColor && pendingVariantUrl) {
-                            toast({ title: 'আগের কালারটি আগে সেভ বা বাতিল করুন', variant: 'destructive' });
-                            return;
-                          }
-                          setSingleUploadIsColor(false);
-                        }}
-                        className={`flex-1 py-2 rounded-sm text-xs font-semibold text-center transition-all border ${
-                          !singleUploadIsColor
-                            ? 'gradient-gold text-white border-gold/40 shadow-sm'
-                            : 'bg-transparent text-muted-foreground border-border/40 hover:border-gold/30'
-                        }`}
-                      >
-                        📷 গ্যালারি ছবি
-                      </button>
-                      <button
-                        onClick={() => setSingleUploadIsColor(true)}
-                        className={`flex-1 py-2 rounded-sm text-xs font-semibold text-center transition-all border ${
-                          singleUploadIsColor
-                            ? 'gradient-gold text-white border-gold/40 shadow-sm'
-                            : 'bg-transparent text-muted-foreground border-border/40 hover:border-gold/30'
-                        }`}
-                      >
-                        🎨 কালার ভ্যারিয়েন্ট
-                      </button>
-                    </div>
-
-                    {/* Upload button — hidden when a color variant image is pending save */}
-                    {!(singleUploadIsColor && pendingVariantUrl) && (
+                    {/* Upload button — hidden when an image is pending save */}
+                    {!pendingVariantUrl && (
                       <button
                         onClick={() => singleFileRef.current?.click()}
                         disabled={uploading}
@@ -558,10 +501,8 @@ const ProductsPage = () => {
                       >
                         {uploading ? <Loader2 className="w-6 h-6 animate-spin" /> : (
                           <>
-                            {singleUploadIsColor ? <Palette className="w-6 h-6" /> : <Upload className="w-6 h-6" />}
-                            <span className="text-xs font-medium">
-                              {singleUploadIsColor ? 'কালার ভ্যারিয়েন্টের ছবি আপলোড করুন' : 'গ্যালারি ছবি আপলোড করুন'}
-                            </span>
+                            <Palette className="w-6 h-6" />
+                            <span className="text-xs font-medium">কালার ভ্যারিয়েন্টের ছবি আপলোড করুন</span>
                             <span className="text-[10px] text-muted-foreground/60">PNG, JPG, WebP</span>
                           </>
                         )}
@@ -569,7 +510,7 @@ const ProductsPage = () => {
                     )}
 
                     {/* Pending variant: image uploaded, now fill color + save */}
-                    {singleUploadIsColor && pendingVariantUrl && (
+                    {pendingVariantUrl && (
                       <motion.div
                         initial={{ scale: 0.95, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
@@ -639,9 +580,11 @@ const ProductsPage = () => {
                                 nextVariants.push(payload);
                               }
 
+                              const syncedImages = Array.from(new Set(nextVariants.map(v => v.image_url)));
                               return {
                                 ...prev,
                                 color_variants: nextVariants,
+                                image_urls: syncedImages,
                               };
                             });
 
