@@ -110,6 +110,13 @@ const ProductsPage = () => {
 
   // Unified single image upload — optionally with color
   const uploadSingleImage = async (file: File) => {
+    if (uploading) return;
+
+    if (singleUploadIsColor && pendingVariantUrl) {
+      toast({ title: 'আগের ছবির কালার আগে সেভ বা বাতিল করুন', variant: 'destructive' });
+      return;
+    }
+
     setUploading(true);
     try {
       const compressed = await compressImage(file);
@@ -126,7 +133,7 @@ const ProductsPage = () => {
       if (singleUploadIsColor) {
         // Store URL as pending — wait for user to click Save
         setPendingVariantUrl(publicUrl);
-        toast({ title: 'ছবি আপলোড হয়েছে — সেভ করুন' });
+        toast({ title: 'ছবি আপলোড হয়েছে — এখন কালার দিয়ে সেভ করুন' });
       } else {
         // Add as regular gallery image
         setForm(prev => ({ ...prev, image_urls: [...prev.image_urls, publicUrl] }));
@@ -515,7 +522,13 @@ const ProductsPage = () => {
                     {/* Toggle: gallery vs color variant */}
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={() => setSingleUploadIsColor(false)}
+                        onClick={() => {
+                          if (singleUploadIsColor && pendingVariantUrl) {
+                            toast({ title: 'আগের কালারটি আগে সেভ বা বাতিল করুন', variant: 'destructive' });
+                            return;
+                          }
+                          setSingleUploadIsColor(false);
+                        }}
                         className={`flex-1 py-2 rounded-sm text-xs font-semibold text-center transition-all border ${
                           !singleUploadIsColor
                             ? 'gradient-gold text-white border-gold/40 shadow-sm'
@@ -571,7 +584,11 @@ const ProductsPage = () => {
                             <p className="text-[11px] text-muted-foreground">এখন কালার নাম ও কোড দিন</p>
                           </div>
                           <button
-                            onClick={() => setPendingVariantUrl(null)}
+                            onClick={() => {
+                              setPendingVariantUrl(null);
+                              setSingleUploadColor('');
+                              setSingleUploadHex('#000000');
+                            }}
                             className="p-1.5 rounded-sm border border-border/40 text-muted-foreground hover:text-destructive hover:border-destructive/40 transition-all shrink-0"
                             title="বাতিল"
                           >
@@ -598,20 +615,43 @@ const ProductsPage = () => {
 
                         <button
                           onClick={() => {
-                            if (!singleUploadColor.trim()) {
+                            const colorName = singleUploadColor.trim();
+                            if (!colorName) {
                               toast({ title: 'কালারের নাম লিখুন', variant: 'destructive' });
                               return;
                             }
-                            setForm(prev => ({
-                              ...prev,
-                              color_variants: [...prev.color_variants, { color: singleUploadColor.trim(), hex: singleUploadHex, image_url: pendingVariantUrl! }],
-                            }));
+
+                            const normalizedColor = colorName.toLowerCase();
+                            let updatedExisting = false;
+
+                            setForm(prev => {
+                              const nextVariants = [...prev.color_variants];
+                              const payload = { color: colorName, hex: singleUploadHex, image_url: pendingVariantUrl! };
+
+                              const indexByColor = nextVariants.findIndex(v => v.color.trim().toLowerCase() === normalizedColor);
+                              const indexByImage = nextVariants.findIndex(v => v.image_url === pendingVariantUrl);
+                              const targetIndex = indexByColor !== -1 ? indexByColor : indexByImage;
+
+                              if (targetIndex !== -1) {
+                                nextVariants[targetIndex] = payload;
+                                updatedExisting = true;
+                              } else {
+                                nextVariants.push(payload);
+                              }
+
+                              return {
+                                ...prev,
+                                color_variants: nextVariants,
+                              };
+                            });
+
                             setPendingVariantUrl(null);
                             setSingleUploadColor('');
                             setSingleUploadHex('#000000');
-                            toast({ title: 'কালার ভ্যারিয়েন্ট সেভ হয়েছে ✓' });
+                            toast({ title: updatedExisting ? 'কালার ভ্যারিয়েন্ট আপডেট হয়েছে ✓' : 'কালার ভ্যারিয়েন্ট সেভ হয়েছে ✓' });
                           }}
-                          className="w-full py-2.5 rounded-sm gradient-gold text-white text-sm font-semibold hover:opacity-90 transition-all shadow-sm flex items-center justify-center gap-2"
+                          disabled={!singleUploadColor.trim()}
+                          className="w-full py-2.5 rounded-sm gradient-gold text-white text-sm font-semibold hover:opacity-90 transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <Save className="w-4 h-4" /> সেভ করুন
                         </button>
