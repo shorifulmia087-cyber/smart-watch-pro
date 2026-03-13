@@ -53,10 +53,13 @@ const ProductsPage = () => {
   const [newDesc, setNewDesc] = useState('');
   const [newFeature, setNewFeature] = useState({ icon: '', title: '', desc: '' });
   const [newColor, setNewColor] = useState('');
-  const [colorVariantUploading, setColorVariantUploading] = useState(false);
-  const [newVariantColor, setNewVariantColor] = useState('');
-  const [newVariantHex, setNewVariantHex] = useState('#000000');
-  const colorFileRef = useRef<HTMLInputElement>(null);
+
+  // Single image upload state — each image can optionally have a color
+  const [singleUploadColor, setSingleUploadColor] = useState('');
+  const [singleUploadHex, setSingleUploadHex] = useState('#000000');
+  const [singleUploadIsColor, setSingleUploadIsColor] = useState(false);
+  const singleFileRef = useRef<HTMLInputElement>(null);
+
   const openNew = () => {
     setEditingId(null);
     setForm({
@@ -69,6 +72,9 @@ const ProductsPage = () => {
     setNewDesc('');
     setNewFeature({ icon: '', title: '', desc: '' });
     setNewColor('');
+    setSingleUploadColor('');
+    setSingleUploadHex('#000000');
+    setSingleUploadIsColor(false);
     setSheetOpen(true);
   };
 
@@ -95,36 +101,52 @@ const ProductsPage = () => {
     setNewDesc('');
     setNewFeature({ icon: '', title: '', desc: '' });
     setNewColor('');
+    setSingleUploadColor('');
+    setSingleUploadHex('#000000');
+    setSingleUploadIsColor(false);
     setSheetOpen(true);
   };
 
-  const uploadImages = async (files: FileList) => {
+  // Unified single image upload — optionally with color
+  const uploadSingleImage = async (file: File) => {
     setUploading(true);
-    const urls: string[] = [];
-    for (const file of Array.from(files)) {
-      try {
-        // Compress to WebP before uploading
-        const compressed = await compressImage(file);
-        const ext = compressed.name.split('.').pop() || 'webp';
-        const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-        const { error } = await supabase.storage.from(BUCKET).upload(path, compressed);
-        if (error) {
-          toast({ title: 'আপলোড ত্রুটি', description: error.message, variant: 'destructive' });
-          continue;
-        }
-        const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(path);
-        urls.push(urlData.publicUrl);
-
-        // Also generate & upload a thumbnail
-        const thumb = await generateThumbnail(file);
-        const thumbPath = `thumbs/${path}`;
-        await supabase.storage.from(BUCKET).upload(thumbPath, thumb);
-      } catch {
-        toast({ title: 'কম্প্রেশন ত্রুটি', description: file.name, variant: 'destructive' });
+    try {
+      const compressed = await compressImage(file);
+      const ext = compressed.name.split('.').pop() || 'webp';
+      const path = `${singleUploadIsColor ? 'colors/' : ''}${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error } = await supabase.storage.from(BUCKET).upload(path, compressed);
+      if (error) {
+        toast({ title: 'আপলোড ত্রুটি', description: error.message, variant: 'destructive' });
+        return;
       }
+      const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(path);
+      const publicUrl = urlData.publicUrl;
+
+      if (singleUploadIsColor && singleUploadColor.trim()) {
+        // Add as color variant (NOT to image_urls gallery)
+        setForm(prev => ({
+          ...prev,
+          color_variants: [...prev.color_variants, { color: singleUploadColor.trim(), hex: singleUploadHex, image_url: publicUrl }],
+        }));
+        setSingleUploadColor('');
+        setSingleUploadHex('#000000');
+        toast({ title: 'কালার ভ্যারিয়েন্ট যোগ হয়েছে' });
+      } else {
+        // Add as regular gallery image
+        setForm(prev => ({ ...prev, image_urls: [...prev.image_urls, publicUrl] }));
+
+        // Generate thumbnail
+        try {
+          const thumb = await generateThumbnail(file);
+          const thumbPath = `thumbs/${path}`;
+          await supabase.storage.from(BUCKET).upload(thumbPath, thumb);
+        } catch { /* ignore thumb error */ }
+      }
+    } catch {
+      toast({ title: 'কম্প্রেশন ত্রুটি', variant: 'destructive' });
+    } finally {
+      setUploading(false);
     }
-    setForm(prev => ({ ...prev, image_urls: [...prev.image_urls, ...urls] }));
-    setUploading(false);
   };
 
   const removeImage = (index: number) => {
@@ -149,32 +171,6 @@ const ProductsPage = () => {
 
   const removeFeature = (index: number) => {
     setForm(prev => ({ ...prev, features: prev.features.filter((_, i) => i !== index) }));
-  };
-
-  const uploadColorVariantImage = async (file: File) => {
-    if (!newVariantColor.trim()) {
-      toast({ title: 'কালারের নাম দিন', variant: 'destructive' });
-      return;
-    }
-    setColorVariantUploading(true);
-    try {
-      const compressed = await compressImage(file);
-      const ext = compressed.name.split('.').pop() || 'webp';
-      const path = `colors/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-      const { error } = await supabase.storage.from(BUCKET).upload(path, compressed);
-      if (error) { toast({ title: 'আপলোড ত্রুটি', description: error.message, variant: 'destructive' }); return; }
-      const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(path);
-      setForm(prev => ({
-        ...prev,
-        color_variants: [...prev.color_variants, { color: newVariantColor.trim(), hex: newVariantHex, image_url: urlData.publicUrl }],
-      }));
-      setNewVariantColor('');
-      setNewVariantHex('#000000');
-    } catch {
-      toast({ title: 'কম্প্রেশন ত্রুটি', variant: 'destructive' });
-    } finally {
-      setColorVariantUploading(false);
-    }
   };
 
   const saveProduct = () => {
@@ -352,7 +348,7 @@ const ProductsPage = () => {
 
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
         <SheetContent className="w-full sm:max-w-5xl overflow-y-auto p-0 border-l border-border/20 shadow-2xl bg-ash dark:bg-background">
-          {/* Brand-consistent Header */}
+          {/* Header */}
           <div className="sticky top-0 z-10 bg-surface dark:bg-card border-b border-border/30">
             <div className="px-4 md:px-8 py-4">
               <div className="flex items-center justify-between">
@@ -385,7 +381,7 @@ const ProductsPage = () => {
             </div>
           </div>
 
-          {/* Bento Grid Layout — full-width */}
+          {/* Bento Grid Layout */}
           <div className="px-4 md:px-8 py-6">
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
               {/* ─── Primary Column (Left 3/5) ─── */}
@@ -443,7 +439,7 @@ const ProductsPage = () => {
                   </div>
                 </BentoCard>
 
-                {/* Features with drag handles */}
+                {/* Features */}
                 <BentoCard title="ফিচার্স (কেন বেছে নেবেন)" icon={<Sparkles className="w-4 h-4" />} badge="ওয়েবসাইটে দেখাবে">
                   <div className="space-y-2">
                     {form.features.map((f, i) => (
@@ -477,29 +473,125 @@ const ProductsPage = () => {
 
               {/* ─── Secondary Column (Right 2/5) ─── */}
               <div className="lg:col-span-2 space-y-4">
-                {/* Product Images */}
-                <BentoCard title="প্রোডাক্ট ছবি" icon={<Camera className="w-4 h-4" />}>
-                  <div className="grid grid-cols-2 gap-3">
-                    {form.image_urls.map((url, i) => (
-                      <div key={i} className="relative group aspect-square rounded-sm overflow-hidden bg-muted border border-border/30 hover:shadow-lg transition-all">
-                        <img src={url} alt={`Product ${i + 1}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                        <button onClick={() => removeImage(i)} className="absolute top-1.5 right-1.5 w-6 h-6 bg-destructive text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100 shadow-lg">
-                          <X className="w-3 h-3" />
-                        </button>
-                        {i === 0 && <span className="absolute bottom-1.5 left-1.5 text-[9px] gradient-gold text-white px-2 py-0.5 rounded-sm font-medium shadow-sm">থাম্বনেইল</span>}
+                {/* Unified Image Upload */}
+                <BentoCard title="ছবি আপলোড" icon={<Camera className="w-4 h-4" />} badge="গ্যালারি + কালার">
+                  {/* Existing gallery images */}
+                  {form.image_urls.length > 0 && (
+                    <div>
+                      <p className="text-[11px] font-medium text-muted-foreground mb-2">গ্যালারি ছবি</p>
+                      <div className="grid grid-cols-3 gap-2">
+                        {form.image_urls.map((url, i) => (
+                          <div key={i} className="relative group aspect-square rounded-sm overflow-hidden bg-muted border border-border/30 hover:shadow-lg transition-all">
+                            <img src={url} alt={`Product ${i + 1}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                            <button onClick={() => removeImage(i)} className="absolute top-1 right-1 w-5 h-5 bg-destructive text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100 shadow-lg">
+                              <X className="w-3 h-3" />
+                            </button>
+                            {i === 0 && <span className="absolute bottom-1 left-1 text-[8px] gradient-gold text-white px-1.5 py-0.5 rounded-sm font-medium shadow-sm">থাম্বনেইল</span>}
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                  <button onClick={() => fileInputRef.current?.click()} disabled={uploading} className="w-full py-8 rounded-sm border-2 border-dashed border-border/40 hover:border-gold/50 flex flex-col items-center justify-center gap-2 transition-all text-muted-foreground hover:text-gold hover:bg-gold/5">
-                    {uploading ? <Loader2 className="w-6 h-6 animate-spin" /> : (
-                      <>
-                        <Upload className="w-6 h-6" />
-                        <span className="text-xs font-medium">ছবি আপলোড করুন</span>
-                        <span className="text-[10px] text-muted-foreground/60">PNG, JPG, WebP</span>
-                      </>
+                    </div>
+                  )}
+
+                  {/* Existing color variants */}
+                  {form.color_variants.length > 0 && (
+                    <div>
+                      <p className="text-[11px] font-medium text-muted-foreground mb-2">কালার ভ্যারিয়েন্ট</p>
+                      <div className="space-y-2">
+                        {form.color_variants.map((variant, i) => (
+                          <motion.div key={i} initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex items-center gap-2.5 bg-muted/20 border border-border/30 rounded-sm p-2 group hover:border-border/60 transition-all">
+                            <div className="w-12 h-12 rounded-sm overflow-hidden border border-border/40 shrink-0">
+                              <img src={variant.image_url} alt={variant.color} className="w-full h-full object-cover" />
+                            </div>
+                            <span className="w-5 h-5 rounded-full border-2 border-border shrink-0 shadow-inner" style={{ backgroundColor: variant.hex }} />
+                            <span className="font-medium text-sm text-foreground flex-1 truncate">{variant.color}</span>
+                            <button onClick={() => setForm(prev => ({ ...prev, color_variants: prev.color_variants.filter((_, idx) => idx !== i) }))} className="text-muted-foreground/30 hover:text-destructive opacity-0 group-hover:opacity-100 transition-all">
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Upload area — toggle between gallery & color */}
+                  <div className="space-y-3 p-3.5 border border-dashed border-border/40 rounded-sm bg-muted/10">
+                    {/* Toggle: gallery vs color variant */}
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setSingleUploadIsColor(false)}
+                        className={`flex-1 py-2 rounded-sm text-xs font-semibold text-center transition-all border ${
+                          !singleUploadIsColor
+                            ? 'gradient-gold text-white border-gold/40 shadow-sm'
+                            : 'bg-transparent text-muted-foreground border-border/40 hover:border-gold/30'
+                        }`}
+                      >
+                        📷 গ্যালারি ছবি
+                      </button>
+                      <button
+                        onClick={() => setSingleUploadIsColor(true)}
+                        className={`flex-1 py-2 rounded-sm text-xs font-semibold text-center transition-all border ${
+                          singleUploadIsColor
+                            ? 'gradient-gold text-white border-gold/40 shadow-sm'
+                            : 'bg-transparent text-muted-foreground border-border/40 hover:border-gold/30'
+                        }`}
+                      >
+                        🎨 কালার ভ্যারিয়েন্ট
+                      </button>
+                    </div>
+
+                    {/* Color fields — only when color mode selected */}
+                    {singleUploadIsColor && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        className="space-y-2"
+                      >
+                        <div className="grid grid-cols-[1fr_52px] gap-2">
+                          <input
+                            value={singleUploadColor}
+                            onChange={e => setSingleUploadColor(e.target.value)}
+                            placeholder="কালারের নাম (যেমন: কালো)"
+                            className="bg-transparent border border-border/60 rounded-sm px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-gold/20 transition-all placeholder:text-muted-foreground"
+                          />
+                          <input
+                            type="color"
+                            value={singleUploadHex}
+                            onChange={e => setSingleUploadHex(e.target.value)}
+                            className="w-full h-[42px] rounded-sm border border-border/60 cursor-pointer bg-transparent"
+                            title="কালার পিক করুন"
+                          />
+                        </div>
+                      </motion.div>
                     )}
-                  </button>
-                  <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={e => e.target.files && uploadImages(e.target.files)} />
+
+                    {/* Upload button */}
+                    <button
+                      onClick={() => singleFileRef.current?.click()}
+                      disabled={uploading || (singleUploadIsColor && !singleUploadColor.trim())}
+                      className="w-full py-7 rounded-sm border-2 border-dashed border-border/40 hover:border-gold/50 flex flex-col items-center justify-center gap-1.5 transition-all text-muted-foreground hover:text-gold hover:bg-gold/5 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      {uploading ? <Loader2 className="w-6 h-6 animate-spin" /> : (
+                        <>
+                          {singleUploadIsColor ? <Palette className="w-6 h-6" /> : <Upload className="w-6 h-6" />}
+                          <span className="text-xs font-medium">
+                            {singleUploadIsColor ? 'এই কালারের ছবি আপলোড করুন' : 'গ্যালারি ছবি আপলোড করুন'}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground/60">PNG, JPG, WebP</span>
+                        </>
+                      )}
+                    </button>
+                    <input
+                      ref={singleFileRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={e => {
+                        if (e.target.files?.[0]) uploadSingleImage(e.target.files[0]);
+                        e.target.value = '';
+                      }}
+                    />
+                  </div>
                 </BentoCard>
 
                 {/* Pricing */}
@@ -521,44 +613,6 @@ const ProductsPage = () => {
                   <div>
                     <label className="text-[11px] font-medium text-muted-foreground mb-1.5 block">Meta Description</label>
                     <textarea value={form.meta_description} onChange={e => setForm({ ...form, meta_description: e.target.value })} rows={3} placeholder="সার্চ ইঞ্জিনে দেখানো বিবরণ..." className="w-full bg-transparent border border-border/60 rounded-sm px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-gold/20 focus:border-gold/40 transition-all resize-none placeholder:text-muted-foreground" />
-                  </div>
-                </BentoCard>
-
-                {/* Color Variants with Images */}
-                <BentoCard title="কালার ভ্যারিয়েন্ট (ছবিসহ)" icon={<Palette className="w-4 h-4" />} badge="প্রতিটি কালারে আলাদা ছবি">
-                  <div className="space-y-3">
-                    {form.color_variants.map((variant, i) => (
-                      <motion.div key={i} initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex items-center gap-3 bg-muted/20 border border-border/30 rounded-sm p-2.5 group hover:border-border/60 transition-all">
-                        <div className="w-14 h-14 rounded-sm overflow-hidden border border-border/40 shrink-0">
-                          <img src={variant.image_url} alt={variant.color} className="w-full h-full object-cover" />
-                        </div>
-                        <span className="w-5 h-5 rounded-full border-2 border-border shrink-0 shadow-inner" style={{ backgroundColor: variant.hex }} />
-                        <span className="font-medium text-sm text-foreground flex-1">{variant.color}</span>
-                        <button onClick={() => setForm(prev => ({ ...prev, color_variants: prev.color_variants.filter((_, idx) => idx !== i) }))} className="text-muted-foreground/30 hover:text-destructive opacity-0 group-hover:opacity-100 transition-all">
-                          <X className="w-4 h-4" />
-                        </button>
-                      </motion.div>
-                    ))}
-                    {form.color_variants.length === 0 && <p className="text-[11px] text-muted-foreground/50 italic">কোনো কালার ভ্যারিয়েন্ট যোগ করা হয়নি</p>}
-                  </div>
-                  <div className="space-y-2 p-3.5 border border-dashed border-border/40 rounded-sm bg-muted/10">
-                    <div className="grid grid-cols-[1fr_60px] gap-2">
-                      <input value={newVariantColor} onChange={e => setNewVariantColor(e.target.value)} placeholder="কালারের নাম (যেমন: কালো)" className="bg-transparent border border-border/60 rounded-sm px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-gold/20 transition-all placeholder:text-muted-foreground" />
-                      <input type="color" value={newVariantHex} onChange={e => setNewVariantHex(e.target.value)} className="w-full h-[42px] rounded-sm border border-border/60 cursor-pointer bg-transparent" title="কালার পিক করুন" />
-                    </div>
-                    <button
-                      onClick={() => colorFileRef.current?.click()}
-                      disabled={colorVariantUploading || !newVariantColor.trim()}
-                      className="w-full py-6 rounded-sm border-2 border-dashed border-border/40 hover:border-gold/50 flex flex-col items-center justify-center gap-1.5 transition-all text-muted-foreground hover:text-gold hover:bg-gold/5 disabled:opacity-40 disabled:cursor-not-allowed"
-                    >
-                      {colorVariantUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
-                        <>
-                          <ImagePlus className="w-5 h-5" />
-                          <span className="text-xs font-medium">এই কালারের ছবি আপলোড করুন</span>
-                        </>
-                      )}
-                    </button>
-                    <input ref={colorFileRef} type="file" accept="image/*" className="hidden" onChange={e => { if (e.target.files?.[0]) uploadColorVariantImage(e.target.files[0]); e.target.value = ''; }} />
                   </div>
                 </BentoCard>
               </div>
