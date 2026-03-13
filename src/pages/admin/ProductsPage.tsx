@@ -105,11 +105,11 @@ const ProductsPage = () => {
     setSheetOpen(true);
   };
 
-  // Unified single image upload — optionally with color
+  // Single flow: image upload only for color variants
   const uploadSingleImage = async (file: File) => {
     if (uploading) return;
 
-    if (singleUploadIsColor && pendingVariantUrl) {
+    if (pendingVariantUrl) {
       toast({ title: 'আগের ছবির কালার আগে সেভ বা বাতিল করুন', variant: 'destructive' });
       return;
     }
@@ -118,7 +118,7 @@ const ProductsPage = () => {
     try {
       const compressed = await compressImage(file);
       const ext = compressed.name.split('.').pop() || 'webp';
-      const path = `${singleUploadIsColor ? 'colors/' : ''}${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const path = `colors/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
       const { error } = await supabase.storage.from(BUCKET).upload(path, compressed);
       if (error) {
         toast({ title: 'আপলোড ত্রুটি', description: error.message, variant: 'destructive' });
@@ -127,21 +127,8 @@ const ProductsPage = () => {
       const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(path);
       const publicUrl = urlData.publicUrl;
 
-      if (singleUploadIsColor) {
-        // Store URL as pending — wait for user to click Save
-        setPendingVariantUrl(publicUrl);
-        toast({ title: 'ছবি আপলোড হয়েছে — এখন কালার দিয়ে সেভ করুন' });
-      } else {
-        // Add as regular gallery image
-        setForm(prev => ({ ...prev, image_urls: [...prev.image_urls, publicUrl] }));
-
-        // Generate thumbnail
-        try {
-          const thumb = await generateThumbnail(file);
-          const thumbPath = `thumbs/${path}`;
-          await supabase.storage.from(BUCKET).upload(thumbPath, thumb);
-        } catch { /* ignore thumb error */ }
-      }
+      setPendingVariantUrl(publicUrl);
+      toast({ title: 'ছবি আপলোড হয়েছে — এখন কালার দিয়ে সেভ করুন' });
     } catch {
       toast({ title: 'কম্প্রেশন ত্রুটি', variant: 'destructive' });
     } finally {
