@@ -12,6 +12,12 @@ import { useFraudCheck, type FraudResult } from '@/hooks/useFraudCheck';
 import UpazilaCombobox from '@/components/UpazilaCombobox';
 import type { Upazila } from '@/data/bangladeshLocations';
 
+interface ColorVariant {
+  color: string;
+  hex: string;
+  image_url: string;
+}
+
 interface OrderModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -24,6 +30,7 @@ interface OrderModalProps {
   nagadNumber?: string;
   rocketNumber?: string;
   availableColors?: string[];
+  colorVariants?: ColorVariant[];
   onOrderSuccess?: () => void;
   onOrderOpen?: () => void;
 }
@@ -37,7 +44,7 @@ interface FormErrors {
   upazila?: string;
 }
 
-const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInside = 70, deliveryChargeOutside = 150, onlinePaymentEnabled = true, bkashNumber = '', nagadNumber = '', rocketNumber = '', availableColors = [], onOrderSuccess, onOrderOpen }: OrderModalProps) => {
+const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInside = 70, deliveryChargeOutside = 150, onlinePaymentEnabled = true, bkashNumber = '', nagadNumber = '', rocketNumber = '', availableColors = [], colorVariants = [], onOrderSuccess, onOrderOpen }: OrderModalProps) => {
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState<'cod' | 'online'>('cod');
   const [paymentType, setPaymentType] = useState<'full_payment' | 'delivery_charge_only'>('delivery_charge_only');
@@ -190,7 +197,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
     if (!cleanAddress) errs.address = 'ঠিকানা লিখুন';
     else if (cleanAddress.length < 10) errs.address = 'সম্পূর্ণ ঠিকানা দিন (কমপক্ষে ১০ অক্ষর)';
 
-    if (availableColors.length > 0 && !selectedColor) errs.color = 'একটি কালার সিলেক্ট করুন';
+    if ((availableColors.length > 0 || colorVariants.length > 0) && !selectedColor) errs.color = 'একটি কালার সিলেক্ট করুন';
 
     if (!selectedUpazila) errs.upazila = 'উপজেলা নির্বাচন করুন';
 
@@ -573,8 +580,36 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
                 )}
               </div>
               
-              {/* Color Selection */}
-              {availableColors.length > 0 && (
+              {/* Color Selection — visual variants or text buttons */}
+              {colorVariants.length > 0 ? (
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium mb-2">কালার সিলেক্ট করুন *</p>
+                  <div className="flex flex-wrap gap-2">
+                    {colorVariants.map((variant) => (
+                      <button
+                        key={variant.color}
+                        type="button"
+                        onClick={() => setSelectedColor(variant.color)}
+                        className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-sm font-medium transition-all ${
+                          selectedColor === variant.color
+                            ? 'border-gold bg-gold/10 text-gold shadow-sm ring-1 ring-gold/30'
+                            : 'border-border/60 bg-surface text-muted-foreground hover:border-border'
+                        }`}
+                      >
+                        <div className="w-8 h-8 rounded-lg overflow-hidden border border-border/40 shrink-0">
+                          <img src={variant.image_url} alt={variant.color} className="w-full h-full object-cover" />
+                        </div>
+                        <span
+                          className="w-4 h-4 rounded-full border border-border/40 shrink-0"
+                          style={{ backgroundColor: variant.hex }}
+                        />
+                        <span>{variant.color}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <ErrorMessage error={errors.color} />
+                </div>
+              ) : availableColors.length > 0 ? (
                 <div>
                   <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium mb-2">কালার সিলেক্ট করুন *</p>
                   <div className="flex flex-wrap gap-2">
@@ -595,7 +630,7 @@ const OrderModal = ({ isOpen, onClose, unitPrice, watchName, deliveryChargeInsid
                   </div>
                   <ErrorMessage error={errors.color} />
                 </div>
-              )}
+              ) : null}
               {/* Honeypot fields */}
               <div className="absolute left-[-9999px] top-[-9999px]" aria-hidden="true" tabIndex={-1}>
                 <input type="text" name="website_url" value={honeypot} onChange={(e) => setHoneypot(e.target.value)} tabIndex={-1} autoComplete="off" />
