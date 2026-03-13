@@ -536,15 +536,8 @@ const ProductsPage = () => {
                       </button>
                     </div>
 
-                    {/* Color fields — show AFTER image is uploaded in color mode */}
-                    {singleUploadIsColor && !pendingVariantUrl && (
-                      <div className="text-center text-xs text-muted-foreground py-2">
-                        প্রথমে ছবি আপলোড করুন, তারপর কালার সেট করুন
-                      </div>
-                    )}
-
-                    {/* Upload button — always visible unless pending variant exists */}
-                    {!pendingVariantUrl && (
+                    {/* Upload button — hidden when a color variant image is pending save */}
+                    {!(singleUploadIsColor && pendingVariantUrl) && (
                       <button
                         onClick={() => singleFileRef.current?.click()}
                         disabled={uploading}
