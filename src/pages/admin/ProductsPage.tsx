@@ -656,8 +656,6 @@ const ProductsPage = () => {
                           <Save className="w-4 h-4" /> সেভ করুন
                         </button>
                       </motion.div>
-                    )
-                      </motion.div>
                     )}
 
                     <input
